@@ -280,6 +280,7 @@
 
         .speed-slider {
             -webkit-appearance: none;
+            appearance: none;
             width: 80px;
             height: 4px;
             background: var(--border);
@@ -559,14 +560,19 @@
         }
 
         function toggleAutoPlay() {
+            console.trace("toggleAutoPlay called. Current state:", isAutoPlaying);
             isAutoPlaying = !isAutoPlaying;
+            console.log("AutoPlay toggled:", isAutoPlaying);
             const btn = document.getElementById('btn-play');
 
             if (isAutoPlaying) {
                 btn.textContent = '⏸';
                 // If we are currently waiting for a step, trigger it immediately (delayed)
                 if (resolveStep) {
+                    console.log("Triggering next step from toggle");
                     triggerNextStep();
+                } else {
+                    console.log("Not currently waiting for step, autoplay active for next await");
                 }
             } else {
                 btn.textContent = '▶';
@@ -579,14 +585,17 @@
 
         function triggerNextStep() {
             if (autoPlayTimer) clearTimeout(autoPlayTimer);
+            const delay = autoPlayDelay || 800;
+            console.log("Scheduling next step in", delay, "ms");
 
             autoPlayTimer = setTimeout(() => {
+                console.log("AutoPlay timer fired. Playing?", isAutoPlaying, "Has resolve?", !!resolveStep);
                 if (isAutoPlaying && resolveStep) {
                     document.getElementById('btn-next').disabled = true;
                     resolveStep();
                     resolveStep = null;
                 }
-            }, autoPlayDelay);
+            }, delay);
         }
 
         function awaitStep() {
@@ -607,6 +616,7 @@
                 document.getElementById('btn-prev').disabled = currentStepIndex <= 1;
 
                 if (isAutoPlaying) {
+                    console.log("AutoPlay active at awaitStep, triggering next...");
                     triggerNextStep();
                 }
             });

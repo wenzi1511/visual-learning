@@ -66,13 +66,14 @@ function renderVisualStack(stackFrames) {
 // Global ID to track current animation run
 let currentRunId = 0;
 
-// Tree Step Controller
-const treeStepController = {
+// Tree Step Controller - Expose to state for auto-play access
+state.treeStepController = {
     steps: [],
     currentStep: 0,
     isActive: false,
     traversalType: null // 'bfs', 'pre', 'in', 'post'
 };
+const treeStepController = state.treeStepController;
 
 // Generate BFS steps
 function generateBFSSteps(root) {

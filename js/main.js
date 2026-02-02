@@ -226,7 +226,11 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Step Controls - handle array, tree, and graph modes
+    // Step Controls - handle array, tree, and graph modes
     state.dom.btnPrevStep.addEventListener('click', () => {
+        // Pause on manual interaction
+        if (state.isAutoPlaying) toggleAutoPlay();
+
         if (state.currentMode === 'array') {
             prevStep();
         } else if (['bt', 'bst'].includes(state.currentMode)) {
@@ -235,7 +239,16 @@ document.addEventListener('DOMContentLoaded', () => {
             prevGraphStep();
         }
     });
+
     state.dom.btnNextStep.addEventListener('click', () => {
+        // Pause on manual interaction
+        if (state.isAutoPlaying) toggleAutoPlay();
+
+        manualNextStep();
+    });
+
+    // Wrapper for next step to handle dispatching
+    function manualNextStep() {
         if (state.currentMode === 'array') {
             nextStep();
         } else if (['bt', 'bst'].includes(state.currentMode)) {
@@ -243,7 +256,91 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (state.currentMode === 'graph') {
             nextGraphStep();
         }
-    });
+    }
+
+    // --- AUTO STEPPER LOGIC ---
+    state.isAutoPlaying = false;
+    state.autoPlayDelay = 800; // Default matches slider in HTML
+    let autoPlayTimer = null;
+
+    const btnPlay = document.getElementById('btnPlay');
+    const speedSlider = document.getElementById('speedSlider');
+
+    function toggleAutoPlay() {
+        state.isAutoPlaying = !state.isAutoPlaying;
+
+        if (state.isAutoPlaying) {
+            btnPlay.textContent = '⏸';
+            // Start loop
+            triggerNextStep();
+        } else {
+            btnPlay.textContent = '▶';
+            if (autoPlayTimer) {
+                clearTimeout(autoPlayTimer);
+                autoPlayTimer = null;
+            }
+        }
+    }
+
+    function triggerNextStep() {
+        if (autoPlayTimer) clearTimeout(autoPlayTimer);
+
+        autoPlayTimer = setTimeout(() => {
+            if (!state.isAutoPlaying) return;
+
+            // Check if we can proceed (are we at end?)
+            let isAtEnd = false;
+            if (state.stepController && state.stepController.isActive) {
+                const { steps, currentStep } = state.stepController;
+                if (currentStep >= steps.length - 1) isAtEnd = true;
+            } else if (state.treeStepController && state.treeStepController.isActive) {
+                const { steps, currentStep } = state.treeStepController;
+                if (currentStep >= steps.length - 1) isAtEnd = true;
+            } else if (state.graphStepController && state.graphStepController.isActive) {
+                const { steps, currentStep } = state.graphStepController;
+                if (currentStep >= steps.length - 1) isAtEnd = true;
+            } else {
+                // Not active? Stop.
+                isAtEnd = true;
+            }
+
+            if (isAtEnd) {
+                // Stop auto-play
+                toggleAutoPlay();
+                return;
+            }
+
+            // Execute Step
+            manualNextStep();
+
+            // Schedule next if still playing
+            if (state.isAutoPlaying) {
+                triggerNextStep();
+            }
+
+        }, state.autoPlayDelay);
+    }
+
+    // Auto-step UI Listeners
+    if (btnPlay) {
+        btnPlay.addEventListener('click', toggleAutoPlay);
+    }
+
+    if (speedSlider) {
+        speedSlider.addEventListener('input', (e) => {
+            // Slider: 100 (Fast) to 2000 (Slow)
+            // Just use value directly as delay
+            // But usually "Higher Slider" = "Faster Speed". 
+            // In test.html we did: delay = 2100 - val.
+            // Let's do the same for consistency if slider is "Speed".
+            // If slider is "Delay", then direct mapping.
+            // Label says "Speed". So Right = Fast?
+            // HTML Slider: min="100" max="2000" val="800".
+            // Let's assume Right (2000) is Fast (Low delay) -> Delay = 2100 - val.
+            const val = parseInt(e.target.value);
+            state.autoPlayDelay = 2100 - val;
+        });
+    }
 
     // List Operations
     state.dom.btnListAppend.addEventListener('click', () => {

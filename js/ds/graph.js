@@ -186,13 +186,14 @@ function renderVisited(visitedSet) {
     });
 }
 
-// Graph Step Controller
-const graphStepController = {
+// Graph Step Controller - Expose to state for auto-play access
+state.graphStepController = {
     steps: [],
     currentStep: 0,
     isActive: false,
     traversalType: null // 'bfs' or 'dfs'
 };
+const graphStepController = state.graphStepController;
 
 // Generate Graph BFS Steps
 function generateGraphBFSSteps(startNodeId) {

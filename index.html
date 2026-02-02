@@ -77,6 +77,16 @@
 
         <!-- Settings Section -->
         <div class="category-section">
+            <div class="section-title">Extras</div>
+            <div class="section-grid">
+                <div class="card" onclick="window.location.href='playground/test.html'">
+                    <h3>🧪 Playground</h3>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Section -->
+        <div class="category-section">
             <div class="section-title">Settings</div>
             <div
                 style="padding: 15px; background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border);">
@@ -270,6 +280,22 @@
                         <polyline points="9 18 15 12 9 6"></polyline>
                     </svg>
                 </button>
+
+                <div class="separator"
+                    style="width: 1px; height: 30px; background: rgba(255,255,255,0.2); margin: 0 10px;"></div>
+
+                <div class="autoplay-controls" style="display: flex; align-items: center; gap: 10px;">
+                    <button id="btnPlay" class="step-btn" title="Play/Pause"
+                        style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); width: 40px; height: 40px;">
+                        ▶
+                    </button>
+                    <div class="speed-control"
+                        style="display: flex; flex-direction: column; align-items: center; gap: 2px;">
+                        <input type="range" id="speedSlider" min="100" max="2000" value="800" step="100"
+                            style="width: 60px; height: 4px; accent-color: #f59e0b;">
+                        <span style="font-size: 0.7rem; color: #94a3b8; font-family: monospace;">Speed</span>
+                    </div>
+                </div>
             </div>
         </div>
 
