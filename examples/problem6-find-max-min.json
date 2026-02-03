@@ -1,0 +1,20 @@
+{
+    "name": "Find Max/Min",
+    "difficulty": "Easy",
+    "tags": [
+        "Array",
+        "Linear Scan"
+    ],
+    "description": "<p>Find the maximum and minimum values in an array using a single pass.</p><p><strong>Approach:</strong> Initialize max and min with the first element. Iterate through the array, updating max when we find a larger value, and min when we find a smaller value.</p>",
+    "structures": [
+        "array"
+    ],
+    "inputs": [
+        {
+            "label": "Array",
+            "placeholder": "1, 2, 3, 4, 5",
+            "default": "3, 1, 4, 1, 5, 9, 2, 6"
+        }
+    ],
+    "code": "class Playground {\n  async run(inputs) {\n    const nums = inputs[0].split(',').map(x => parseInt(x.trim()));\n    this.array.init(nums);\n    this.log('Find Maximum and Minimum in array');\n    await this.await();\n\n    let max = nums[0];\n    let min = nums[0];\n    let maxIdx = 0;\n    let minIdx = 0;\n\n    this.array.highlight(0, '#f59e0b');\n    this.log(`Start: max=${max}, min=${min}`);\n    await this.await();\n\n    for (let i = 1; i < nums.length; i++) {\n      this.ptr.set('i', i);\n      this.array.highlight(i, '#3b82f6');\n      this.log(`Checking index ${i}: value = ${nums[i]}`);\n      await this.await();\n\n      if (nums[i] > max) {\n        this.array.highlight(maxIdx, '#64748b');\n        max = nums[i];\n        maxIdx = i;\n        this.array.highlight(i, '#10b981');\n        this.log(`🔺 New max found: ${max}`);\n        await this.await();\n      } else if (nums[i] < min) {\n        this.array.highlight(minIdx, '#64748b');\n        min = nums[i];\n        minIdx = i;\n        this.array.highlight(i, '#ef4444');\n        this.log(`🔻 New min found: ${min}`);\n        await this.await();\n      } else {\n        this.log(`${nums[i]} is between min and max`);\n        this.array.highlight(i, '#64748b');\n        await this.await();\n      }\n    }\n\n    this.ptr.remove('i');\n    this.array.clearHighlights();\n    this.array.highlight(maxIdx, '#10b981');\n    this.array.highlight(minIdx, '#ef4444');\n    this.log(`✅ Result: Max = ${max} at index ${maxIdx}, Min = ${min} at index ${minIdx}`);\n    await this.await();\n\n    return { max, min };\n  }\n}"
+}

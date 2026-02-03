@@ -45,8 +45,92 @@
         }
 
         .container {
-            max-width: 1000px;
+            max-width: 1400px;
             margin: 0 auto;
+        }
+
+        /* Main two-column layout */
+        .main-layout {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 20px;
+            align-items: start;
+        }
+
+        @media (max-width: 1000px) {
+            .main-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Problem description panel */
+        .problem-panel {
+            background: var(--bg-panel);
+            border-radius: 12px;
+            padding: 24px;
+            border: 1px solid var(--border);
+            position: sticky;
+            top: 30px;
+        }
+
+        .problem-panel h2 {
+            font-size: 1.3rem;
+            margin-bottom: 16px;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .problem-panel h2 .icon {
+            font-size: 1.5rem;
+        }
+
+        .problem-description {
+            color: var(--text-sub);
+            line-height: 1.7;
+            font-size: 0.95rem;
+        }
+
+        .problem-description p {
+            margin-bottom: 12px;
+        }
+
+        .problem-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 16px;
+        }
+
+        .tag {
+            background: rgba(59, 130, 246, 0.15);
+            color: #60a5fa;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .tag.easy {
+            background: rgba(16, 185, 129, 0.15);
+            color: #34d399;
+        }
+
+        .tag.medium {
+            background: rgba(245, 158, 11, 0.15);
+            color: #fbbf24;
+        }
+
+        .tag.hard {
+            background: rgba(239, 68, 68, 0.15);
+            color: #f87171;
+        }
+
+        .right-content {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
         }
 
         h1 {
@@ -456,47 +540,61 @@
     <div class="container">
         <h1>🎮 Playground Test</h1>
 
-        <div class="panel">
-            <h3>Input</h3>
-            <div id="inputs-container">
-                <!-- Dynamic inputs will be added here -->
-            </div>
-            <button id="btn-reset" onclick="reset()">▶ Start / Reset</button>
-        </div>
-
-        <div class="layout-row" id="structures-row">
-            <div class="panel" id="array-panel" style="display: none;">
-                <h3>Array</h3>
-                <div id="array-container"></div>
-                <div id="ptr-container"></div>
-            </div>
-
-            <div class="panel" id="stack-panel" style="display: none;">
-                <h3>Stack</h3>
-                <div class="stack-wrapper">
-                    <div class="stack-container" id="stack-container"></div>
+        <div class="main-layout">
+            <!-- Left: Problem Description -->
+            <div class="problem-panel">
+                <h2><span class="icon">📖</span> <span id="problem-title">Problem</span></h2>
+                <div class="problem-description" id="problem-description">
+                    <p>Loading problem description...</p>
                 </div>
+                <div class="problem-tags" id="problem-tags"></div>
             </div>
 
-            <div class="panel" id="queue-panel" style="display: none;">
-                <h3>Queue</h3>
-                <div class="queue-wrapper">
-                    <div class="queue-container" id="queue-container"></div>
+            <!-- Right: Input + Visualizations -->
+            <div class="right-content">
+                <div class="panel">
+                    <h3>Input</h3>
+                    <div id="inputs-container">
+                        <!-- Dynamic inputs will be added here -->
+                    </div>
+                    <button id="btn-reset" onclick="reset()">▶ Start / Reset</button>
                 </div>
-            </div>
 
-            <div class="panel" id="hashmap-panel" style="display: none;">
-                <h3>HashMap</h3>
-                <div class="hashmap-wrapper">
-                    <div class="hashmap-container" id="hashmap-container"></div>
+                <div class="layout-row" id="structures-row">
+                    <div class="panel" id="array-panel" style="display: none;">
+                        <h3>Array</h3>
+                        <div id="array-container"></div>
+                        <div id="ptr-container"></div>
+                    </div>
+
+                    <div class="panel" id="stack-panel" style="display: none;">
+                        <h3>Stack</h3>
+                        <div class="stack-wrapper">
+                            <div class="stack-container" id="stack-container"></div>
+                        </div>
+                    </div>
+
+                    <div class="panel" id="queue-panel" style="display: none;">
+                        <h3>Queue</h3>
+                        <div class="queue-wrapper">
+                            <div class="queue-container" id="queue-container"></div>
+                        </div>
+                    </div>
+
+                    <div class="panel" id="hashmap-panel" style="display: none;">
+                        <h3>HashMap</h3>
+                        <div class="hashmap-wrapper">
+                            <div class="hashmap-container" id="hashmap-container"></div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
 
-        <div class="panel">
-            <h3>Log</h3>
-            <div id="log-container">Click "Start" to begin...</div>
-        </div>
+                <div class="panel">
+                    <h3>Log</h3>
+                    <div id="log-container">Click "Start" to begin...</div>
+                </div>
+            </div> <!-- end right-content -->
+        </div> <!-- end main-layout -->
 
         <div class="controls">
             <button class="step-btn" id="btn-prev" disabled>←</button>
@@ -1007,6 +1105,35 @@
 
                 // Build input fields from JSON config
                 buildInputFields(playgroundInputs);
+
+                // Populate problem description
+                document.getElementById('problem-title').textContent = data.name || 'Problem';
+
+                if (data.description) {
+                    document.getElementById('problem-description').innerHTML = data.description;
+                } else {
+                    document.getElementById('problem-description').innerHTML = '<p>No description provided.</p>';
+                }
+
+                // Build tags
+                const tagsContainer = document.getElementById('problem-tags');
+                tagsContainer.innerHTML = '';
+
+                if (data.difficulty) {
+                    const diffTag = document.createElement('span');
+                    diffTag.className = `tag ${data.difficulty.toLowerCase()}`;
+                    diffTag.textContent = data.difficulty;
+                    tagsContainer.appendChild(diffTag);
+                }
+
+                if (data.tags) {
+                    data.tags.forEach(tag => {
+                        const tagEl = document.createElement('span');
+                        tagEl.className = 'tag';
+                        tagEl.textContent = tag;
+                        tagsContainer.appendChild(tagEl);
+                    });
+                }
 
                 log('✓ Loaded! Click "Start" to begin.');
             })

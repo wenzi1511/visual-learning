@@ -1,5 +1,11 @@
 {
-    "name": "ContainsDuplicate",
+    "name": "Contains Duplicate",
+    "difficulty": "Easy",
+    "tags": [
+        "HashMap",
+        "Array"
+    ],
+    "description": "<p>Given an integer array, return true if any value appears at least twice, and false if every element is distinct.</p><p><strong>Approach:</strong> Use a HashMap to track seen numbers. If we encounter a number that's already in the map, we found a duplicate!</p>",
     "structures": [
         "array",
         "hashmap-simple"
