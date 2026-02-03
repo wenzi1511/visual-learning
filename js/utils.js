@@ -2,12 +2,13 @@ import { state } from './state.js';
 
 export const getAddr = () => "0x" + Math.floor(Math.random() * 0xFFFF).toString(16).toUpperCase().padStart(4, '0');
 
-export function createPath(d, hasArrow) {
+export function createPath(d, hasArrow, color = "#94a3b8", width = "2", dashed = false) {
     const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
     path.setAttribute("d", d);
-    path.setAttribute("stroke", "#94a3b8");
-    path.setAttribute("stroke-width", "2");
+    path.setAttribute("stroke", color);
+    path.setAttribute("stroke-width", width);
     path.setAttribute("fill", "none");
+    if (dashed) path.setAttribute("stroke-dasharray", "4, 4");
     if (hasArrow) path.setAttribute("marker-end", "url(#arrow)");
     state.dom.svgLayer.appendChild(path);
 }
@@ -79,7 +80,7 @@ export function drawCLLReturnArrow(sId, tId) {
     createPath(d, true);
 }
 
-export function drawLine(sId, tId, hasArrow) {
+export function drawLine(sId, tId, hasArrow, color = "#94a3b8", width = "2", dashed = false) {
     const sEl = document.getElementById(sId);
     const tEl = document.getElementById(tId);
     if (!sEl || !tEl) return;
@@ -100,5 +101,5 @@ export function drawLine(sId, tId, hasArrow) {
     const x2 = tx - r * Math.cos(angle);
     const y2 = ty - r * Math.sin(angle);
 
-    createPath(`M ${x1} ${y1} L ${x2} ${y2}`, hasArrow);
+    createPath(`M ${x1} ${y1} L ${x2} ${y2}`, hasArrow, color, width, dashed);
 }

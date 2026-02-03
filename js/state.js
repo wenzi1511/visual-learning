@@ -32,6 +32,7 @@ export const state = {
     dom: {
         stage: null,
         svgLayer: null,
+        mainInputContainer: null,
         userInput: null,
         homeView: null,
         appContainer: null,
@@ -80,13 +81,24 @@ export const state = {
         btnListRemove: null,
         btnListSearch: null,
         btnListPopHead: null,
-        btnListPopTail: null
+        btnListPopTail: null,
+
+        // Hash
+        hashControls: null,
+        hashKey: null,
+        hashValue: null,
+        btnHashPut: null,
+        btnHashGet: null,
+        btnHashRemove: null,
+        btnHashClear: null,
+        hashInfo: null
     }
 };
 
 export const initGlobals = () => {
     state.dom.stage = document.getElementById('stage');
     state.dom.svgLayer = document.getElementById('svg-layer');
+    state.dom.mainInputContainer = document.getElementById('main-input-container');
     state.dom.userInput = document.getElementById('userInput');
     state.dom.homeView = document.getElementById('home-view');
     state.dom.appContainer = document.getElementById('app-container');
@@ -153,6 +165,16 @@ export const initGlobals = () => {
     state.dom.btnGraphBFS = document.getElementById('btnGraphBFS');
     state.dom.btnGraphDFS = document.getElementById('btnGraphDFS');
     state.dom.graphInstructions = document.getElementById('graph-instructions');
+
+    // Hash
+    state.dom.hashControls = document.getElementById('hash-controls');
+    state.dom.hashKey = document.getElementById('hashKey');
+    state.dom.hashValue = document.getElementById('hashValue');
+    state.dom.btnHashPut = document.getElementById('btnHashPut');
+    state.dom.btnHashGet = document.getElementById('btnHashGet');
+    state.dom.btnHashRemove = document.getElementById('btnHashRemove');
+    state.dom.btnHashClear = document.getElementById('btnHashClear');
+    state.dom.hashInfo = document.getElementById('hash-info');
 
     // Aux
     state.dom.auxContainer = document.getElementById('aux-panel');

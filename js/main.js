@@ -5,6 +5,7 @@ import { initList, appendList, prependList, removeListVal, popListHead, popListT
 import { initBST, initBT, runBFS, runDFS, nextTreeStep, prevTreeStep, resetTreeStepController, searchBST } from './ds/tree.js';
 import { initGraph, nextGraphStep, prevGraphStep, resetGraphStepController } from './ds/graph.js';
 import { initHeap, insertHeap, extractHeap, peekHeap } from './ds/heap.js';
+import { initHash, putHash, getHash, removeHash, clearHash } from './ds/hash.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     initGlobals();
@@ -30,7 +31,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const titles = {
             'array': 'Array', 'stack': 'Stack', 'queue': 'Queue',
             'sll': 'Singly Linked List', 'dll': 'Doubly Linked List', 'cll': 'Circular Linked List',
-            'bt': 'Binary Tree', 'bst': 'Binary Search Tree', 'graph': 'Graph'
+            'bt': 'Binary Tree', 'bst': 'Binary Search Tree', 'graph': 'Graph',
+            'hashmap': 'HashMap', 'hashset': 'HashSet', 'treemap': 'TreeMap', 'linkedhashmap': 'LinkedHashMap'
         };
         state.dom.structureTitle.innerText = titles[type] || type.toUpperCase();
 
@@ -96,8 +98,21 @@ document.addEventListener('DOMContentLoaded', () => {
             import('./ds/graph.js').then(module => module.initGraph([]));
         } else {
             state.dom.graphControls.classList.add('hidden');
-            // auxContainer hidden handled by tree check above, but we need to ensure logic flow is correct
-            // Actually, simpler to just separate the logic
+        }
+
+        // Toggle Hash Controls
+        if (['hashmap', 'hashset', 'treemap', 'linkedhashmap'].includes(type)) {
+            state.dom.hashControls.classList.remove('hidden');
+        } else {
+            state.dom.hashControls.classList.add('hidden');
+        }
+
+        // Toggle Main Input (Enter Values)
+        // Hidden for Graph and Hash structures as per user request
+        if (['graph', 'hashmap', 'hashset', 'treemap', 'linkedhashmap'].includes(type)) {
+            if (state.dom.mainInputContainer) state.dom.mainInputContainer.classList.add('hidden');
+        } else {
+            if (state.dom.mainInputContainer) state.dom.mainInputContainer.classList.remove('hidden');
         }
 
         state.dom.userInput.value = '';
@@ -418,6 +433,46 @@ document.addEventListener('DOMContentLoaded', () => {
             import('./ds/graph.js').then(module => module.handleStageClick(e));
         }
     });
+
+    // --- HASH CONTROLS ---
+    const getHashInputs = () => {
+        const keyRaw = state.dom.hashKey.value.trim();
+        const valRaw = state.dom.hashValue.value.trim();
+        const key = keyRaw !== '' ? Number(keyRaw) : NaN;
+        return { key, val: valRaw || keyRaw };
+    };
+
+    if (state.dom.btnHashPut) {
+        state.dom.btnHashPut.addEventListener('click', () => {
+            const { key, val } = getHashInputs();
+            if (!isNaN(key)) {
+                putHash(key, val);
+                state.dom.hashKey.value = '';
+                state.dom.hashValue.value = '';
+                state.dom.hashKey.focus();
+            }
+        });
+    }
+
+    if (state.dom.btnHashGet) {
+        state.dom.btnHashGet.addEventListener('click', () => {
+            const { key } = getHashInputs();
+            if (!isNaN(key)) getHash(key);
+        });
+    }
+
+    if (state.dom.btnHashRemove) {
+        state.dom.btnHashRemove.addEventListener('click', () => {
+            const { key } = getHashInputs();
+            if (!isNaN(key)) removeHash(key);
+        });
+    }
+
+    if (state.dom.btnHashClear) {
+        state.dom.btnHashClear.addEventListener('click', () => {
+            clearHash();
+        });
+    }
 });
 
 function resetStage() {
@@ -469,6 +524,13 @@ function renderStructure(inputStr) {
         case 'minheap':
         case 'maxheap':
             initHeap(vals, state.currentMode);
+            break;
+
+        case 'hashmap':
+        case 'hashset':
+        case 'treemap':
+        case 'linkedhashmap':
+            initHash(vals, state.currentMode);
             break;
 
         case 'graph':
