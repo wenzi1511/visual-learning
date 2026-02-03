@@ -535,22 +535,41 @@ export function renderTree(root) {
 
     function calcPos(node, depth) {
         if (!node) return;
-        calcPos(node.left, depth + 1);
-        calcPos(node.right, depth + 1);
+
+        let leftX = null;
+        let rightX = null;
+
+        // Traverse Left
+        if (node.left) {
+            calcPos(node.left, depth + 1);
+            leftX = posMap.get(node.left).x;
+        } else if (node.right) {
+            // If we have a right child but no left, treat left as a "ghost" leaf to push parent right
+            leftX = leafCount * (nodeWidth + gap);
+            leafCount++;
+        }
+
+        // Traverse Right
+        if (node.right) {
+            calcPos(node.right, depth + 1);
+            rightX = posMap.get(node.right).x;
+        } else if (node.left) {
+            // If we have a left child but no right, treat right as a "ghost" leaf to push parent left
+            rightX = leafCount * (nodeWidth + gap);
+            leafCount++;
+        }
 
         let x;
         if (!node.left && !node.right) {
+            // Real Leaf
             x = leafCount * (nodeWidth + gap);
             leafCount++;
-        } else if (node.left && node.right) {
-            const lx = posMap.get(node.left).x;
-            const rx = posMap.get(node.right).x;
-            x = (lx + rx) / 2;
         } else {
-            const child = node.left || node.right;
-            const cx = posMap.get(child).x;
-            x = cx;
+            // Parent: Center between (Real Left | Ghost Left) and (Real Right | Ghost Right)
+            // Note: If a child is missing, we used the ghost value calculated above.
+            x = (leftX + rightX) / 2;
         }
+
         posMap.set(node, { x, depth });
     }
 

@@ -136,19 +136,22 @@ export function clearHash() {
 function putTreeMap(key, value) {
     const Node = (k, v) => ({ id: crypto.randomUUID(), key: k, value: v, left: null, right: null });
 
+    // Convert key to number for proper numeric comparison
+    const numKey = Number(key);
+
     if (!treeMapRoot) {
-        treeMapRoot = Node(key, value);
+        treeMapRoot = Node(numKey, value);
     } else {
         let curr = treeMapRoot;
         while (true) {
-            if (key === curr.key) {
+            if (numKey === curr.key) {
                 curr.value = value;
                 break;
-            } else if (key < curr.key) {
-                if (!curr.left) { curr.left = Node(key, value); break; }
+            } else if (numKey < curr.key) {
+                if (!curr.left) { curr.left = Node(numKey, value); break; }
                 curr = curr.left;
             } else {
-                if (!curr.right) { curr.right = Node(key, value); break; }
+                if (!curr.right) { curr.right = Node(numKey, value); break; }
                 curr = curr.right;
             }
         }
@@ -164,10 +167,11 @@ function removeTreeMap(key) {
 
 function deleteNode(root, key) {
     if (!root) return null;
-    if (key < root.key) {
-        root.left = deleteNode(root.left, key);
-    } else if (key > root.key) {
-        root.right = deleteNode(root.right, key);
+    const numKey = Number(key);
+    if (numKey < root.key) {
+        root.left = deleteNode(root.left, numKey);
+    } else if (numKey > root.key) {
+        root.right = deleteNode(root.right, numKey);
     } else {
         // Found
         if (!root.left) return root.right;
@@ -302,6 +306,7 @@ function renderTreeMap() {
 
     if (!treeMapRoot) {
         state.dom.stage.innerHTML = '';
+        state.dom.svgLayer.innerHTML = ''; // Clear lines too
         return;
     }
 
@@ -324,7 +329,8 @@ function renderTreeMap() {
     // WAIT: renderTree uses state.dom.stage directly.
 
     import('./tree.js').then(mod => {
-        state.dom.stage.innerHTML = ''; // Clear previous tree
+        state.dom.stage.innerHTML = ''; // Clear previous tree nodes
+        state.dom.svgLayer.innerHTML = ''; // Clear previous lines
         mod.renderTree(visualRoot);
     });
 }
