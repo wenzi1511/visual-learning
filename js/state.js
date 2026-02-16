@@ -99,7 +99,11 @@ export const state = {
         gridRows: null,
         gridCols: null,
         btnBuildGrid: null,
-        gridReplaceVal: null
+        gridReplaceVal: null,
+        gridStartRow: null,
+        gridStartCol: null,
+        btnGridBFS: null,
+        btnGridDFS: null
     }
 };
 
@@ -197,6 +201,10 @@ export const initGlobals = () => {
     state.dom.gridCols = document.getElementById('gridCols');
     state.dom.btnBuildGrid = document.getElementById('btnBuildGrid');
     state.dom.gridReplaceVal = document.getElementById('gridReplaceVal');
+    state.dom.gridStartRow = document.getElementById('gridStartRow');
+    state.dom.gridStartCol = document.getElementById('gridStartCol');
+    state.dom.btnGridBFS = document.getElementById('btnGridBFS');
+    state.dom.btnGridDFS = document.getElementById('btnGridDFS');
 
     // Step Controls
     state.dom.stepControls = document.getElementById('step-controls');

@@ -491,6 +491,196 @@
             }
         }
 
+        /* === PREMIUM GRID STYLES === */
+        .grid-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 12px;
+        }
+
+        .grid-container {
+            display: inline-grid;
+            gap: 3px;
+            padding: 14px;
+            background: rgba(30, 41, 59, 0.6);
+            border-radius: 14px;
+            border: 1px solid rgba(100, 116, 139, 0.3);
+            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.3);
+        }
+
+        .grid-cell {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-family: "Fira Code", monospace;
+            border-radius: 8px;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        .grid-cell::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 50%;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), transparent);
+            border-radius: 6px 6px 0 0;
+        }
+
+        .grid-cell:hover {
+            transform: scale(1.08);
+            z-index: 10;
+        }
+
+        .grid-idx-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: "Fira Code", monospace;
+            color: #64748b;
+            font-weight: 500;
+            user-select: none;
+        }
+
+        .grid-idx-row {
+            justify-content: flex-end;
+            padding-right: 6px;
+        }
+
+        .grid-cell.cell-true {
+            background: linear-gradient(145deg, rgba(16, 185, 129, 0.85), rgba(5, 150, 105, 0.75));
+            border: 2px solid #34d399;
+            color: #ffffff;
+            box-shadow: 0 2px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        .grid-cell.cell-false {
+            background: linear-gradient(145deg, rgba(239, 68, 68, 0.7), rgba(185, 28, 28, 0.6));
+            border: 2px solid #f87171;
+            color: #ffffff;
+            box-shadow: 0 2px 12px rgba(239, 68, 68, 0.25);
+        }
+
+        .grid-cell.cell-empty {
+            background: linear-gradient(145deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.8));
+            border: 2px solid rgba(100, 116, 139, 0.4);
+            color: #64748b;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .grid-cell.cell-filled {
+            background: linear-gradient(145deg, rgba(59, 130, 246, 0.8), rgba(37, 99, 235, 0.7));
+            border: 2px solid rgba(96, 165, 250, 0.7);
+            color: #ffffff;
+            box-shadow: 0 2px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        /* === PREMIUM QUEUE STYLES === */
+        .queue-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 200px;
+            padding: 20px;
+        }
+
+        .queue-vis-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 18px 24px;
+            border-top: 3px solid #64748b;
+            border-bottom: 3px solid #64748b;
+            min-width: 160px;
+            min-height: 80px;
+            background: linear-gradient(90deg, rgba(131, 24, 67, 0.08) 0%, rgba(131, 24, 67, 0.04) 100%);
+            border-radius: 0;
+        }
+
+        .queue-vis-container::before {
+            content: 'FRONT';
+            position: absolute;
+            bottom: -22px;
+            left: 8px;
+            font-size: 0.6rem;
+            color: #f472b6;
+            letter-spacing: 2px;
+            font-weight: 700;
+        }
+
+        .queue-vis-container::after {
+            content: 'REAR';
+            position: absolute;
+            bottom: -22px;
+            right: 8px;
+            font-size: 0.6rem;
+            color: #f472b6;
+            letter-spacing: 2px;
+            font-weight: 700;
+        }
+
+        .queue-vis-item {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(145deg, rgba(131, 24, 67, 0.9), rgba(131, 24, 67, 0.7));
+            border: 2px solid var(--queue-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.2rem;
+            border-radius: 12px;
+            animation: queueSlideIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transition: all 0.25s ease;
+            box-shadow:
+                0 3px 10px rgba(244, 114, 182, 0.2),
+                0 0 0 1px rgba(244, 114, 182, 0.1) inset,
+                0 1px 0 rgba(255, 255, 255, 0.1) inset;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .queue-vis-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 50%;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), transparent);
+            border-radius: 8px 8px 0 0;
+        }
+
+        .queue-vis-item:hover {
+            transform: scale(1.06);
+            box-shadow:
+                0 6px 20px rgba(244, 114, 182, 0.35),
+                0 0 0 1px rgba(244, 114, 182, 0.2) inset;
+        }
+
+        @keyframes queueSlideIn {
+            0% {
+                opacity: 0;
+                transform: translateX(30px) scale(0.9);
+            }
+
+            70% {
+                transform: translateX(-4px) scale(1.02);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateX(0) scale(1);
+            }
+        }
+
         /* === POINTER INDICATORS === */
         #ptr-container {
             display: flex;
@@ -1072,6 +1262,142 @@
             }
         });
 
+        const createGridPrimitive = (slotId) => ({
+            slotId,
+            data: [],
+            init(matrix) {
+                this.data = matrix.map(row => [...row]);
+                this.render();
+            },
+            get rows() { return this.data.length; },
+            get cols() { return this.data.length > 0 ? this.data[0].length : 0; },
+            getCell(r, c) {
+                if (r < 0 || r >= this.rows || c < 0 || c >= this.cols) return undefined;
+                return this.data[r][c];
+            },
+            setCell(r, c, val) {
+                if (r < 0 || r >= this.rows || c < 0 || c >= this.cols) return;
+                this.data[r][c] = val;
+                this.render();
+            },
+            highlight(r, c, color) {
+                const container = document.getElementById(`slot-${this.slotId}-content`);
+                if (!container) return;
+                const cells = container.querySelectorAll('.grid-cell');
+                cells.forEach(cell => {
+                    if (parseInt(cell.dataset.row) === r && parseInt(cell.dataset.col) === c) {
+                        cell.style.backgroundColor = color;
+                        cell.style.borderColor = color;
+                        cell.style.boxShadow = `0 4px 20px ${color}66`;
+                    }
+                });
+            },
+            clearHighlights() {
+                this.render();
+            },
+            render() {
+                const container = document.getElementById(`slot-${this.slotId}-content`);
+                if (!container) return;
+                const rows = this.data.length;
+                const cols = rows > 0 ? this.data[0].length : 0;
+                if (rows === 0 || cols === 0) {
+                    container.innerHTML = '<div class="grid-wrapper"><div class="grid-container">Empty</div></div>';
+                    return;
+                }
+                const maxCellSize = 64;
+                const minCellSize = 36;
+                const cellSize = Math.max(minCellSize, Math.min(maxCellSize, Math.floor(360 / Math.max(rows, cols))));
+                const fontSize = cellSize > 44 ? '0.9rem' : '0.7rem';
+                const idxSize = '0.65rem';
+
+                // Grid with extra column for row indices and extra row for col indices
+                let html = `<div class="grid-wrapper"><div class="grid-container" style="grid-template-columns: 24px repeat(${cols}, ${cellSize}px); grid-template-rows: 20px repeat(${rows}, ${cellSize}px);">`;
+
+                // Top-left corner (empty)
+                html += `<div style="width:24px;height:20px;"></div>`;
+                // Column headers (j)
+                for (let c = 0; c < cols; c++) {
+                    html += `<div class="grid-idx-header" style="width:${cellSize}px;height:20px;font-size:${idxSize};">${c}</div>`;
+                }
+
+                for (let r = 0; r < rows; r++) {
+                    // Row header (i)
+                    html += `<div class="grid-idx-header grid-idx-row" style="width:24px;height:${cellSize}px;font-size:${idxSize};">${r}</div>`;
+                    for (let c = 0; c < cols; c++) {
+                        const val = this.data[r][c];
+                        let cellClass = 'grid-cell ';
+                        let displayVal = val;
+                        if (val === true) {
+                            cellClass += 'cell-true';
+                            displayVal = '✓';
+                        } else if (val === false) {
+                            cellClass += 'cell-false';
+                            displayVal = '✗';
+                        } else if (val === 0 || val === '0') {
+                            cellClass += 'cell-empty';
+                        } else {
+                            cellClass += 'cell-filled';
+                        }
+                        html += `<div class="${cellClass}" data-row="${r}" data-col="${c}" style="width:${cellSize}px;height:${cellSize}px;font-size:${fontSize};">${displayVal}</div>`;
+                    }
+                }
+                html += '</div></div>';
+                container.innerHTML = html;
+            },
+            clone() {
+                return { data: this.data.map(row => [...row]) };
+            },
+            restore(state) {
+                this.data = state.data.map(row => [...row]);
+                this.render();
+            }
+        });
+
+        const createQueuePrimitive = (slotId) => ({
+            slotId,
+            data: [],
+            enqueue(v) { this.data.push(v); this.render(); },
+            dequeue() { const v = this.data.shift(); this.render(); return v; },
+            peek() { return this.data[0]; },
+            isEmpty() { return this.data.length === 0; },
+            size() { return this.data.length; },
+            init(arr) { this.data = [...arr]; this.render(); },
+            highlight(i, color) {
+                const container = document.getElementById(`slot-${this.slotId}-content`);
+                const items = container.querySelectorAll('.queue-vis-item');
+                if (items[i]) {
+                    items[i].style.backgroundColor = color;
+                    items[i].style.borderColor = color;
+                }
+            },
+            clearHighlights() {
+                const container = document.getElementById(`slot-${this.slotId}-content`);
+                container.querySelectorAll('.queue-vis-item').forEach(item => {
+                    item.style.backgroundColor = '';
+                    item.style.borderColor = '';
+                });
+            },
+            clear() { this.data = []; this.render(); },
+            render() {
+                const container = document.getElementById(`slot-${this.slotId}-content`);
+                if (!container) return;
+                if (this.data.length === 0) {
+                    container.innerHTML = '<div class="queue-wrapper"><div class="queue-vis-container" style="justify-content:center;color:#64748b;font-style:italic;">Empty</div></div>';
+                    return;
+                }
+                container.innerHTML = '<div class="queue-wrapper"><div class="queue-vis-container">' +
+                    this.data.map(v => `<div class="queue-vis-item">${v}</div>`).join('') +
+                    '</div></div>';
+            },
+            clone() {
+                return { data: [...this.data] };
+            },
+            restore(state) {
+                this.data = [...state.data];
+                this.render();
+            }
+        });
+
         // Pointer primitive (shared across all slots)
         const ptrPrimitive = {
             pointers: {},
@@ -1156,6 +1482,12 @@
                     case 'hashmap-simple':
                         primitive = createHashmapPrimitive(slotId);
                         break;
+                    case 'grid':
+                        primitive = createGridPrimitive(slotId);
+                        break;
+                    case 'queue':
+                        primitive = createQueuePrimitive(slotId);
+                        break;
                     default:
                         primitive = createArrayPrimitive(slotId);
                 }
@@ -1236,6 +1568,26 @@
                 });
             });
 
+            container.querySelectorAll('.grid-cell').forEach((cell) => {
+                highlights.push({
+                    type: 'grid-cell',
+                    row: cell.dataset.row,
+                    col: cell.dataset.col,
+                    bg: cell.style.backgroundColor || '',
+                    border: cell.style.borderColor || '',
+                    shadow: cell.style.boxShadow || ''
+                });
+            });
+
+            container.querySelectorAll('.queue-vis-item').forEach((item, i) => {
+                highlights.push({
+                    type: 'queue-vis-item',
+                    index: i,
+                    bg: item.style.backgroundColor || '',
+                    border: item.style.borderColor || ''
+                });
+            });
+
             return highlights;
         }
 
@@ -1266,6 +1618,20 @@
                             if (valEl) valEl.style.background = h.valBg;
                         }
                     });
+                } else if (h.type === 'grid-cell') {
+                    container.querySelectorAll('.grid-cell').forEach(cell => {
+                        if (cell.dataset.row === h.row && cell.dataset.col === h.col) {
+                            cell.style.backgroundColor = h.bg;
+                            cell.style.borderColor = h.border;
+                            cell.style.boxShadow = h.shadow;
+                        }
+                    });
+                } else if (h.type === 'queue-vis-item') {
+                    const items = container.querySelectorAll('.queue-vis-item');
+                    if (items[h.index]) {
+                        items[h.index].style.backgroundColor = h.bg;
+                        items[h.index].style.borderColor = h.border;
+                    }
                 }
             });
         }

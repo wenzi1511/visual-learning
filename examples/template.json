@@ -3,7 +3,9 @@
     "structures": [
         "array",
         "stack",
-        "hashmap-simple"
+        "queue",
+        "hashmap-simple",
+        "grid"
     ],
     "inputs": [
         {

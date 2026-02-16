@@ -135,7 +135,13 @@ export function nextStep() {
     if (state.stepController.currentStep >= state.stepController.steps.length - 1) return;
 
     state.stepController.currentStep++;
-    renderArrayStep();
+    if (state.stepController.mode === 'stack-mono') {
+        renderStackStep();
+    } else if (state.stepController.mode === 'queue-mono') {
+        renderQueueStep();
+    } else {
+        renderArrayStep();
+    }
     updateStepButtons();
 }
 
@@ -144,7 +150,13 @@ export function prevStep() {
     if (state.stepController.currentStep <= 0) return;
 
     state.stepController.currentStep--;
-    renderArrayStep();
+    if (state.stepController.mode === 'stack-mono') {
+        renderStackStep();
+    } else if (state.stepController.mode === 'queue-mono') {
+        renderQueueStep();
+    } else {
+        renderArrayStep();
+    }
     updateStepButtons();
 }
 
@@ -160,6 +172,7 @@ export function resetStepController() {
     state.stepController.currentStep = 0;
     state.stepController.isActive = false;
     state.stepController.searchTarget = null;
+    state.stepController.mode = null;
 
     // Hide step controls
     if (state.dom.stepControls) {
@@ -198,22 +211,133 @@ export function renderStack(vals, container = state.dom.stage, isEmbedded = fals
 
 export function pushToStack(val) {
     if (state.currentMode !== 'stack') return;
-    state.dsData.push(val);
-    renderStack(state.dsData);
+
+    // Reset previous steps
+    resetStepController();
+
+    const mono = state.stackMonotonic;
+    if (!mono) {
+        // Normal push
+        state.dsData.push(val);
+        renderStack(state.dsData);
+        return;
+    }
+
+    // Monotonic Step Generation
+    const steps = [];
+    // Copy data to simulate steps without mutating actual state yet
+    let simData = [...state.dsData];
+
+    // Step 0: Initial state
+    steps.push({ type: 'init', data: [...simData], val: val, msg: `Prepare to push ${val}` });
+
+    if (mono === 'inc') {
+        // Monotonic Increasing: Pop while top >= val
+        while (simData.length > 0) {
+            const top = simData[simData.length - 1];
+            steps.push({ type: 'compare', data: [...simData], val: val, highlightIdx: simData.length - 1, msg: `Compare top (${top}) >= ${val}?` });
+
+            if (top >= val) {
+                steps.push({ type: 'pop', data: [...simData], val: val, highlightIdx: simData.length - 1, msg: `${top} >= ${val} is true → Pop ${top}` });
+                simData.pop();
+                steps.push({ type: 'popped', data: [...simData], val: val, msg: 'Popped.' });
+            } else {
+                steps.push({ type: 'keep', data: [...simData], val: val, highlightIdx: simData.length - 1, msg: `${top} < ${val} → Keep ${top}` });
+                break;
+            }
+        }
+    } else if (mono === 'dec') {
+        // Monotonic Decreasing: Pop while top <= val
+        while (simData.length > 0) {
+            const top = simData[simData.length - 1];
+            steps.push({ type: 'compare', data: [...simData], val: val, highlightIdx: simData.length - 1, msg: `Compare top (${top}) <= ${val}?` });
+
+            if (top <= val) {
+                steps.push({ type: 'pop', data: [...simData], val: val, highlightIdx: simData.length - 1, msg: `${top} <= ${val} is true → Pop ${top}` });
+                simData.pop();
+                steps.push({ type: 'popped', data: [...simData], val: val, msg: 'Popped.' });
+            } else {
+                steps.push({ type: 'keep', data: [...simData], val: val, highlightIdx: simData.length - 1, msg: `${top} > ${val} → Keep ${top}` });
+                break;
+            }
+        }
+    }
+
+    // Final Push
+    simData.push(val);
+    steps.push({ type: 'push', data: [...simData], val: val, highlightIdx: simData.length - 1, msg: `Push ${val}` });
+
+    // Update actual data immediately for consistency
+    state.dsData = simData;
+
+    // Activate Step Controller
+    state.stepController.steps = steps;
+    state.stepController.currentStep = 0;
+    state.stepController.isActive = true;
+    state.stepController.mode = 'stack-mono';
+
+    state.dom.stepControls.classList.remove('hidden');
+    renderStackStep();
+    updateStepButtons();
 }
 
 export function popFromStack() {
     if (state.currentMode !== 'stack') return;
+    resetStepController();
     if (state.dsData.length === 0) {
         alert("Stack is empty!");
+        renderStack(state.dsData); // Just to be safe
         return;
     }
     state.dsData.pop();
     renderStack(state.dsData);
 }
 
+export function renderStackStep() {
+    const { steps, currentStep } = state.stepController;
+    if (!steps.length) return;
+
+    if (state.dom.stepControls) state.dom.stepControls.classList.remove('hidden');
+
+    const step = steps[currentStep];
+
+    // Render the state of the stack at this step
+    renderStack(step.data, state.dom.stage, false);
+    state.dom.stepIndicator.innerText = step.msg;
+
+    let items = state.dom.stage.querySelectorAll('.stack-item');
+    if (items.length === 0 && step.data.length > 0) {
+        items = state.dom.stage.querySelectorAll('.stack-item');
+    }
+
+    // reset styles
+    items.forEach(el => {
+        el.style.backgroundColor = '';
+        el.style.borderColor = '';
+        el.style.transform = '';
+    });
+
+    if (step.type === 'compare') {
+        if (items[step.highlightIdx]) {
+            items[step.highlightIdx].style.borderColor = '#3b82f6'; // Blue border
+            items[step.highlightIdx].style.transform = 'scale(1.05)';
+        }
+    } else if (step.type === 'pop') {
+        if (items[step.highlightIdx]) {
+            items[step.highlightIdx].style.backgroundColor = '#ef4444'; // Red
+            items[step.highlightIdx].style.borderColor = '#ef4444';
+        }
+    } else if (step.type === 'push') {
+        if (items[step.highlightIdx]) {
+            items[step.highlightIdx].style.backgroundColor = '#10b981'; // Green
+            items[step.highlightIdx].style.transform = 'scale(1.1)';
+        }
+    }
+}
+
 export function peekStack() {
     if (state.currentMode !== 'stack') return;
+    resetStepController();
     if (state.dsData.length === 0) {
         alert("Stack is empty!");
         return;
@@ -231,9 +355,6 @@ export function peekStack() {
             topItem.style.transform = '';
         }, 1000);
     }
-
-    // Optional: Log to chat if we want text feedback too
-    // console.log("Peek:", val);
 }
 
 export function renderQueue(vals, container = state.dom.stage, isEmbedded = false) {
@@ -243,7 +364,6 @@ export function renderQueue(vals, container = state.dom.stage, isEmbedded = fals
     const cont = document.createElement('div');
     cont.className = 'queue-container' + (isEmbedded ? ' embedded' : '');
 
-    // Force inline style reset for embedded to ensure no absolute positioning override issues
     if (isEmbedded) {
         cont.style.position = 'static';
         cont.style.transform = 'none';
@@ -258,8 +378,146 @@ export function renderQueue(vals, container = state.dom.stage, isEmbedded = fals
 
 export function enqueueToQueue(val) {
     if (state.currentMode !== 'queue') return;
-    state.dsData.push(val);
-    renderQueue(state.dsData);
+
+    resetStepController();
+
+    const mono = state.queueMonotonic;
+    const kRaw = state.dom.queueWindowK ? state.dom.queueWindowK.value : '';
+    const k = parseInt(kRaw);
+    const hasWindow = !isNaN(k) && k > 0;
+
+    if (!mono) {
+        // Normal enqueue
+        state.dsData.push(val);
+        logQueue(`Enqueue ${val}`);
+
+        // Limit window if needed
+        if (hasWindow) {
+            while (state.dsData.length > k) {
+                const shifted = state.dsData.shift();
+                logQueue(`Window Limit (${k}): Removed Front ${shifted}`);
+            }
+        }
+
+        renderQueue(state.dsData);
+        return;
+    }
+
+    // Monotonic Step Generation
+    const steps = [];
+    let simData = [...state.dsData];
+
+    steps.push({ type: 'init', data: [...simData], val: val, msg: `Prepare to enqueue ${val}` });
+
+    // 1. Monotonic Checks (Remove from Back)
+    if (mono === 'inc') {
+        while (simData.length > 0) {
+            const back = simData[simData.length - 1];
+            steps.push({ type: 'compare', data: [...simData], val: val, highlightIdx: simData.length - 1, msg: `Compare Back to ${val}: ${back} >= ${val}?` });
+
+            if (back >= val) {
+                steps.push({ type: 'pop', data: [...simData], val: val, highlightIdx: simData.length - 1, msg: `Back ${back} >= ${val} -> Pop Back` });
+                simData.pop();
+                steps.push({ type: 'popped', data: [...simData], val: val, msg: 'Popped Back.' });
+                logQueue(`Monotonic: Back (${back}) >= Current (${val}) -> Pop Back`);
+            } else {
+                steps.push({ type: 'keep', data: [...simData], val: val, highlightIdx: simData.length - 1, msg: `Back ${back} < ${val} -> Keep` });
+                break;
+            }
+        }
+    } else if (mono === 'dec') {
+        while (simData.length > 0) {
+            const back = simData[simData.length - 1];
+            steps.push({ type: 'compare', data: [...simData], val: val, highlightIdx: simData.length - 1, msg: `Compare Back to ${val}: ${back} <= ${val}?` });
+
+            if (back <= val) {
+                steps.push({ type: 'pop', data: [...simData], val: val, highlightIdx: simData.length - 1, msg: `Back ${back} <= ${val} -> Pop Back` });
+                simData.pop();
+                steps.push({ type: 'popped', data: [...simData], val: val, msg: 'Popped Back.' });
+                logQueue(`Monotonic: Back (${back}) <= Current (${val}) -> Pop Back`);
+            } else {
+                steps.push({ type: 'keep', data: [...simData], val: val, highlightIdx: simData.length - 1, msg: `Back ${back} > ${val} -> Keep` });
+                break;
+            }
+        }
+    }
+
+    // 2. Push New Value
+    simData.push(val);
+    steps.push({ type: 'push', data: [...simData], val: val, highlightIdx: simData.length - 1, msg: `Push ${val} to Back` });
+    logQueue(`Push ${val} to Back`);
+
+    // 3. Window Limit Checks (Remove from Front)
+    if (hasWindow) {
+        while (simData.length > k) {
+            const front = simData[0];
+            steps.push({ type: 'compare-window', data: [...simData], val: val, highlightIdx: 0, msg: `Size ${simData.length} > ${k}? Remove Front ${front}` });
+            simData.shift();
+            steps.push({ type: 'popped-front', data: [...simData], val: val, msg: `Removed Front ${front} (Window Limit)` });
+            logQueue(`Window Limit (${k}): Removed Front ${front}`);
+        }
+    }
+
+    state.dsData = simData;
+
+    // Build Steps
+    state.stepController.steps = steps;
+    state.stepController.currentStep = 0;
+    state.stepController.isActive = true;
+    state.stepController.mode = 'queue-mono';
+
+    state.dom.stepControls.classList.remove('hidden');
+    renderQueueStep();
+    updateStepButtons();
+}
+
+export function renderQueueStep() {
+    const { steps, currentStep } = state.stepController;
+    if (!steps.length) return;
+
+    if (state.dom.stepControls) state.dom.stepControls.classList.remove('hidden');
+
+    const step = steps[currentStep];
+    renderQueue(step.data, state.dom.stage, false);
+    state.dom.stepIndicator.innerText = step.msg;
+
+    let items = state.dom.stage.querySelectorAll('.queue-item');
+    if (items.length === 0 && step.data.length > 0) {
+        items = state.dom.stage.querySelectorAll('.queue-item');
+    }
+
+    // Reset styles
+    items.forEach(el => {
+        el.style.backgroundColor = '';
+        el.style.borderColor = '';
+        el.style.transform = '';
+    });
+
+    if (step.type === 'compare') {
+        // Highlight back item (last one)
+        if (items[step.highlightIdx]) {
+            items[step.highlightIdx].style.borderColor = '#3b82f6'; // Blue border
+            items[step.highlightIdx].style.transform = 'scale(1.05)';
+        }
+    } else if (step.type === 'pop') {
+        // Highlight back item for removal
+        if (items[step.highlightIdx]) {
+            items[step.highlightIdx].style.backgroundColor = '#ef4444'; // Red
+            items[step.highlightIdx].style.borderColor = '#ef4444';
+        }
+    } else if (step.type === 'push') {
+        // Highlight new item at back
+        if (items[step.highlightIdx]) {
+            items[step.highlightIdx].style.backgroundColor = '#10b981'; // Green
+            items[step.highlightIdx].style.transform = 'scale(1.1)';
+        }
+    } else if (step.type === 'compare-window') {
+        // Highlight front item for removal
+        if (items[0]) {
+            items[0].style.backgroundColor = '#fca5a5'; // Light Red
+            items[0].style.borderColor = '#ef4444';
+        }
+    }
 }
 
 export function dequeueFromQueue() {
@@ -268,8 +526,20 @@ export function dequeueFromQueue() {
         alert("Queue is empty!");
         return;
     }
-    state.dsData.shift();
+    const val = state.dsData.shift();
+    logQueue(`Dequeue ${val}`);
     renderQueue(state.dsData);
+}
+
+function logQueue(msg) {
+    if (state.dom.queueLog) {
+        const line = document.createElement('div');
+        line.textContent = `> ${msg}`;
+        line.style.borderBottom = '1px solid rgba(255,255,255,0.05)';
+        line.style.padding = '2px 0';
+        state.dom.queueLog.appendChild(line);
+        state.dom.queueLog.scrollTop = state.dom.queueLog.scrollHeight;
+    }
 }
 
 export function peekQueue() {

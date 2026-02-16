@@ -6,7 +6,7 @@ import { initBST, initBT, runBFS, runDFS, nextTreeStep, prevTreeStep, resetTreeS
 import { initGraph, nextGraphStep, prevGraphStep, resetGraphStepController } from './ds/graph.js';
 import { initHeap, insertHeap, extractHeap, peekHeap } from './ds/heap.js';
 import { initHash, putHash, getHash, removeHash, clearHash } from './ds/hash.js';
-import { initGrid, renderGrid } from './ds/grid.js';
+import { initGrid, renderGrid, runGridBFS, runGridDFS, nextGridStep, prevGridStep, resetGridStepController } from './ds/grid.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     initGlobals();
@@ -104,6 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Toggle Grid Controls
         if (type === 'grid') {
             state.dom.gridControls.classList.remove('hidden');
+            state.dom.auxContainer.classList.remove('hidden'); // Enable Aux for Grid Traversals
             // Build a default 3x3 grid immediately
             const defaultRows = parseInt(state.dom.gridRows.value) || 3;
             const defaultCols = parseInt(state.dom.gridCols.value) || 3;
@@ -282,6 +283,8 @@ document.addEventListener('DOMContentLoaded', () => {
             prevTreeStep();
         } else if (state.currentMode === 'graph') {
             prevGraphStep();
+        } else if (state.currentMode === 'grid') {
+            prevGridStep();
         }
     });
 
@@ -300,6 +303,8 @@ document.addEventListener('DOMContentLoaded', () => {
             nextTreeStep();
         } else if (state.currentMode === 'graph') {
             nextGraphStep();
+        } else if (state.currentMode === 'grid') {
+            nextGridStep();
         }
     }
 
@@ -343,6 +348,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (currentStep >= steps.length - 1) isAtEnd = true;
             } else if (state.graphStepController && state.graphStepController.isActive) {
                 const { steps, currentStep } = state.graphStepController;
+                if (currentStep >= steps.length - 1) isAtEnd = true;
+            } else if (state.gridStepController && state.gridStepController.isActive) {
+                const { steps, currentStep } = state.gridStepController;
                 if (currentStep >= steps.length - 1) isAtEnd = true;
             } else {
                 // Not active? Stop.
@@ -528,6 +536,22 @@ document.addEventListener('DOMContentLoaded', () => {
             initGrid(rows, cols);
         });
     }
+
+    if (state.dom.btnGridBFS) {
+        state.dom.btnGridBFS.addEventListener('click', () => {
+            const startRow = parseInt(state.dom.gridStartRow.value) || 0;
+            const startCol = parseInt(state.dom.gridStartCol.value) || 0;
+            runGridBFS(startRow, startCol);
+        });
+    }
+
+    if (state.dom.btnGridDFS) {
+        state.dom.btnGridDFS.addEventListener('click', () => {
+            const startRow = parseInt(state.dom.gridStartRow.value) || 0;
+            const startCol = parseInt(state.dom.gridStartCol.value) || 0;
+            runGridDFS(startRow, startCol);
+        });
+    }
 });
 
 function resetStage() {
@@ -551,6 +575,7 @@ function resetStage() {
     resetStepController();
     resetTreeStepController();
     resetGraphStepController();
+    resetGridStepController();
 
     // Hide step controls
     if (state.dom.stepControls) {
