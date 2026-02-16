@@ -92,7 +92,7 @@
         /* Sidebar toggle button */
         .sidebar-toggle {
             position: fixed;
-            top: 80px;
+            top: 64px;
             left: 20px;
             z-index: 1001;
             width: 36px;
@@ -791,10 +791,39 @@
             padding: 30px 20px;
             font-size: 0.95rem;
         }
+
+        .home-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1001;
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: var(--bg-panel);
+            border: 1px solid var(--border);
+            color: var(--text-sub);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            transition: all 0.25s ease;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+            text-decoration: none;
+        }
+
+        .home-btn:hover {
+            background: rgba(59, 130, 246, 0.2);
+            color: #60a5fa;
+            border-color: #3b82f6;
+            transform: scale(1.08);
+        }
     </style>
 </head>
 
 <body>
+    <a href="../index.html" class="home-btn" title="Back to Home">🏠</a>
     <button class="sidebar-toggle" id="sidebar-toggle" title="Toggle sidebar">
         <span class="arrow">◀</span>
     </button>

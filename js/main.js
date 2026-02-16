@@ -6,6 +6,7 @@ import { initBST, initBT, runBFS, runDFS, nextTreeStep, prevTreeStep, resetTreeS
 import { initGraph, nextGraphStep, prevGraphStep, resetGraphStepController } from './ds/graph.js';
 import { initHeap, insertHeap, extractHeap, peekHeap } from './ds/heap.js';
 import { initHash, putHash, getHash, removeHash, clearHash } from './ds/hash.js';
+import { initGrid, renderGrid } from './ds/grid.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     initGlobals();
@@ -31,7 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const titles = {
             'array': 'Array', 'stack': 'Stack', 'queue': 'Queue',
             'sll': 'Singly Linked List', 'dll': 'Doubly Linked List', 'cll': 'Circular Linked List',
-            'bt': 'Binary Tree', 'bst': 'Binary Search Tree', 'graph': 'Graph',
+            'bt': 'Binary Tree', 'bst': 'Binary Search Tree', 'graph': 'Graph', 'grid': 'Grid',
             'hashmap': 'HashMap', 'hashmap-simple': 'HashMap (Simple)', 'hashset': 'HashSet', 'treemap': 'TreeMap', 'linkedhashmap': 'LinkedHashMap'
         };
         state.dom.structureTitle.innerText = titles[type] || type.toUpperCase();
@@ -100,6 +101,17 @@ document.addEventListener('DOMContentLoaded', () => {
             state.dom.graphControls.classList.add('hidden');
         }
 
+        // Toggle Grid Controls
+        if (type === 'grid') {
+            state.dom.gridControls.classList.remove('hidden');
+            // Build a default 3x3 grid immediately
+            const defaultRows = parseInt(state.dom.gridRows.value) || 3;
+            const defaultCols = parseInt(state.dom.gridCols.value) || 3;
+            initGrid(defaultRows, defaultCols);
+        } else {
+            state.dom.gridControls.classList.add('hidden');
+        }
+
         // Toggle Hash Controls
         if (['hashmap', 'hashmap-simple', 'hashset', 'treemap', 'linkedhashmap'].includes(type)) {
             state.dom.hashControls.classList.remove('hidden');
@@ -127,7 +139,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Toggle Main Input (Enter Values)
         // Hidden for Graph and Hash structures as per user request
-        if (['graph', 'hashmap', 'hashmap-simple', 'hashset', 'treemap', 'linkedhashmap'].includes(type)) {
+        if (['graph', 'grid', 'hashmap', 'hashmap-simple', 'hashset', 'treemap', 'linkedhashmap'].includes(type)) {
             if (state.dom.mainInputContainer) state.dom.mainInputContainer.classList.add('hidden');
         } else {
             if (state.dom.mainInputContainer) state.dom.mainInputContainer.classList.remove('hidden');
@@ -507,6 +519,15 @@ document.addEventListener('DOMContentLoaded', () => {
             clearHash();
         });
     }
+
+    // --- GRID CONTROLS ---
+    if (state.dom.btnBuildGrid) {
+        state.dom.btnBuildGrid.addEventListener('click', () => {
+            const rows = parseInt(state.dom.gridRows.value) || 3;
+            const cols = parseInt(state.dom.gridCols.value) || 3;
+            initGrid(rows, cols);
+        });
+    }
 });
 
 function resetStage() {
@@ -571,6 +592,10 @@ function renderStructure(inputStr) {
         case 'graph':
             import('./ds/graph.js').then(module => module.initGraph(vals));
             // Show Graph Controls explicitly handled in selectStructure
+            break;
+
+        case 'grid':
+            // Grid uses its own build flow via Build button
             break;
     }
 }

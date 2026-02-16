@@ -14,6 +14,7 @@ export const state = {
 
     // Data Structure State
     dsData: [],
+    gridData: [], // 2D array for grid
 
     // Graph Interaction
     graphMode: null, // 'node', 'edge-dir', 'edge-undir'
@@ -91,7 +92,14 @@ export const state = {
         btnHashGet: null,
         btnHashRemove: null,
         btnHashClear: null,
-        hashInfo: null
+        hashInfo: null,
+
+        // Grid
+        gridControls: null,
+        gridRows: null,
+        gridCols: null,
+        btnBuildGrid: null,
+        gridReplaceVal: null
     }
 };
 
@@ -182,6 +190,13 @@ export const initGlobals = () => {
     state.dom.visualVisited = document.getElementById('visual-visited');
     state.dom.visualQueue = document.getElementById('visual-queue');
     state.dom.visualStack = document.getElementById('visual-stack');
+
+    // Grid
+    state.dom.gridControls = document.getElementById('grid-controls');
+    state.dom.gridRows = document.getElementById('gridRows');
+    state.dom.gridCols = document.getElementById('gridCols');
+    state.dom.btnBuildGrid = document.getElementById('btnBuildGrid');
+    state.dom.gridReplaceVal = document.getElementById('gridReplaceVal');
 
     // Step Controls
     state.dom.stepControls = document.getElementById('step-controls');
