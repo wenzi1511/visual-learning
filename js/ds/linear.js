@@ -1,4 +1,5 @@
 import { state } from '../state.js';
+import { renderSortStep } from './sorting.js';
 
 export function renderArray(vals) {
     const stage = state.dom.stage;
@@ -139,6 +140,8 @@ export function nextStep() {
         renderStackStep();
     } else if (state.stepController.mode === 'queue-mono') {
         renderQueueStep();
+    } else if (state.stepController.mode === 'sort') {
+        renderSortStep();
     } else {
         renderArrayStep();
     }
@@ -154,6 +157,8 @@ export function prevStep() {
         renderStackStep();
     } else if (state.stepController.mode === 'queue-mono') {
         renderQueueStep();
+    } else if (state.stepController.mode === 'sort') {
+        renderSortStep();
     } else {
         renderArrayStep();
     }
@@ -186,6 +191,10 @@ export function resetStepController() {
         cell.style.backgroundColor = '';
         cell.style.transform = '';
     });
+
+    // Remove bar chart if present
+    const bars = state.dom.stage.querySelector('.bar-container');
+    if (bars) bars.remove();
 }
 
 export function renderStack(vals, container = state.dom.stage, isEmbedded = false) {

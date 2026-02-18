@@ -7,6 +7,7 @@ import { initGraph, nextGraphStep, prevGraphStep, resetGraphStepController } fro
 import { initHeap, insertHeap, extractHeap, peekHeap } from './ds/heap.js';
 import { initHash, putHash, getHash, removeHash, clearHash } from './ds/hash.js';
 import { initGrid, renderGrid, runGridBFS, runGridDFS, nextGridStep, prevGridStep, resetGridStepController } from './ds/grid.js';
+import { startSort } from './ds/sorting.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     initGlobals();
@@ -337,13 +338,19 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!isNaN(val)) searchArray(val);
     });
 
+    // Sort button
+    state.dom.btnSort.addEventListener('click', () => {
+        const algo = state.dom.sortAlgo.value;
+        startSort(algo);
+    });
+
     // Step Controls - handle array, tree, and graph modes
     // Step Controls - handle array, tree, and graph modes
     state.dom.btnPrevStep.addEventListener('click', () => {
         // Pause on manual interaction
         if (state.isAutoPlaying) toggleAutoPlay();
 
-        if (state.currentMode === 'array') {
+        if (state.currentMode === 'array' || state.currentMode === 'stack' || state.currentMode === 'queue') {
             prevStep();
         } else if (['bt', 'bst'].includes(state.currentMode)) {
             prevTreeStep();
@@ -363,7 +370,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Wrapper for next step to handle dispatching
     function manualNextStep() {
-        if (state.currentMode === 'array') {
+        if (state.currentMode === 'array' || state.currentMode === 'stack' || state.currentMode === 'queue') {
             nextStep();
         } else if (['bt', 'bst'].includes(state.currentMode)) {
             nextTreeStep();

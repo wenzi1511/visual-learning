@@ -178,6 +178,21 @@
                     <button id="btnArrDelete" class="control-btn">Delete</button>
                     <button id="btnArrSearch" class="control-btn">Search</button>
                 </div>
+                <div class="ops-divider">
+                    <h4 class="ops-title">Sorting</h4>
+                    <div class="ops-row">
+                        <select id="sortAlgo"
+                            style="flex: 1; padding: 8px 10px; background: #1e293b; border: 1px solid rgba(255,255,255,0.1); color: #e2e8f0; border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 0.8rem; cursor: pointer;">
+                            <option value="bubble">Bubble Sort</option>
+                            <option value="selection">Selection Sort</option>
+                            <option value="insertion">Insertion Sort</option>
+                            <option value="merge">Merge Sort</option>
+                            <option value="quick">Quick Sort</option>
+                        </select>
+                        <button id="btnSort" class="control-btn traversal-btn">Sort</button>
+                    </div>
+                    <div id="sortLog" class="sort-log-panel"></div>
+                </div>
             </div>
 
             <!-- List Controls -->

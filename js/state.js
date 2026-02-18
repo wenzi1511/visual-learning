@@ -99,6 +99,9 @@ export const state = {
         btnArrUpdate: null,
         btnArrDelete: null,
         btnArrSearch: null,
+        sortAlgo: null,
+        btnSort: null,
+        sortLog: null,
         // List
         listControls: null,
         listVal: null,
@@ -188,6 +191,9 @@ export const initGlobals = () => {
     state.dom.btnArrUpdate = document.getElementById('btnArrUpdate');
     state.dom.btnArrDelete = document.getElementById('btnArrDelete');
     state.dom.btnArrSearch = document.getElementById('btnArrSearch');
+    state.dom.sortAlgo = document.getElementById('sortAlgo');
+    state.dom.btnSort = document.getElementById('btnSort');
+    state.dom.sortLog = document.getElementById('sortLog');
 
     // List
     state.dom.listControls = document.getElementById('list-controls');
