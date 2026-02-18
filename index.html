@@ -166,14 +166,13 @@
             </div>
 
             <!-- Array Controls -->
-            <div id="array-controls" class="hidden"
-                style="margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px;">
-                <h4 style="margin: 0 0 10px 0; font-size: 1rem;">Operations</h4>
-                <div style="display: flex; gap: 5px; margin-bottom: 5px;">
+            <div id="array-controls" class="ops-section hidden">
+                <h4 class="ops-title">Operations</h4>
+                <div class="ops-row">
                     <input type="number" id="arrIdx" placeholder="Idx" style="width: 50px;">
                     <input type="text" id="arrVal" placeholder="Val" style="width: 60px;">
                 </div>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px;">
+                <div class="ops-grid">
                     <button id="btnArrInsert" class="control-btn">Insert</button>
                     <button id="btnArrUpdate" class="control-btn">Update</button>
                     <button id="btnArrDelete" class="control-btn">Delete</button>
@@ -182,129 +181,113 @@
             </div>
 
             <!-- List Controls -->
-            <div id="list-controls" class="hidden"
-                style="margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px;">
-                <h4 style="margin: 0 0 10px 0; font-size: 1rem;">Operations</h4>
-                <div style="display: flex; gap: 5px; margin-bottom: 10px;">
+            <div id="list-controls" class="ops-section hidden">
+                <h4 class="ops-title">Operations</h4>
+                <div class="ops-row">
                     <input type="text" id="listVal" placeholder="Value" style="width: 100px;">
                 </div>
-                <div style="display: flex; gap: 5px; flex-wrap: wrap;">
-                    <button id="btnListAppend" class="control-btn" style="flex:1;">Append</button>
-                    <button id="btnListPrepend" class="control-btn" style="flex:1;">Prepend</button>
-                </div>
-                <div style="display: flex; gap: 5px; margin-top: 5px;">
-                    <button id="btnListRemove" class="control-btn" style="flex:1;">Remove Val</button>
-                    <button id="btnListSearch" class="control-btn" style="flex:1;">Search</button>
-                </div>
-                <div style="display: flex; gap: 5px; margin-top: 5px;">
-                    <button id="btnListPopHead" class="control-btn" style="flex:1;">Pop Head</button>
-                    <button id="btnListPopTail" class="control-btn" style="flex:1;">Pop Tail</button>
+                <div class="ops-grid">
+                    <button id="btnListAppend" class="control-btn">Append</button>
+                    <button id="btnListPrepend" class="control-btn">Prepend</button>
+                    <button id="btnListRemove" class="control-btn">Remove Val</button>
+                    <button id="btnListSearch" class="control-btn">Search</button>
+                    <button id="btnListPopHead" class="control-btn">Pop Head</button>
+                    <button id="btnListPopTail" class="control-btn">Pop Tail</button>
                 </div>
             </div>
 
             <!-- Stack Controls -->
-            <div id="stack-controls" class="hidden"
-                style="margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px;">
-                <h4 style="margin: 0 0 10px 0; font-size: 1rem;">Operations</h4>
-                <div style="display: flex; gap: 5px; margin-bottom: 10px;">
+            <div id="stack-controls" class="ops-section hidden">
+                <h4 class="ops-title">Operations</h4>
+                <div class="ops-row">
                     <input type="text" id="stackPushInput" placeholder="Value" style="width: 60px;">
                     <button id="btnPush" class="control-btn">Push</button>
                 </div>
-                <div style="display: flex; gap: 5px; margin-bottom: 10px;">
-                    <button id="btnPop" class="control-btn">Pop</button>
-                    <button id="btnPeek" class="control-btn">Peek</button>
+                <div class="ops-row">
+                    <button id="btnPop" class="control-btn" style="flex:1;">Pop</button>
+                    <button id="btnPeek" class="control-btn" style="flex:1;">Peek</button>
                 </div>
-                <div style="display: flex; align-items: center; gap: 8px;">
-                    <span style="font-size: 0.8rem; color: var(--text); opacity: 0.7;">Monotonic:</span>
-                    <button id="btnStackMonotonic" class="control-btn" style="flex: 1; font-size: 0.75rem;">Off</button>
+                <div class="ops-row">
+                    <span class="ops-label">Monotonic:</span>
+                    <button id="btnStackMonotonic" class="control-btn" style="flex: 1;">Off</button>
                 </div>
             </div>
 
             <!-- Queue Controls -->
-            <div id="queue-controls" class="hidden"
-                style="margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px;">
-                <h4 style="margin: 0 0 10px 0; font-size: 1rem;">Operations</h4>
-                <div style="display: flex; gap: 5px; margin-bottom: 10px;">
+            <div id="queue-controls" class="ops-section hidden">
+                <h4 class="ops-title">Operations</h4>
+                <div class="ops-row">
                     <input type="text" id="queueEnqueueInput" placeholder="Value" style="width: 60px;">
                     <button id="btnEnqueue" class="control-btn">Enqueue</button>
                 </div>
-                <div style="display: flex; gap: 5px; margin-bottom: 10px;">
-                    <button id="btnDequeue" class="control-btn">Dequeue</button>
-                    <button id="btnPeekQueue" class="control-btn">Peek</button>
+                <div class="ops-row">
+                    <button id="btnDequeue" class="control-btn" style="flex:1;">Dequeue</button>
+                    <button id="btnPeekQueue" class="control-btn" style="flex:1;">Peek</button>
                 </div>
-                <div style="display: flex; align-items: center; gap: 8px;">
-                    <span style="font-size: 0.8rem; color: var(--text); opacity: 0.7;">Monotonic:</span>
-                    <button id="btnQueueMonotonic" class="control-btn" style="flex: 1; font-size: 0.75rem;">Off</button>
+                <div class="ops-row">
+                    <span class="ops-label">Monotonic:</span>
+                    <button id="btnQueueMonotonic" class="control-btn" style="flex: 1;">Off</button>
                     <input type="number" id="queueWindowK" placeholder="k" class="hidden"
                         style="width: 40px; font-size: 0.8rem;" min="1" title="Window Size">
                 </div>
-                <!-- Queue Log -->
                 <div id="queueLog"
-                    style="margin-top: 10px; height: 80px; overflow-y: auto; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 5px; font-family: monospace; font-size: 0.75rem; color: #cbd5e1;">
+                    style="margin-top: 10px; height: 80px; overflow-y: auto; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 8px; font-family: monospace; font-size: 0.75rem; color: #cbd5e1;">
                 </div>
             </div>
 
             <!-- Trie Controls -->
-            <div id="trie-controls" class="hidden"
-                style="margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px;">
-                <h4 style="margin: 0 0 10px 0; font-size: 1rem;">Operations</h4>
-                <div style="display: flex; gap: 5px; margin-bottom: 10px;">
+            <div id="trie-controls" class="ops-section hidden">
+                <h4 class="ops-title">Operations</h4>
+                <div class="ops-row">
                     <input type="text" id="trieInput" placeholder="Word" style="width: 100px;">
                     <button id="btnTrieInsert" class="control-btn">Insert</button>
                 </div>
-                <div style="display: flex; gap: 5px;">
-                    <button id="btnTrieSearch" class="control-btn">Search</button>
-                    <button id="btnTrieStartsWith" class="control-btn">Starts With</button>
+                <div class="ops-row">
+                    <button id="btnTrieSearch" class="control-btn" style="flex:1;">Search</button>
+                    <button id="btnTrieStartsWith" class="control-btn" style="flex:1;">Starts With</button>
                 </div>
             </div>
 
             <!-- Union Find Controls -->
-            <div id="union-find-controls" class="hidden"
-                style="margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px;">
-                <h4 style="margin: 0 0 10px 0; font-size: 1rem;">Operations</h4>
-                <div style="display: flex; gap: 5px; margin-bottom: 10px;">
+            <div id="union-find-controls" class="ops-section hidden">
+                <h4 class="ops-title">Operations</h4>
+                <div class="ops-row">
                     <input type="number" id="ufSize" placeholder="Size (1-15)" value="10" style="width: 80px;">
                     <button id="btnUfInit" class="control-btn">Init</button>
                 </div>
-                <div style="display: flex; gap: 5px; margin-bottom: 10px;">
+                <div class="ops-row">
                     <input type="number" id="ufP" placeholder="P" style="width: 40px;">
                     <input type="number" id="ufQ" placeholder="Q" style="width: 40px;">
-                    <button id="btnUfUnion" class="control-btn">Union(P,Q)</button>
-                    <button id="btnUfFind" class="control-btn">Find(P)</button>
+                    <button id="btnUfUnion" class="control-btn">Union</button>
+                    <button id="btnUfFind" class="control-btn">Find</button>
                 </div>
             </div>
 
             <!-- Heap Controls -->
-            <div id="heap-controls" class="hidden"
-                style="margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px;">
-                <h4 style="margin: 0 0 10px 0; font-size: 1rem;">Operations</h4>
-                <div style="display: flex; gap: 5px; margin-bottom: 10px;">
+            <div id="heap-controls" class="ops-section hidden">
+                <h4 class="ops-title">Operations</h4>
+                <div class="ops-row">
                     <input type="text" id="heapInput" placeholder="Value" style="width: 60px;">
                     <button id="btnHeapInsert" class="control-btn">Insert</button>
                 </div>
-                <div style="display: flex; gap: 5px;">
-                    <button id="btnHeapExtract" class="control-btn">Poll</button>
-                    <button id="btnHeapPeek" class="control-btn">Peek</button>
+                <div class="ops-row">
+                    <button id="btnHeapExtract" class="control-btn" style="flex:1;">Poll</button>
+                    <button id="btnHeapPeek" class="control-btn" style="flex:1;">Peek</button>
                 </div>
             </div>
 
             <!-- Tree Controls -->
-            <div id="tree-controls" class="hidden"
-                style="margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px;">
-                <h4 style="margin: 0 0 10px 0; font-size: 1rem;">Traversals</h4>
-                <div style="display: flex; gap: 5px; flex-wrap: wrap;">
-                    <button id="btnBFS" class="control-btn" style="flex:1;">BFS</button>
-                    <button id="btnPreorder" class="control-btn" style="flex:1;">Preorder</button>
+            <div id="tree-controls" class="ops-section hidden">
+                <h4 class="ops-title">Traversals</h4>
+                <div class="ops-grid">
+                    <button id="btnBFS" class="control-btn">BFS</button>
+                    <button id="btnPreorder" class="control-btn">Preorder</button>
+                    <button id="btnInorder" class="control-btn">Inorder</button>
+                    <button id="btnPostorder" class="control-btn">Postorder</button>
                 </div>
-                <div style="display: flex; gap: 5px; margin-top: 5px;">
-                    <button id="btnInorder" class="control-btn" style="flex:1;">Inorder</button>
-                    <button id="btnPostorder" class="control-btn" style="flex:1;">Postorder</button>
-                </div>
-                <!-- BST Search -->
-                <div id="bst-search-controls" class="hidden"
-                    style="margin-top: 15px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 10px;">
-                    <h4 style="margin: 0 0 10px 0; font-size: 1rem;">Search</h4>
-                    <div style="display: flex; gap: 5px;">
+                <div id="bst-search-controls" class="ops-divider hidden">
+                    <h4 class="ops-title">Search</h4>
+                    <div class="ops-row">
                         <input type="number" id="bstSearchVal" placeholder="Value" style="width: 80px;">
                         <button id="btnBSTSearch" class="control-btn" style="flex:1;">Search</button>
                     </div>
@@ -312,30 +295,23 @@
             </div>
 
             <!-- Graph Controls -->
-            <div id="graph-controls" class="hidden"
-                style="margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px;">
-                <h4 style="margin: 0 0 10px 0; font-size: 1rem;">Builder Tools</h4>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px;">
+            <div id="graph-controls" class="ops-section hidden">
+                <h4 class="ops-title">Builder Tools</h4>
+                <div class="ops-grid">
                     <button id="btnAddNode" class="control-btn" title="Click stage to add node">Add Node</button>
                     <button id="btnResetGraph" class="control-btn cancel-btn">Reset</button>
                 </div>
-                <div style="display: flex; flex-direction: column; gap: 5px; margin-top: 5px;">
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px;">
-                        <button id="btnAddEdgeUndir" class="control-btn">Add Edge (Line)</button>
-                        <button id="btnAddEdgeDir" class="control-btn">Add Edge (Arrow)</button>
-                    </div>
-                    <div
-                        style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-top: 5px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 5px;">
-                        <button id="btnDelNode" class="control-btn cancel-btn">Delete Node</button>
-                        <button id="btnDelEdge" class="control-btn cancel-btn">Delete Edge</button>
-                    </div>
-                    <div
-                        style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-top: 5px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 5px;">
-                        <button id="btnGraphBFS" class="control-btn traversal-btn">Run
-                            BFS</button>
-                        <button id="btnGraphDFS" class="control-btn traversal-btn">Run
-                            DFS</button>
-                    </div>
+                <div class="ops-grid" style="margin-top: 6px;">
+                    <button id="btnAddEdgeUndir" class="control-btn">Edge (Line)</button>
+                    <button id="btnAddEdgeDir" class="control-btn">Edge (Arrow)</button>
+                </div>
+                <div class="ops-grid ops-divider">
+                    <button id="btnDelNode" class="control-btn cancel-btn">Delete Node</button>
+                    <button id="btnDelEdge" class="control-btn cancel-btn">Delete Edge</button>
+                </div>
+                <div class="ops-grid ops-divider">
+                    <button id="btnGraphBFS" class="control-btn traversal-btn">Run BFS</button>
+                    <button id="btnGraphDFS" class="control-btn traversal-btn">Run DFS</button>
                 </div>
                 <div style="margin-top: 10px; font-size: 0.8rem; color: var(--text-sub); font-style: italic;"
                     id="graph-instructions">
@@ -344,30 +320,29 @@
             </div>
 
             <!-- Grid Controls -->
-            <div id="grid-controls" class="hidden"
-                style="margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px;">
-                <h4 style="margin: 0 0 10px 0; font-size: 1rem;">Grid Setup</h4>
-                <div style="display: flex; gap: 5px; margin-bottom: 10px;">
+            <div id="grid-controls" class="ops-section hidden">
+                <h4 class="ops-title">Grid Setup</h4>
+                <div class="ops-row">
                     <input type="number" id="gridRows" placeholder="Rows" style="width: 70px;" min="1" max="20"
                         value="3">
                     <input type="number" id="gridCols" placeholder="Cols" style="width: 70px;" min="1" max="20"
                         value="3">
                     <button id="btnBuildGrid" class="control-btn" style="flex: 1;">Build</button>
                 </div>
-                <div style="border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 10px; margin-top: 5px;">
-                    <h4 style="margin: 0 0 8px 0; font-size: 0.9rem;">Replace node with value:</h4>
+                <div class="ops-divider">
+                    <h4 class="ops-title">Replace Value</h4>
                     <input type="text" id="gridReplaceVal" placeholder="Value" style="width: 100%; margin-bottom: 8px;">
                     <div style="font-size: 0.8rem; color: var(--text-sub); font-style: italic;">
                         Click a cell to set its value
                     </div>
                 </div>
-                <div style="border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 10px; margin-top: 10px;">
-                    <h4 style="margin: 0 0 8px 0; font-size: 0.9rem;">Traversals</h4>
-                    <div style="display: flex; gap: 5px; margin-bottom: 8px;">
+                <div class="ops-divider">
+                    <h4 class="ops-title">Traversals</h4>
+                    <div class="ops-row">
                         <input type="number" id="gridStartRow" placeholder="Row" style="width: 60px;" min="0" value="0">
                         <input type="number" id="gridStartCol" placeholder="Col" style="width: 60px;" min="0" value="0">
                     </div>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px;">
+                    <div class="ops-grid">
                         <button id="btnGridBFS" class="control-btn traversal-btn">Run BFS</button>
                         <button id="btnGridDFS" class="control-btn traversal-btn">Run DFS</button>
                     </div>
@@ -375,21 +350,19 @@
             </div>
 
             <!-- Hash Controls -->
-            <div id="hash-controls" class="hidden"
-                style="margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px;">
-                <h4 style="margin: 0 0 10px 0; font-size: 1rem;">Hash Operations</h4>
-                <div style="display: flex; gap: 5px; margin-bottom: 5px;">
+            <div id="hash-controls" class="ops-section hidden">
+                <h4 class="ops-title">Hash Operations</h4>
+                <div class="ops-row">
                     <input type="number" id="hashKey" placeholder="Key (Int)" style="width: 70px;">
                     <input type="text" id="hashValue" placeholder="Value" style="width: 70px;">
                 </div>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px;">
+                <div class="ops-grid">
                     <button id="btnHashPut" class="control-btn">Put</button>
                     <button id="btnHashGet" class="control-btn">Get</button>
                     <button id="btnHashRemove" class="control-btn">Remove</button>
                     <button id="btnHashClear" class="control-btn cancel-btn">Clear</button>
                 </div>
                 <div id="hash-info" style="margin-top:10px; font-size: 0.8rem; color: var(--text-sub);">
-                    <!-- Info about buckets/load factor -->
                 </div>
             </div>
 
