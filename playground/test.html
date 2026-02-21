@@ -2718,6 +2718,11 @@
                 return this.root.id;
             },
 
+            init() {
+                this.root = new TrieNode();
+                this.render();
+            },
+
             insert(word) {
                 if (!word) return;
                 word = String(word).toLowerCase();
@@ -2773,20 +2778,39 @@
             },
 
             highlightNode(id, color) {
+                const actualId = (typeof id === 'object' && id !== null) ? id.id : id;
                 const container = document.getElementById(`slot-${this.slotId}-content`);
                 if (!container) return;
-                const el = container.querySelector(`[data-id="${id}"]`);
+                const el = container.querySelector(`[data-id="${actualId}"]`);
                 if (el) {
-                    const originalBg = el.style.backgroundColor;
-                    const originalBorder = el.style.borderColor;
+                    el.style.backgroundColor = color || '';
+                    el.style.borderColor = color || '';
+                    el.style.boxShadow = color ? `0 0 15px ${color}` : '';
+                    el.style.transform = color ? 'translate(-50%, -50%) scale(1.2)' : 'translate(-50%, -50%)';
+                }
+            },
 
-                    el.style.backgroundColor = color;
-                    el.style.borderColor = color;
-                    el.style.boxShadow = `0 0 15px ${color}`;
-                    el.style.transform = 'translate(-50%, -50%) scale(1.2)';
+            highlight(target, color) {
+                if (!target) return;
+                // Check if target is a node ID or a word
+                let node = this.data?.nodes?.find(n => n.id === target) || this.getAllNodes().find(n => n.id === target);
 
-                    // Auto-revert after delay for better UX? Or keep it?
-                    // The prompt didn't specify, but usually user wants to see result.
+                if (!node) {
+                    // Try to treat as word
+                    let curr = this.root;
+                    let found = true;
+                    for (const char of String(target).toLowerCase()) {
+                        if (!curr.children[char]) {
+                            found = false;
+                            break;
+                        }
+                        curr = curr.children[char];
+                    }
+                    if (found) node = curr;
+                }
+
+                if (node) {
+                    this.highlightNode(node.id, color);
                 }
             },
 

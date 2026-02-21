@@ -1,23 +1,17 @@
 {
-    "id": "lru-cache",
-    "name": "LRU Cache",
-    "difficulty": "Hard",
-    "description": "<p>Design a data structure that follows the constraints of a <b>Least Recently Used (LRU) cache</b>.</p><ul><li><code>get(key)</code>: Return the value of the key if it exists, otherwise return -1.</li><li><code>put(key, value)</code>: Update the value if the key exists, otherwise add the key-value pair. If the number of keys exceeds the <code>capacity</code>, <b>evict</b> the least recently used key.</li><li>The functions must each run in O(1) average time complexity.</li></ul>",
+    "id": "linked-list-cycle-detection",
+    "name": "Linked List Cycle Detection",
+    "difficulty": "Easy",
+    "description": "<p>Given <code>head</code>, the head of a linked list, determine if the linked list has a cycle in it.</p><p>This visualization uses <b>Floyd's Cycle-Finding Algorithm</b> (Tortoise and Hare):</p><ul><li>The <code>slow</code> pointer moves one step at a time.</li><li>The <code>fast</code> pointer moves two steps at a time.</li><li>If there is a cycle, the <code>fast</code> pointer will eventually meet the <code>slow</code> pointer.</li><li>If the <code>fast</code> pointer reaches the end of the list (null), there is no cycle.</li></ul>",
     "tags": [
-        "Hashmap",
-        "Doubly Linked List",
-        "Design"
+        "Linked List",
+        "Two Pointers"
     ],
     "slots": [
         {
-            "id": "cacheMap",
-            "type": "hashmap",
-            "label": "Cache Map (Key -> Value)"
-        },
-        {
-            "id": "usageList",
-            "type": "dll",
-            "label": "Usage Order (Head = Recent, Tail = LRU)"
+            "id": "mainList",
+            "type": "sll",
+            "label": "Linked List"
         },
         {
             "id": "stateMap",
@@ -27,20 +21,15 @@
     ],
     "inputs": [
         {
-            "label": "Operations",
-            "default": "[\"put\", \"put\", \"get\", \"put\", \"get\", \"put\", \"get\", \"get\", \"get\"]",
-            "placeholder": "Array of operation names"
+            "label": "Nodes (comma separated)",
+            "default": "3, 2, 0, -4",
+            "placeholder": "3, 2, 0, -4"
         },
         {
-            "label": "Values",
-            "default": "[[1, 1], [2, 2], [1], [3, 3], [2], [4, 4], [1], [3], [4]]",
-            "placeholder": "Array of arguments"
-        },
-        {
-            "label": "Capacity",
-            "default": "2",
-            "placeholder": "Number"
+            "label": "Cycle Pos (index)",
+            "default": "1",
+            "placeholder": "-1 for no cycle"
         }
     ],
-    "code": "class Playground {\n    async run(inputs) {\n        const operations = JSON.parse(inputs[0]);\n        const params = JSON.parse(inputs[1]);\n        const capacity = parseInt(inputs[2]);\n\n        // internal tracking for the DLL visualization\n        let order = []; // array of keys\n        const cache = new Map();\n\n        await this.cacheMap.init([]);\n        await this.usageList.init([]);\n        await this.stateMap.init([\n            [\"Capacity\", capacity.toString()],\n            [\"Current Size\", \"0\"],\n            [\"Operation\", \"Start\"],\n            [\"Result\", \"-\"]\n        ]);\n\n        this.log(`Initializing LRU Cache with capacity: ${capacity}`);\n        await this.await();\n\n        for (let i = 0; i < operations.length; i++) {\n            const op = operations[i];\n            const p = params[i];\n            \n            this.stateMap.put(\"Operation\", `${op}(${p.join(', ')})`);\n            this.log(`Executing ${op}(${p.join(', ')})`);\n            await this.await();\n\n            if (op === \"put\") {\n                const key = p[0].toString();\n                const val = p[1].toString();\n\n                if (cache.has(key)) {\n                    this.log(`Key ${key} exists. Updating value and moving to front.`);\n                    cache.set(key, val);\n                    this.cacheMap.put(key, val);\n                    // Move to front\n                    order = order.filter(k => k !== key);\n                    order.unshift(key);\n                } else {\n                    if (cache.size >= capacity) {\n                        const lruKey = order.pop();\n                        this.log(`Capacity reached. Evicting Least Recently Used: ${lruKey}`);\n                        this.usageList.highlightNode(this.usageList.getTailId(), \"#ef4444\");\n                        await this.await();\n                        \n                        cache.delete(lruKey);\n                        this.cacheMap.remove(lruKey);\n                        this.usageList.removeLast();\n                        await this.await();\n                    }\n                    \n                    this.log(`Adding key ${key} to cache.`);\n                    cache.set(key, val);\n                    this.cacheMap.put(key, val);\n                    order.unshift(key);\n                }\n                \n                // Update DLL Visualizer\n                await this.usageList.init(order.map(k => `[${k}:${cache.get(k)}]`));\n                this.usageList.highlightNode(this.usageList.getHeadId(), \"#22c55e\");\n                this.stateMap.put(\"Current Size\", cache.size.toString());\n                this.stateMap.put(\"Result\", \"null\");\n                await this.await();\n                this.usageList.highlightNode(this.usageList.getHeadId(), null);\n\n            } else if (op === \"get\") {\n                const key = p[0].toString();\n                if (cache.has(key)) {\n                    const val = cache.get(key);\n                    this.log(`Cache Hit! Value: ${val}. Moving ${key} to front.`);\n                    this.cacheMap.highlight(key, \"#22c55e\");\n                    \n                    // Update order\n                    order = order.filter(k => k !== key);\n                    order.unshift(key);\n                    \n                    await this.usageList.init(order.map(k => `[${k}:${cache.get(k)}]`));\n                    this.stateMap.put(\"Result\", val);\n                    await this.await();\n                    this.cacheMap.highlight(key, null);\n                } else {\n                    this.log(`Cache Miss! Key ${key} not found.`);\n                    this.stateMap.put(\"Result\", \"-1\");\n                    await this.await();\n                }\n            }\n        }\n\n        this.log(\"All operations completed.\");\n        return Array.from(cache.entries());\n    }\n}"
+    "code": "class Playground {\n    async run(inputs) {\n        const vals = inputs[0].split(',').map(s => s.trim()).filter(s => s !== \"\");\n        const pos = parseInt(inputs[1]);\n\n        if (vals.length === 0) return false;\n\n        // 1. Initialize structures\n        await this.mainList.init(vals);\n        await this.stateMap.init([\n            [\"Slow Pointer\", \"null\"],\n            [\"Fast Pointer\", \"null\"],\n            [\"Cycle Detected\", \"false\"]\n        ]);\n\n        // 2. Setup Cycle for visualization if pos >= 0\n        let headId = this.mainList.getHeadId();\n        let tailId = headId;\n        let cycleTargetId = null;\n        let nodes = [];\n\n        // Traverse to find node IDs for cycle creation\n        let current = headId;\n        let index = 0;\n        while (current !== null) {\n            nodes.push(current);\n            if (index === pos) cycleTargetId = current;\n            tailId = current;\n            current = this.mainList.getNextId(current);\n            index++;\n        }\n\n        if (pos >= 0 && cycleTargetId) {\n            this.log(`Creating a cycle from the last node to node at index ${pos}`);\n            await this.mainList.link(tailId, cycleTargetId, \"next\");\n            await this.await();\n        }\n\n        // 3. Algorithm: Tortoise and Hare\n        let slow = headId;\n        let fast = headId;\n\n        this.mainList.createPointer(\"slow\", slow, \"#3b82f6\");\n        this.mainList.createPointer(\"fast\", fast, \"#ef4444\");\n        this.log(\"Initializing Slow and Fast pointers at head.\");\n        await this.await();\n\n        while (fast !== null) {\n            // Move slow\n            slow = this.mainList.getNextId(slow);\n            this.mainList.movePointer(\"slow\", slow);\n            this.stateMap.put(\"Slow Pointer\", slow || \"null\");\n            \n            // Move fast once\n            fast = this.mainList.getNextId(fast);\n            if (fast !== null) {\n                this.mainList.movePointer(\"fast\", fast);\n                this.stateMap.put(\"Fast Pointer\", fast);\n                this.log(\"Moving slow 1 step, fast 1 step...\");\n                await this.await();\n                \n                // Move fast twice\n                fast = this.mainList.getNextId(fast);\n                if (fast !== null) {\n                    this.mainList.movePointer(\"fast\", fast);\n                    this.stateMap.put(\"Fast Pointer\", fast);\n                }\n            }\n            \n            this.log(\"Moving fast the second step...\");\n            await this.await();\n\n            if (fast === null) {\n                this.log(\"Fast pointer reached null. No cycle detected.\");\n                return false;\n            }\n\n            if (slow === fast) {\n                this.log(\"Slow and Fast pointers met! Cycle detected.\");\n                this.stateMap.put(\"Cycle Detected\", \"TRUE\");\n                this.mainList.highlightNode(slow, \"#22c55e\");\n                await this.await();\n                return true;\n            }\n        }\n\n        this.log(\"End of list reached.\");\n        return false;\n    }\n}"
 }

@@ -94,9 +94,9 @@ Each slot is accessible via `this.slotId`. Global utilities: `this.log(msg)` and
     - `highlightNode(i, color)`.
 
 13. **Trie**:
-    - `init()`.
+    - `init()`: Clear the Trie.
     - `insert(word)`, `search(word)`.
-    - `highlight(nodeOrId, color)`.
+    - `highlight(nodeOrIdOrWord, color)`.
 
 ### IMPORTANT CODING RULES
 - **Snapshot Requirement**: You MUST call `await this.await()` after every significant state change (swap, push, highlight, pointer move) to allow the user to step through.
