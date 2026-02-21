@@ -81,6 +81,15 @@ export const state = {
         btnHeapExtract: null,
         btnHeapPeek: null,
 
+        dequeControls: null,
+        dequeInput: null,
+        btnDequeAddFirst: null,
+        btnDequeAddLast: null,
+        btnDequePollFirst: null,
+        btnDequePollLast: null,
+        btnDequePeekFirst: null,
+        btnDequePeekLast: null,
+
         treeControls: null,
         btnBFS: null,
         btnPreorder: null,
@@ -182,6 +191,15 @@ export const initGlobals = () => {
     state.dom.btnHeapInsert = document.getElementById('btnHeapInsert');
     state.dom.btnHeapExtract = document.getElementById('btnHeapExtract');
     state.dom.btnHeapPeek = document.getElementById('btnHeapPeek');
+
+    state.dom.dequeControls = document.getElementById('deque-controls');
+    state.dom.dequeInput = document.getElementById('dequeInput');
+    state.dom.btnDequeAddFirst = document.getElementById('btnDequeAddFirst');
+    state.dom.btnDequeAddLast = document.getElementById('btnDequeAddLast');
+    state.dom.btnDequePollFirst = document.getElementById('btnDequePollFirst');
+    state.dom.btnDequePollLast = document.getElementById('btnDequePollLast');
+    state.dom.btnDequePeekFirst = document.getElementById('btnDequePeekFirst');
+    state.dom.btnDequePeekLast = document.getElementById('btnDequePeekLast');
 
     // Array
     state.dom.arrayControls = document.getElementById('array-controls');

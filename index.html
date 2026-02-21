@@ -27,6 +27,9 @@
                 <div class="card" onclick="selectStructure('queue')">
                     <h3>Queue</h3>
                 </div>
+                <div class="card" onclick="selectStructure('deque')">
+                    <h3>Deque</h3>
+                </div>
             </div>
         </div>
 
@@ -250,6 +253,22 @@
                 </div>
                 <div id="queueLog"
                     style="margin-top: 10px; height: 80px; overflow-y: auto; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 8px; font-family: monospace; font-size: 0.75rem; color: #cbd5e1;">
+                </div>
+            </div>
+
+            <!-- Deque Controls -->
+            <div id="deque-controls" class="ops-section hidden">
+                <h4 class="ops-title">Operations</h4>
+                <div class="ops-row">
+                    <input type="text" id="dequeInput" placeholder="Value" style="width: 60px;">
+                </div>
+                <div class="ops-grid">
+                    <button id="btnDequeAddFirst" class="control-btn">Add First</button>
+                    <button id="btnDequeAddLast" class="control-btn">Add Last</button>
+                    <button id="btnDequePollFirst" class="control-btn">Poll First</button>
+                    <button id="btnDequePollLast" class="control-btn">Poll Last</button>
+                    <button id="btnDequePeekFirst" class="control-btn" style="flex:1;">Peek First</button>
+                    <button id="btnDequePeekLast" class="control-btn" style="flex:1;">Peek Last</button>
                 </div>
             </div>
 

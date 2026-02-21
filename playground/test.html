@@ -320,6 +320,37 @@
             border: 1px dashed rgba(100, 116, 139, 0.3);
             border-radius: 8px;
             position: relative;
+            scrollbar-width: none;
+            /* Firefox */
+            -ms-overflow-style: none;
+            /* IE/Edge */
+        }
+
+        .slot-content::-webkit-scrollbar {
+            display: none;
+            /* Chrome/Safari */
+        }
+
+        /* Hide scrollbars for all data structure wrappers */
+        .sll-wrapper,
+        .dll-wrapper,
+        .uf-wrapper,
+        .bt-wrapper,
+        .heap-wrapper,
+        .graph-wrapper,
+        .trie-wrapper {
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .sll-wrapper::-webkit-scrollbar,
+        .dll-wrapper::-webkit-scrollbar,
+        .uf-wrapper::-webkit-scrollbar,
+        .bt-wrapper::-webkit-scrollbar,
+        .heap-wrapper::-webkit-scrollbar,
+        .graph-wrapper::-webkit-scrollbar,
+        .trie-wrapper::-webkit-scrollbar {
+            display: none;
         }
 
         .ptr-container-global {
@@ -2683,6 +2714,10 @@
             slotId,
             root: new TrieNode(),
 
+            getRootId() {
+                return this.root.id;
+            },
+
             insert(word) {
                 if (!word) return;
                 word = String(word).toLowerCase();
@@ -3036,6 +3071,14 @@
                 this.render();
             },
 
+            getHeadId() {
+                return this.data.length > 0 ? this.data[0].id : null;
+            },
+
+            getTailId() {
+                return this.data.length > 0 ? this.data[this.data.length - 1].id : null;
+            },
+
             get(index) {
                 if (index < 0 || index >= this.data.length) return undefined;
                 return this.data[index].val;
@@ -3373,6 +3416,19 @@
                 this.render();
             },
 
+            getHeadId() {
+                return this.data.length > 0 ? this.data[0].id : null;
+            },
+
+            getTailId() {
+                return this.data.length > 0 ? this.data[this.data.length - 1].id : null;
+            },
+
+            get(index) {
+                if (index < 0 || index >= this.data.length) return undefined;
+                return this.data[index].val;
+            },
+
             highlight(index, color) {
                 const container = document.getElementById(`slot-${this.slotId}-content`);
                 if (!container) return;
@@ -3387,7 +3443,31 @@
                 }
             },
 
+            highlightNode(id, color) {
+                const actualId = this._getActualId(id);
+                const node = this.data.find(n => n.id === actualId);
+                if (node) {
+                    node.color = color;
+                    this.render();
+                }
+            },
+
+            highlightEdge(fromId, toId, color, direction = 'next') {
+                const actualFromId = this._getActualId(fromId);
+                const node = this.data.find(n => n.id === actualFromId);
+                if (node) {
+                    if (direction === 'next') node.nextColor = color;
+                    else node.prevColor = color;
+                    this.render();
+                }
+            },
+
             clearHighlights() {
+                this.data.forEach(n => {
+                    delete n.color;
+                    delete n.nextColor;
+                    delete n.prevColor;
+                });
                 this.render();
             },
 
@@ -3408,8 +3488,9 @@
                     this.pointers['tail'] = { nodeId: this.data[this.data.length - 1].id, color: '#3b82f6' };
                 }
 
-                const nodeWidth = 100;
-                const gap = 100;
+                const nodeWidth = 220;
+                const nodeHeight = 70;
+                const gap = 80;
                 const startX = 40;
                 const startY = 100;
 
@@ -3424,44 +3505,34 @@
                 html += `<svg style="position: absolute; left: 0; top: 0; width: ${totalWidth}px; height: 100%; pointer-events: none;">
                     <defs>
                         <marker id="dll-arrow-r-${this.slotId}" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
-                            <polygon points="0 0, 10 3.5, 0 7" fill="#3b82f6" />
+                            <polygon points="0 0, 10 3.5, 0 7" fill="#64748b" />
                         </marker>
-                        <marker id="dll-arrow-l-${this.slotId}" markerWidth="10" markerHeight="7" refX="1" refY="3.5" orient="auto">
-                            <polygon points="10 0, 0 3.5, 10 7" fill="#60a5fa" />
+                        <marker id="dll-arrow-l-${this.slotId}" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                            <polygon points="0 0, 10 3.5, 0 7" fill="#64748b" />
                         </marker>
                     </defs>`;
 
                 // Draw arrows
                 this.data.forEach(node => {
                     const pos = nodeMap[node.id];
-                    const nextColor = node.nextColor || '#3b82f6';
-                    const prevColor = node.prevColor || '#60a5fa';
+                    const nextColor = node.nextColor || '#64748b';
+                    const prevColor = node.prevColor || '#64748b';
 
                     if (node.nextId && nodeMap[node.nextId]) {
                         const target = nodeMap[node.nextId];
                         const x1 = pos.x + nodeWidth;
                         const x2 = target.x;
-                        const y = pos.y + 35;
-                        if (Math.abs(pos.y - target.y) < 5 && pos.x < target.x) {
-                            html += `<path d="M ${x1} ${y} L ${x2} ${y}" stroke="${nextColor}" stroke-width="2" marker-end="url(#dll-arrow-r-${this.slotId})" />`;
-                        } else {
-                            const midX = (x1 + x2) / 2;
-                            const midY = (y + target.y + 35) / 2 - 40;
-                            html += `<path d="M ${x1} ${y} Q ${midX} ${midY} ${x2} ${target.y + 35}" fill="none" stroke="${nextColor}" stroke-width="2" marker-end="url(#dll-arrow-r-${this.slotId})" />`;
-                        }
+                        const y = pos.y + 24 + (nodeHeight / 2) - 6;
+
+                        html += `<path d="M ${x1} ${y} L ${x2} ${y}" stroke="${nextColor}" stroke-width="2" marker-end="url(#dll-arrow-r-${this.slotId})" fill="none" />`;
                     }
                     if (node.prevId && nodeMap[node.prevId]) {
                         const target = nodeMap[node.prevId];
                         const x1 = pos.x;
                         const x2 = target.x + nodeWidth;
-                        const y = pos.y + 45;
-                        if (Math.abs(pos.y - target.y) < 5 && pos.x > target.x) {
-                            html += `<path d="M ${x1} ${y} L ${x2} ${y}" stroke="${prevColor}" stroke-width="2" marker-end="url(#dll-arrow-l-${this.slotId})" />`;
-                        } else {
-                            const midX = (x1 + x2) / 2;
-                            const midY = (y + target.y + 45) / 2 + 40;
-                            html += `<path d="M ${x1} ${y} Q ${midX} ${midY} ${x2} ${target.y + 45}" fill="none" stroke="${prevColor}" stroke-width="2" marker-end="url(#dll-arrow-l-${this.slotId})" />`;
-                        }
+                        const y = pos.y + 24 + (nodeHeight / 2) + 6;
+
+                        html += `<path d="M ${x1} ${y} L ${x2} ${y}" stroke="${prevColor}" stroke-width="2" marker-end="url(#dll-arrow-l-${this.slotId})" fill="none" />`;
                     }
                 });
                 html += `</svg>`;
@@ -3488,11 +3559,34 @@
 
                     html += `<div class="dll-node-wrapper" style="position: absolute; left: ${pos.x}px; top: ${pos.y}px; width: ${nodeWidth}px; display:flex; flex-direction:column; align-items:center;">
                         <div class="dll-ptrs" style="position: absolute; bottom: calc(100% + 20px); display:flex; flex-direction:column; align-items:center; z-index:10;">${ptrs}</div>
-                        <div style="font-size: 0.65rem; color: #64748b; text-align: center; margin-bottom: 2px;">${node.addr}</div>
-                        <div class="dll-node-box" style="width:100%; background: #1e293b; border: 2px solid ${node.color || '#334155'}; border-radius: 6px; position: relative; transition: all 0.2s; ${node.color ? `box-shadow: 0 0 10px ${node.color};` : ''}">
-                            <div style="padding: 4px; text-align: center; color: #4ade80; font-size: 0.6rem; border-bottom: 1px solid #334155; font-family: monospace;">P: ${prevAddr}</div>
-                            <div style="padding: 10px; text-align: center; font-weight: bold; color: white; font-size: 1.1rem;">${node.val}</div>
-                            <div style="padding: 4px; text-align: center; color: #3b82f6; font-size: 0.6rem; border-top: 1px solid #334155; font-family: monospace;">N: ${nextAddr}</div>
+                        <div style="font-size: 0.7rem; color: #ef4444; font-family: 'Fira Code', monospace; margin-bottom: 6px; font-weight: bold;">${node.addr}</div>
+                        <div class="dll-node-box" style="
+                            width: 100%;
+                            height: ${nodeHeight}px;
+                            background: #1e293b;
+                            border: 2px solid ${node.color || '#334155'};
+                            border-radius: 8px;
+                            display: flex;
+                            overflow: hidden;
+                            transition: all 0.2s;
+                            ${node.color ? `box-shadow: 0 0 15px ${node.color};` : 'box-shadow: 0 4px 6px rgba(0,0,0,0.3);'}
+                        ">
+                            <!-- PREV Section -->
+                            <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; border-right: 1px solid #334155; background: rgba(255,255,255,0.02);">
+                                <div style="font-size: 0.55rem; color: #64748b; font-weight: bold; letter-spacing: 1px; margin-bottom: 2px;">PREV</div>
+                                <div style="font-size: 0.65rem; color: #94a3b8; font-family: monospace;">${prevAddr}</div>
+                            </div>
+
+                            <!-- DATA Section -->
+                            <div style="flex: 1.2; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.2);">
+                                <div style="font-weight: 900; color: white; font-size: 1.4rem; font-family: 'Fira Code', monospace;">${node.val}</div>
+                            </div>
+
+                            <!-- NEXT Section -->
+                            <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; border-left: 1px solid #334155; background: rgba(255,255,255,0.02);">
+                                <div style="font-size: 0.55rem; color: #64748b; font-weight: bold; letter-spacing: 1px; margin-bottom: 2px;">NEXT</div>
+                                <div style="font-size: 0.65rem; color: #94a3b8; font-family: monospace;">${nextAddr}</div>
+                            </div>
                         </div>
                     </div>`;
                 });
@@ -3516,8 +3610,14 @@
             popFront() { const v = this.data.shift(); this.render(); return v; },
             pushBack(v) { this.data.push(v); this.render(); },
             popBack() { const v = this.data.pop(); this.render(); return v; },
-            peekFront() { return this.data[0]; },
+            // Aliases for poll/add
+            addFirst(v) { this.pushFront(v); },
+            addLast(v) { this.pushBack(v); },
+            pollFirst() { return this.popFront(); },
+            pollLast() { return this.popBack(); },
+            peekFirst() { return this.data[0]; },
             peekBack() { return this.data[this.data.length - 1]; },
+            peekLast() { return this.peekBack(); },
             isEmpty() { return this.data.length === 0; },
             size() { return this.data.length; },
             init(arr) { this.data = [...arr]; this.render(); },
@@ -4026,9 +4126,9 @@
                 updateButtons();
 
                 if (result !== undefined) {
-                    log(`✅ Finished! Result: ${JSON.stringify(result)}`);
+                    log(` Finished! Result: ${JSON.stringify(result)}`);
                 } else {
-                    log(`✅ Finished!`);
+                    log(` Finished!`);
                 }
             } catch (e) {
                 log(`❌ Error: ${e.message}`);

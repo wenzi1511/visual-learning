@@ -570,3 +570,98 @@ export function peekQueue() {
         }, 1000);
     }
 }
+
+export function renderDeque(vals, container = state.dom.stage, isEmbedded = false) {
+    const existing = container.querySelector('.deque-container');
+    if (existing) container.removeChild(existing);
+
+    const cont = document.createElement('div');
+    cont.className = 'deque-container' + (isEmbedded ? ' embedded' : '');
+
+    if (isEmbedded) {
+        cont.style.position = 'static';
+        cont.style.transform = 'none';
+        cont.style.margin = '5px 0';
+    }
+
+    vals.forEach(v => {
+        cont.innerHTML += `<div class="deque-item">${v}</div>`;
+    });
+    container.appendChild(cont);
+}
+
+export function addFirstDeque(val) {
+    if (state.currentMode !== 'deque') return;
+    resetStepController();
+    state.dsData.unshift(val);
+    renderDeque(state.dsData);
+}
+
+export function addLastDeque(val) {
+    if (state.currentMode !== 'deque') return;
+    resetStepController();
+    state.dsData.push(val);
+    renderDeque(state.dsData);
+}
+
+export function pollFirstDeque() {
+    if (state.currentMode !== 'deque') return;
+    resetStepController();
+    if (state.dsData.length === 0) {
+        alert("Deque is empty!");
+        return;
+    }
+    state.dsData.shift();
+    renderDeque(state.dsData);
+}
+
+export function pollLastDeque() {
+    if (state.currentMode !== 'deque') return;
+    resetStepController();
+    if (state.dsData.length === 0) {
+        alert("Deque is empty!");
+        return;
+    }
+    state.dsData.pop();
+    renderDeque(state.dsData);
+}
+
+export function peekFirstDeque() {
+    if (state.currentMode !== 'deque') return;
+    resetStepController();
+    if (state.dsData.length === 0) {
+        alert("Deque is empty!");
+        return;
+    }
+
+    const items = state.dom.stage.querySelectorAll('.deque-item');
+    if (items.length > 0) {
+        const frontItem = items[0];
+        frontItem.style.backgroundColor = '#ec4899';
+        frontItem.style.transform = 'scale(1.1)';
+        setTimeout(() => {
+            frontItem.style.backgroundColor = '';
+            frontItem.style.transform = '';
+        }, 1000);
+    }
+}
+
+export function peekLastDeque() {
+    if (state.currentMode !== 'deque') return;
+    resetStepController();
+    if (state.dsData.length === 0) {
+        alert("Deque is empty!");
+        return;
+    }
+
+    const items = state.dom.stage.querySelectorAll('.deque-item');
+    if (items.length > 0) {
+        const backItem = items[items.length - 1];
+        backItem.style.backgroundColor = '#ec4899';
+        backItem.style.transform = 'scale(1.1)';
+        setTimeout(() => {
+            backItem.style.backgroundColor = '';
+            backItem.style.transform = '';
+        }, 1000);
+    }
+}

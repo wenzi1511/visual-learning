@@ -1,6 +1,6 @@
 import { state, initGlobals } from './state.js';
 import { initCanvas, resetZoom } from './canvas.js';
-import { renderArray, renderStack, renderQueue, pushToStack, popFromStack, peekStack, enqueueToQueue, dequeueFromQueue, peekQueue, insertArray, updateArray, deleteArray, searchArray, nextStep, prevStep, resetStepController } from './ds/linear.js';
+import { renderArray, renderStack, renderQueue, renderDeque, pushToStack, popFromStack, peekStack, enqueueToQueue, dequeueFromQueue, peekQueue, addFirstDeque, addLastDeque, pollFirstDeque, pollLastDeque, peekFirstDeque, peekLastDeque, insertArray, updateArray, deleteArray, searchArray, nextStep, prevStep, resetStepController } from './ds/linear.js';
 import { initList, appendList, prependList, removeListVal, popListHead, popListTail, searchList } from './ds/list.js';
 import { initBST, initBT, runBFS, runDFS, nextTreeStep, prevTreeStep, resetTreeStepController, searchBST } from './ds/tree.js';
 import { initGraph, nextGraphStep, prevGraphStep, resetGraphStepController } from './ds/graph.js';
@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
         state.dsData = []; // Reset data
 
         const titles = {
-            'array': 'Array', 'stack': 'Stack', 'queue': 'Queue',
+            'array': 'Array', 'stack': 'Stack', 'queue': 'Queue', 'deque': 'Deque',
             'sll': 'Singly Linked List', 'dll': 'Doubly Linked List', 'cll': 'Circular Linked List',
             'bt': 'Binary Tree', 'bst': 'Binary Search Tree', 'graph': 'Graph', 'grid': 'Grid',
             'hashmap': 'HashMap', 'hashmap-simple': 'HashMap (Simple)', 'hashset': 'HashSet', 'hashset-simple': 'HashSet (Simple)', 'treemap': 'TreeMap', 'linkedhashmap': 'LinkedHashMap',
@@ -69,6 +69,13 @@ document.addEventListener('DOMContentLoaded', () => {
             state.dom.queueWindowK.value = '';
         } else {
             state.dom.queueControls.classList.add('hidden');
+        }
+
+        // Toggle Deque Controls
+        if (type === 'deque') {
+            state.dom.dequeControls.classList.remove('hidden');
+        } else {
+            state.dom.dequeControls.classList.add('hidden');
         }
 
         // Toggle Heap Controls
@@ -276,6 +283,55 @@ document.addEventListener('DOMContentLoaded', () => {
     state.dom.btnPeekQueue.addEventListener('click', () => {
         peekQueue();
     });
+
+    // Deque Operations
+    if (state.dom.btnDequeAddFirst) {
+        state.dom.btnDequeAddFirst.addEventListener('click', () => {
+            const raw = state.dom.dequeInput.value.trim();
+            const val = Number(raw);
+            if (raw !== '' && !isNaN(val)) {
+                addFirstDeque(val);
+                state.dom.dequeInput.value = '';
+                state.dom.dequeInput.focus();
+            }
+        });
+    }
+
+    if (state.dom.btnDequeAddLast) {
+        state.dom.btnDequeAddLast.addEventListener('click', () => {
+            const raw = state.dom.dequeInput.value.trim();
+            const val = Number(raw);
+            if (raw !== '' && !isNaN(val)) {
+                addLastDeque(val);
+                state.dom.dequeInput.value = '';
+                state.dom.dequeInput.focus();
+            }
+        });
+    }
+
+    if (state.dom.btnDequePollFirst) {
+        state.dom.btnDequePollFirst.addEventListener('click', () => {
+            pollFirstDeque();
+        });
+    }
+
+    if (state.dom.btnDequePollLast) {
+        state.dom.btnDequePollLast.addEventListener('click', () => {
+            pollLastDeque();
+        });
+    }
+
+    if (state.dom.btnDequePeekFirst) {
+        state.dom.btnDequePeekFirst.addEventListener('click', () => {
+            peekFirstDeque();
+        });
+    }
+
+    if (state.dom.btnDequePeekLast) {
+        state.dom.btnDequePeekLast.addEventListener('click', () => {
+            peekLastDeque();
+        });
+    }
 
     // Queue Monotonic Toggle: Off → Increasing → Decreasing → Off
     state.dom.btnQueueMonotonic.addEventListener('click', () => {
@@ -732,6 +788,7 @@ function renderStructure(inputStr) {
         case 'array': renderArray(vals); break;
         case 'stack': renderStack(vals); break;
         case 'queue': renderQueue(vals); break;
+        case 'deque': renderDeque(vals); break;
 
         case 'sll': initList(vals, 'sll'); break;
         case 'dll': initList(vals, 'dll'); break;
@@ -794,7 +851,7 @@ function setupStepControls() {
         const mode = state.currentMode;
         if (!mode) return;
 
-        if (['array', 'stack', 'queue', 'list', 'sll', 'dll', 'cll'].includes(mode)) {
+        if (['array', 'stack', 'queue', 'deque', 'list', 'sll', 'dll', 'cll'].includes(mode)) {
             nextStep();
         } else if (['bst', 'bt'].includes(mode)) {
             nextTreeStep();
@@ -811,7 +868,7 @@ function setupStepControls() {
         const mode = state.currentMode;
         if (!mode) return;
 
-        if (['array', 'stack', 'queue', 'list', 'sll', 'dll', 'cll'].includes(mode)) {
+        if (['array', 'stack', 'queue', 'deque', 'list', 'sll', 'dll', 'cll'].includes(mode)) {
             prevStep();
         } else if (['bst', 'bt'].includes(mode)) {
             prevTreeStep();
