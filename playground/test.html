@@ -2952,6 +2952,13 @@
                 };
             },
 
+            _getActualId(id) {
+                if (typeof id === 'object' && id !== null) {
+                    return id.nodeId || id.id || id;
+                }
+                return id;
+            },
+
             init(vals) {
                 this.data = vals.map(v => this._makeNode(v));
                 // Set initial sequential links
@@ -2964,13 +2971,15 @@
 
             // Pointer API
             createPointer(name, nodeId, color = '#3b82f6') {
-                this.pointers[name] = { nodeId, color };
+                const actualId = this._getActualId(nodeId);
+                this.pointers[name] = { nodeId: actualId, color };
                 this.render();
             },
 
             movePointer(name, nodeId) {
                 if (this.pointers[name]) {
-                    this.pointers[name].nodeId = nodeId;
+                    const actualId = this._getActualId(nodeId);
+                    this.pointers[name].nodeId = actualId;
                     this.render();
                 }
             },
@@ -2981,20 +2990,24 @@
             },
 
             getNextId(nodeId) {
-                const node = this.data.find(n => n.id === nodeId);
+                const actualId = this._getActualId(nodeId);
+                const node = this.data.find(n => n.id === actualId);
                 return node ? node.nextId : null;
             },
 
             link(fromId, toId) {
-                const node = this.data.find(n => n.id === fromId);
+                const actualFromId = this._getActualId(fromId);
+                const actualToId = this._getActualId(toId);
+                const node = this.data.find(n => n.id === actualFromId);
                 if (node) {
-                    node.nextId = toId;
+                    node.nextId = actualToId;
                     this.render();
                 }
             },
 
             unlink(id) {
-                const node = this.data.find(n => n.id === id);
+                const actualId = this._getActualId(id);
+                const node = this.data.find(n => n.id === actualId);
                 if (node) {
                     node.nextId = null;
                     this.render();
@@ -3055,7 +3068,31 @@
                 }
             },
 
+            highlightNode(id, color) {
+                const actualId = this._getActualId(id);
+                const node = this.data.find(n => n.id === actualId);
+                if (node) {
+                    node.color = color;
+                    this.render();
+                }
+            },
+
+            highlightEdge(fromId, toId, color, direction = 'next') {
+                const actualFromId = this._getActualId(fromId);
+                const node = this.data.find(n => n.id === actualFromId);
+                if (node) {
+                    if (direction === 'next') node.nextColor = color;
+                    else node.prevColor = color;
+                    this.render();
+                }
+            },
+
             clearHighlights() {
+                this.data.forEach(n => {
+                    delete n.color;
+                    delete n.nextColor;
+                    delete n.prevColor;
+                });
                 this.render();
             },
 
@@ -3108,14 +3145,33 @@
                         const x2 = target.x;
                         const y2 = target.y + 30;
 
-                        if (Math.abs(y1 - y2) < 5 && x1 < x2) {
-                            // Forward link
-                            html += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#64748b" stroke-width="2" marker-end="url(#arrow-${this.slotId})" />`;
+                        const color = node.nextColor || '#64748b';
+                        if (x1 < x2) {
+                            // Forward link (normal or skip)
+                            const midY = (y1 + y2) / 2;
+                            if (Math.abs(x2 - x1) > (nodeWidth + gap + 10)) {
+                                // Long skip: curved
+                                const midX = (x1 + x2) / 2;
+                                html += `<path d="M ${x1} ${y1} Q ${midX} ${midY - 40} ${x2} ${y2}" fill="none" stroke="${color}" stroke-width="2" marker-end="url(#arrow-${this.slotId})" />`;
+                            } else {
+                                // Normal adjacent: straight
+                                html += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${color}" stroke-width="2" marker-end="url(#arrow-${this.slotId})" />`;
+                            }
                         } else {
-                            // Curved link for reverse or skip
-                            const midX = (x1 + x2) / 2;
-                            const midY = (y1 + y2) / 2 - 40;
-                            html += `<path d="M ${x1} ${y1} Q ${midX} ${midY} ${x2} ${y2}" fill="none" stroke="#64748b" stroke-width="2" marker-end="url(#arrow-${this.slotId})" />`;
+                            // Backward link (reverse)
+                            const by1 = nodeMap[node.id].y + 45;
+                            const by2 = target.y + 45;
+                            const bx1 = nodeMap[node.id].x;
+                            const bx2 = target.x + nodeWidth;
+
+                            if (Math.abs(bx1 - bx2) < (nodeWidth + gap + 10)) {
+                                // Normal adjacent reverse: straight with offset
+                                html += `<line x1="${bx1}" y1="${by1}" x2="${bx2}" y2="${by2}" stroke="${color}" stroke-width="2" marker-end="url(#arrow-${this.slotId})" />`;
+                            } else {
+                                // Long skip reverse: curved
+                                const midX = (bx1 + bx2) / 2;
+                                html += `<path d="M ${bx1} ${by1} Q ${midX} ${by1 + 40} ${bx2} ${by2}" fill="none" stroke="${color}" stroke-width="2" marker-end="url(#arrow-${this.slotId})" />`;
+                            }
                         }
                     }
                 });
@@ -3148,15 +3204,16 @@
                         flex-direction: column;
                         align-items: center;
                     ">
-                        <div class="sll-ptrs" style="position: absolute; top: -45px; display:flex; flex-direction:column; align-items:center;">${ptrs}</div>
+                        <div class="sll-ptrs" style="position: absolute; bottom: calc(100% + 20px); display:flex; flex-direction:column; align-items:center; z-index:10;">${ptrs}</div>
                         <div class="sll-addr" style="font-size: 0.7rem; color: #94a3b8; margin-bottom: 4px;">${node.addr}</div>
                         <div class="sll-node-box" style="
                             width: 100%;
                             background: #1e293b;
-                            border: 2px solid #334155;
+                            border: 2px solid ${node.color || '#334155'};
                             border-radius: 6px;
                             overflow: hidden;
                             transition: all 0.2s;
+                            ${node.color ? `box-shadow: 0 0 10px ${node.color};` : ''}
                         ">
                              <div class="sll-val" style="
                                 padding: 8px;
@@ -3209,6 +3266,13 @@
                 };
             },
 
+            _getActualId(id) {
+                if (typeof id === 'object' && id !== null) {
+                    return id.nodeId || id.id || id;
+                }
+                return id;
+            },
+
             init(vals) {
                 this.data = vals.map(v => this._makeNode(v));
                 // Set initial sequential links
@@ -3222,12 +3286,14 @@
 
             // Pointer API
             createPointer(name, nodeId, color = '#3b82f6') {
-                this.pointers[name] = { nodeId, color };
+                const actualId = this._getActualId(nodeId);
+                this.pointers[name] = { nodeId: actualId, color };
                 this.render();
             },
             movePointer(name, nodeId) {
                 if (this.pointers[name]) {
-                    this.pointers[name].nodeId = nodeId;
+                    const actualId = this._getActualId(nodeId);
+                    this.pointers[name].nodeId = actualId;
                     this.render();
                 }
             },
@@ -3237,25 +3303,30 @@
             },
 
             getNextId(nodeId) {
-                const node = this.data.find(n => n.id === nodeId);
+                const actualId = this._getActualId(nodeId);
+                const node = this.data.find(n => n.id === actualId);
                 return node ? node.nextId : null;
             },
             getPrevId(nodeId) {
-                const node = this.data.find(n => n.id === nodeId);
+                const actualId = this._getActualId(nodeId);
+                const node = this.data.find(n => n.id === actualId);
                 return node ? node.prevId : null;
             },
 
             link(fromId, toId, direction = 'next') {
-                const node = this.data.find(n => n.id === fromId);
+                const actualFromId = this._getActualId(fromId);
+                const actualToId = this._getActualId(toId);
+                const node = this.data.find(n => n.id === actualFromId);
                 if (node) {
-                    if (direction === 'next') node.nextId = toId;
-                    else node.prevId = toId;
+                    if (direction === 'next') node.nextId = actualToId;
+                    else node.prevId = actualToId;
                     this.render();
                 }
             },
 
             unlink(id, direction = 'both') {
-                const node = this.data.find(n => n.id === id);
+                const actualId = this._getActualId(id);
+                const node = this.data.find(n => n.id === actualId);
                 if (node) {
                     if (direction === 'next' || direction === 'both') node.nextId = null;
                     if (direction === 'prev' || direction === 'both') node.prevId = null;
@@ -3363,30 +3434,33 @@
                 // Draw arrows
                 this.data.forEach(node => {
                     const pos = nodeMap[node.id];
+                    const nextColor = node.nextColor || '#3b82f6';
+                    const prevColor = node.prevColor || '#60a5fa';
+
                     if (node.nextId && nodeMap[node.nextId]) {
                         const target = nodeMap[node.nextId];
                         const x1 = pos.x + nodeWidth;
                         const x2 = target.x;
                         const y = pos.y + 35;
                         if (Math.abs(pos.y - target.y) < 5 && pos.x < target.x) {
-                            html += `<path d="M ${x1} ${y} L ${x2} ${y}" stroke="#3b82f6" stroke-width="2" marker-end="url(#dll-arrow-r-${this.slotId})" />`;
+                            html += `<path d="M ${x1} ${y} L ${x2} ${y}" stroke="${nextColor}" stroke-width="2" marker-end="url(#dll-arrow-r-${this.slotId})" />`;
                         } else {
                             const midX = (x1 + x2) / 2;
                             const midY = (y + target.y + 35) / 2 - 40;
-                            html += `<path d="M ${x1} ${y} Q ${midX} ${midY} ${x2} ${target.y + 35}" fill="none" stroke="#3b82f6" stroke-width="2" marker-end="url(#dll-arrow-r-${this.slotId})" />`;
+                            html += `<path d="M ${x1} ${y} Q ${midX} ${midY} ${x2} ${target.y + 35}" fill="none" stroke="${nextColor}" stroke-width="2" marker-end="url(#dll-arrow-r-${this.slotId})" />`;
                         }
                     }
                     if (node.prevId && nodeMap[node.prevId]) {
                         const target = nodeMap[node.prevId];
                         const x1 = pos.x;
                         const x2 = target.x + nodeWidth;
-                        const y = pos.y + 55;
+                        const y = pos.y + 45;
                         if (Math.abs(pos.y - target.y) < 5 && pos.x > target.x) {
-                            html += `<path d="M ${x1} ${y} L ${x2} ${y}" stroke="#60a5fa" stroke-width="2" marker-end="url(#dll-arrow-l-${this.slotId})" />`;
+                            html += `<path d="M ${x1} ${y} L ${x2} ${y}" stroke="${prevColor}" stroke-width="2" marker-end="url(#dll-arrow-l-${this.slotId})" />`;
                         } else {
                             const midX = (x1 + x2) / 2;
-                            const midY = (y + target.y + 55) / 2 + 40;
-                            html += `<path d="M ${x1} ${y} Q ${midX} ${midY} ${x2} ${target.y + 55}" fill="none" stroke="#60a5fa" stroke-width="2" marker-end="url(#dll-arrow-l-${this.slotId})" />`;
+                            const midY = (y + target.y + 45) / 2 + 40;
+                            html += `<path d="M ${x1} ${y} Q ${midX} ${midY} ${x2} ${target.y + 45}" fill="none" stroke="${prevColor}" stroke-width="2" marker-end="url(#dll-arrow-l-${this.slotId})" />`;
                         }
                     }
                 });
@@ -3413,9 +3487,9 @@
                         .join('');
 
                     html += `<div class="dll-node-wrapper" style="position: absolute; left: ${pos.x}px; top: ${pos.y}px; width: ${nodeWidth}px; display:flex; flex-direction:column; align-items:center;">
-                        <div class="dll-ptrs" style="position: absolute; top: -50px; display:flex; flex-direction:column; align-items:center; z-index:10;">${ptrs}</div>
+                        <div class="dll-ptrs" style="position: absolute; bottom: calc(100% + 20px); display:flex; flex-direction:column; align-items:center; z-index:10;">${ptrs}</div>
                         <div style="font-size: 0.65rem; color: #64748b; text-align: center; margin-bottom: 2px;">${node.addr}</div>
-                        <div class="dll-node-box" style="width:100%; background: #1e293b; border: 2px solid #334155; border-radius: 6px; position: relative; transition: all 0.2s;">
+                        <div class="dll-node-box" style="width:100%; background: #1e293b; border: 2px solid ${node.color || '#334155'}; border-radius: 6px; position: relative; transition: all 0.2s; ${node.color ? `box-shadow: 0 0 10px ${node.color};` : ''}">
                             <div style="padding: 4px; text-align: center; color: #4ade80; font-size: 0.6rem; border-bottom: 1px solid #334155; font-family: monospace;">P: ${prevAddr}</div>
                             <div style="padding: 10px; text-align: center; font-weight: bold; color: white; font-size: 1.1rem;">${node.val}</div>
                             <div style="padding: 4px; text-align: center; color: #3b82f6; font-size: 0.6rem; border-top: 1px solid #334155; font-family: monospace;">N: ${nextAddr}</div>
