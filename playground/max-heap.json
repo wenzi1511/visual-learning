@@ -1,0 +1,32 @@
+{
+    "id": "max-heap-demo",
+    "name": "Max Heap Demo",
+    "title": "Max Heap Operations",
+    "difficulty": "Easy",
+    "description": "Visualizing Max Heap operations: Build, Push, Pop, and Heap Sort (Descending).",
+    "tags": [
+        "Heap",
+        "Priority Queue",
+        "Sorting"
+    ],
+    "slots": [
+        {
+            "id": "heap",
+            "type": "heap",
+            "label": "Max Heap"
+        },
+        {
+            "id": "sorted",
+            "type": "array",
+            "label": "Sorted Output"
+        }
+    ],
+    "inputs": [
+        {
+            "label": "Initial Values",
+            "placeholder": "10, 5, 30, 2, 8",
+            "default": "10, 5, 30, 2, 8, 15, 1"
+        }
+    ],
+    "code": "class Playground {\n    async run(inputs) {\n        const inputStr = inputs[0] || '10, 5, 30, 2, 8, 15, 1';\n        const vals = inputStr.split(',').map(v => parseInt(v.trim())).filter(n => !isNaN(n));\n\n        this.log('Building Max Heap from input...');\n        this.heap.init(vals, 'max');\n        this.sorted.init([]);\n        await this.await();\n\n        this.log('Pushing value 50...');\n        this.heap.push(50);\n        await this.await();\n        \n        this.log('Pushing value 12...');\n        this.heap.push(12);\n        await this.await();\n\n        this.log('Starting Heap Sort (Extract Max)...');\n        const sortedArr = [];\n        while (true) {\n            const max = this.heap.pop();\n            if (max === null) break;\n            \n            this.log(`Extracted Max: ${max}`);\n            sortedArr.push(max);\n            this.sorted.push(max);\n            await this.await();\n        }\n\n        this.log('Heap Sort Complete!');\n    }\n}"
+}

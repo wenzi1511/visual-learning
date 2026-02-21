@@ -1009,6 +1009,22 @@
             text-decoration: none;
         }
 
+        .layout-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            flex: 1;
+        }
+
+        /* Allow slot panels to be resizable */
+        #slots-container .panel {
+            resize: both;
+            overflow: auto;
+            min-height: 300px;
+            min-width: 400px;
+            position: relative;
+        }
+
         .home-btn:hover {
             background: rgba(59, 130, 246, 0.2);
             color: #60a5fa;
@@ -1025,7 +1041,7 @@
     </button>
 
     <div class="container">
-        <h1>🎮 Playground Test</h1>
+        <h1>Playground Test</h1>
 
         <div class="main-layout" id="main-layout">
             <!-- Left: Problem Description + Input -->
@@ -1520,8 +1536,12 @@
                         break;
                     case 'sll':
                         primitive = createSLLPrimitive(slotId);
-                    case 'sll':
-                        primitive = createSLLPrimitive(slotId);
+                        break;
+                    case 'dll':
+                        primitive = createDLLPrimitive(slotId);
+                        break;
+                    case 'deque':
+                        primitive = createDequePrimitive(slotId);
                         break;
                     case 'union-find':
                         primitive = createUnionFindPrimitive(slotId);
@@ -1531,6 +1551,9 @@
                         break;
                     case 'heap':
                         primitive = createHeapPrimitive(slotId);
+                        break;
+                    case 'graph':
+                        primitive = createGraphPrimitive(slotId);
                         break;
                     default:
                         primitive = createArrayPrimitive(slotId);
@@ -2428,6 +2451,221 @@
             }
         });
 
+        // ============ GRAPH PRIMITIVE ============
+
+        const createGraphPrimitive = (slotId) => ({
+            slotId,
+            nodes: [], // { id, val, x, y }
+            edges: [], // { source, target, isDirected, weight }
+
+            init(nodes, edges) {
+                this.nodes = nodes.map(n => ({
+                    id: String(n.id || n.val),
+                    val: n.val,
+                    x: n.x,
+                    y: n.y
+                }));
+                this.edges = edges.map(e => ({
+                    source: String(e.source),
+                    target: String(e.target),
+                    isDirected: !!e.isDirected,
+                    weight: e.weight
+                }));
+                this.applyCircularLayoutIfMissing();
+                this.render();
+            },
+
+            addNode(id, val, x, y) {
+                this.nodes.push({ id: String(id), val, x, y });
+                this.render();
+            },
+
+            addEdge(u, v, isDirected = false, weight = null) {
+                this.edges.push({ source: String(u), target: String(v), isDirected, weight });
+                this.render();
+            },
+
+            getNeighbors(u) {
+                const uid = String(u);
+                const neighbors = [];
+                this.edges.forEach(e => {
+                    if (e.source === uid) neighbors.push({ node: e.target, weight: e.weight });
+                    else if (!e.isDirected && e.target === uid) neighbors.push({ node: e.source, weight: e.weight });
+                });
+                return neighbors;
+            },
+
+            highlightNode(id, color) {
+                const uid = String(id);
+                const container = document.getElementById(`slot-${this.slotId}-content`);
+                if (!container) return;
+                const el = container.querySelector(`[data-node-id="${uid}"]`);
+                if (el) {
+                    el.style.backgroundColor = color;
+                    if (color) {
+                        el.style.borderColor = color;
+                        el.style.boxShadow = `0 0 15px ${color}`;
+                    } else {
+                        el.style.backgroundColor = '#1e293b';
+                        el.style.borderColor = '#64748b';
+                        el.style.boxShadow = '0 4px 6px rgba(0,0,0,0.3)';
+                    }
+                }
+            },
+
+            highlightEdge(u, v, color) {
+                const uid = String(u);
+                const vid = String(v);
+                const container = document.getElementById(`slot-${this.slotId}-content`);
+                if (!container) return;
+                const edgeKey = `edge-${uid}-${vid}`;
+                const el = container.querySelector(`[data-edge-key="${edgeKey}"]`) || container.querySelector(`[data-edge-key="edge-${vid}-${uid}"]`);
+                if (el) {
+                    el.style.stroke = color || '#64748b';
+                    el.style.strokeWidth = color ? '3' : '2';
+                }
+            },
+
+            clearHighlights() {
+                this.render();
+            },
+
+            applyCircularLayoutIfMissing() {
+                const nodesToLayout = this.nodes.filter(n => n.x === undefined || n.y === undefined);
+                if (nodesToLayout.length === 0) return;
+
+                // 1. Find Connected Components
+                const visited = new Set();
+                const components = [];
+
+                this.nodes.forEach(startNode => {
+                    if (!visited.has(startNode.id)) {
+                        const component = [];
+                        const queue = [startNode.id];
+                        visited.add(startNode.id);
+                        while (queue.length > 0) {
+                            const u = queue.shift();
+                            component.push(u);
+                            this.getNeighbors(u).forEach(edge => {
+                                if (!visited.has(edge.node)) {
+                                    visited.add(edge.node);
+                                    queue.push(edge.node);
+                                }
+                            });
+                        }
+                        components.push(component);
+                    }
+                });
+
+                // 2. Layout each component in its own space
+                const componentCount = components.length;
+                const cols = Math.ceil(Math.sqrt(componentCount));
+                const cellWidth = 400;
+                const cellHeight = 350;
+
+                components.forEach((compNodes, idx) => {
+                    const row = Math.floor(idx / cols);
+                    const col = idx % cols;
+                    const center = {
+                        x: col * cellWidth + cellWidth / 2,
+                        y: row * cellHeight + cellHeight / 2
+                    };
+                    const radius = Math.min(120, compNodes.length * 25 + 40);
+
+                    compNodes.forEach((nodeId, i) => {
+                        const n = this.nodes.find(node => node.id === nodeId);
+                        if (n && (n.x === undefined || n.y === undefined)) {
+                            const angle = (2 * Math.PI * i) / compNodes.length;
+                            n.x = center.x + radius * Math.cos(angle);
+                            n.y = center.y + radius * Math.sin(angle);
+                        }
+                    });
+                });
+            },
+
+            render() {
+                const container = document.getElementById(`slot-${this.slotId}-content`);
+                if (!container) return;
+
+                if (this.nodes.length === 0) {
+                    container.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#64748b;font-style:italic;">Empty Graph</div>';
+                    return;
+                }
+
+                let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+                this.nodes.forEach(n => {
+                    minX = Math.min(minX, n.x);
+                    maxX = Math.max(maxX, n.x);
+                    minY = Math.min(minY, n.y);
+                    maxY = Math.max(maxY, n.y);
+                });
+
+                const width = Math.max(maxX + 100, 500);
+                const height = Math.max(maxY + 100, 400);
+
+                let html = `<div class="graph-wrapper" style="position:relative; width:100%; height:100%; min-height:400px; overflow:auto;">
+                    <div class="graph-stage" style="position:relative; width:${width}px; height:${height}px;">`;
+
+                html += `<svg style="position:absolute; left:0; top:0; width:100%; height:100%; overflow:visible; pointer-events:none;">
+                    <defs>
+                        <marker id="graph-arrow-${this.slotId}" markerWidth="10" markerHeight="7" refX="24" refY="3.5" orient="auto">
+                            <polygon points="0 0, 10 3.5, 0 7" fill="#64748b" />
+                        </marker>
+                    </defs>`;
+
+                // Draw Edges
+                this.edges.forEach(e => {
+                    const s = this.nodes.find(n => n.id === e.source);
+                    const t = this.nodes.find(n => n.id === e.target);
+                    if (s && t) {
+                        const edgeKey = `edge-${s.id}-${t.id}`;
+                        const marker = e.isDirected ? `marker-end="url(#graph-arrow-${this.slotId})"` : '';
+
+                        html += `<path data-edge-key="${edgeKey}" d="M ${s.x} ${s.y} L ${t.x} ${t.y}" 
+                                stroke="#64748b" stroke-width="2" ${marker} fill="none" />`;
+
+                        if (e.weight !== null && e.weight !== undefined) {
+                            const midX = (s.x + t.x) / 2;
+                            const midY = (s.y + t.y) / 2;
+                            html += `<text x="${midX}" y="${midY}" fill="#94a3b8" font-size="12" font-family="monospace" text-anchor="middle" dy="-5">${e.weight}</text>`;
+                        }
+                    }
+                });
+                html += `</svg>`;
+
+                // Draw Nodes
+                this.nodes.forEach(n => {
+                    html += `<div class="graph-node" data-node-id="${n.id}" style="
+                        position:absolute;
+                        left:${n.x}px;
+                        top:${n.y}px;
+                        width:36px;
+                        height:36px;
+                        background:#1e293b;
+                        border:2px solid #64748b;
+                        border-radius:50%;
+                        color:white;
+                        display:flex;
+                        align-items:center;
+                        justify-content:center;
+                        font-family:'Fira Code', monospace;
+                        font-weight:bold;
+                        font-size:0.9rem;
+                        transform:translate(-50%, -50%);
+                        transition:all 0.3s ease;
+                        z-index:2;
+                        box-shadow:0 4px 6px rgba(0,0,0,0.3);
+                    ">${n.val}</div>`;
+                });
+
+                html += `</div></div>`;
+                container.innerHTML = html;
+            },
+
+            clone() { return { nodes: JSON.parse(JSON.stringify(this.nodes)), edges: JSON.parse(JSON.stringify(this.edges)) }; },
+            restore(state) { this.nodes = state.nodes; this.edges = state.edges; this.render(); }
+        });
+
         // ============ TRIE PRIMITIVE ============
 
         class TrieNode {
@@ -2703,18 +2941,64 @@
         const createSLLPrimitive = (slotId) => ({
             slotId,
             data: [], // Array of { id, val, addr }
+            pointers: {}, // Map: name -> { nodeId, color }
 
             _makeNode(val) {
                 return {
                     id: Math.random().toString(36).substr(2, 9),
                     val: val,
-                    addr: '0x' + Math.floor(Math.random() * 65535).toString(16).toUpperCase().padStart(4, '0')
+                    addr: '0x' + Math.floor(Math.random() * 65535).toString(16).toUpperCase().padStart(4, '0'),
+                    nextId: null
                 };
             },
 
             init(vals) {
                 this.data = vals.map(v => this._makeNode(v));
+                // Set initial sequential links
+                for (let i = 0; i < this.data.length - 1; i++) {
+                    this.data[i].nextId = this.data[i + 1].id;
+                }
+                this.pointers = {};
                 this.render();
+            },
+
+            // Pointer API
+            createPointer(name, nodeId, color = '#3b82f6') {
+                this.pointers[name] = { nodeId, color };
+                this.render();
+            },
+
+            movePointer(name, nodeId) {
+                if (this.pointers[name]) {
+                    this.pointers[name].nodeId = nodeId;
+                    this.render();
+                }
+            },
+
+            removePointer(name) {
+                delete this.pointers[name];
+                this.render();
+            },
+
+            getNextId(nodeId) {
+                const node = this.data.find(n => n.id === nodeId);
+                return node ? node.nextId : null;
+            },
+
+            link(fromId, toId) {
+                const node = this.data.find(n => n.id === fromId);
+                if (node) {
+                    node.nextId = toId;
+                    this.render();
+                }
+            },
+
+            unlink(id) {
+                const node = this.data.find(n => n.id === id);
+                if (node) {
+                    node.nextId = null;
+                    this.render();
+                }
             },
 
             addHead(val) {
@@ -2789,22 +3073,24 @@
                     return;
                 }
 
-                // Horizontal layout
-                // We'll calculate positions manually or just use flexbox and simple arrows?
-                // Flexbox is easier for layout, but arrows need absolute coordinates.
-                // Let's use a similar approach to the main app: absolute positioning for arrows, but maybe we can use flex for nodes and calculate arrow positions?
-                // Or just fixed gap absolute.
+                // If no head pointer yet, set it to the first node in data
+                if (!this.pointers['head'] && this.data.length > 0) {
+                    this.pointers['head'] = { nodeId: this.data[0].id, color: '#3b82f6' };
+                }
 
                 const nodeWidth = 100;
-                const gap = 60;
-                const startX = 20;
-                const startY = 80;
+                const gap = 80;
+                const startX = 40;
+                const startY = 100;
 
-                let html = `<div class="sll-wrapper" style="position: relative; width: 100%; height: 200px; overflow-x: auto; overflow-y: hidden; background: rgba(0,0,0,0.2); border-radius: 8px;">`;
+                const nodeMap = {};
+                this.data.forEach((n, i) => {
+                    nodeMap[n.id] = { ...n, x: startX + i * (nodeWidth + gap), y: startY };
+                });
 
-                // SVG Layer for arrows
-                // We'll use a wide SVG that scrolls with content if possible, or just huge width.
                 const totalWidth = startX + this.data.length * (nodeWidth + gap) + 100;
+                let html = `<div class="sll-wrapper" style="position: relative; width: 100%; height: 300px; overflow: auto; background: rgba(0,0,0,0.2); border-radius: 8px;">`;
+
                 html += `<svg style="position: absolute; left: 0; top: 0; width: ${totalWidth}px; height: 100%; pointer-events: none;">
                     <defs>
                         <marker id="arrow-${this.slotId}" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
@@ -2813,32 +3099,56 @@
                     </defs>
                 `;
 
-                // Draw arrows
-                for (let i = 0; i < this.data.length - 1; i++) {
-                    const x1 = startX + i * (nodeWidth + gap) + nodeWidth; // Right edge of current
-                    const y1 = startY + 30; // Middle of box approx height 60
-                    const x2 = startX + (i + 1) * (nodeWidth + gap); // Left edge of next
-                    const y2 = y1;
+                // Draw arrows based on nextId
+                this.data.forEach(node => {
+                    if (node.nextId && nodeMap[node.nextId]) {
+                        const target = nodeMap[node.nextId];
+                        const x1 = nodeMap[node.id].x + nodeWidth;
+                        const y1 = nodeMap[node.id].y + 30;
+                        const x2 = target.x;
+                        const y2 = target.y + 30;
 
-                    html += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#64748b" stroke-width="2" marker-end="url(#arrow-${this.slotId})" />`;
-                }
+                        if (Math.abs(y1 - y2) < 5 && x1 < x2) {
+                            // Forward link
+                            html += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#64748b" stroke-width="2" marker-end="url(#arrow-${this.slotId})" />`;
+                        } else {
+                            // Curved link for reverse or skip
+                            const midX = (x1 + x2) / 2;
+                            const midY = (y1 + y2) / 2 - 40;
+                            html += `<path d="M ${x1} ${y1} Q ${midX} ${midY} ${x2} ${y2}" fill="none" stroke="#64748b" stroke-width="2" marker-end="url(#arrow-${this.slotId})" />`;
+                        }
+                    }
+                });
                 html += `</svg>`;
 
                 // Nodes
-                this.data.forEach((node, i) => {
-                    const left = startX + i * (nodeWidth + gap);
-                    const top = startY;
-                    const nextAddr = (i < this.data.length - 1) ? this.data[i + 1].addr : 'NULL';
+                this.data.forEach((node) => {
+                    const pos = nodeMap[node.id];
+                    const nextNode = this.data.find(n => n.id === node.nextId);
+                    const nextAddr = nextNode ? nextNode.addr : 'NULL';
+
+                    // Collect pointers for this node
+                    const ptrs = Object.entries(this.pointers)
+                        .filter(([_, p]) => {
+                            const nodeId = (typeof p === 'object' && p !== null) ? p.nodeId : p;
+                            return nodeId === node.id;
+                        })
+                        .map(([name, p]) => {
+                            const color = (typeof p === 'object' && p !== null) && p.color ? p.color : '#3b82f6';
+                            return `<div style="background:${color}; color:white; padding:2px 6px; border-radius:4px; font-size:0.65rem; font-weight:bold; margin:2px;">${name}</div>`;
+                        })
+                        .join('');
 
                     html += `<div class="sll-node-wrapper" style="
                         position: absolute;
-                        left: ${left}px;
-                        top: ${top}px;
+                        left: ${pos.x}px;
+                        top: ${pos.y}px;
                         width: ${nodeWidth}px;
                         display: flex;
                         flex-direction: column;
                         align-items: center;
                     ">
+                        <div class="sll-ptrs" style="position: absolute; top: -45px; display:flex; flex-direction:column; align-items:center;">${ptrs}</div>
                         <div class="sll-addr" style="font-size: 0.7rem; color: #94a3b8; margin-bottom: 4px;">${node.addr}</div>
                         <div class="sll-node-box" style="
                             width: 100%;
@@ -2867,18 +3177,340 @@
                     </div>`;
                 });
 
-                html += `</div>`;
                 container.innerHTML = html;
             },
 
             clone() {
-                return { data: JSON.parse(JSON.stringify(this.data)) };
+                return { data: JSON.parse(JSON.stringify(this.data)), pointers: JSON.parse(JSON.stringify(this.pointers)) };
             },
 
             restore(state) {
                 this.data = JSON.parse(JSON.stringify(state.data));
+                this.pointers = JSON.parse(JSON.stringify(state.pointers || {}));
                 this.render();
             }
+        });
+
+
+        // ============ DLL PRIMITIVE ============
+
+        const createDLLPrimitive = (slotId) => ({
+            slotId,
+            data: [], // Array of { id, val, addr, nextId, prevId }
+            pointers: {}, // Map: name -> { nodeId, color }
+
+            _makeNode(val) {
+                return {
+                    id: Math.random().toString(36).substr(2, 9),
+                    val: val,
+                    addr: '0x' + Math.floor(Math.random() * 65535).toString(16).toUpperCase().padStart(4, '0'),
+                    nextId: null,
+                    prevId: null
+                };
+            },
+
+            init(vals) {
+                this.data = vals.map(v => this._makeNode(v));
+                // Set initial sequential links
+                for (let i = 0; i < this.data.length; i++) {
+                    if (i < this.data.length - 1) this.data[i].nextId = this.data[i + 1].id;
+                    if (i > 0) this.data[i].prevId = this.data[i - 1].id;
+                }
+                this.pointers = {};
+                this.render();
+            },
+
+            // Pointer API
+            createPointer(name, nodeId, color = '#3b82f6') {
+                this.pointers[name] = { nodeId, color };
+                this.render();
+            },
+            movePointer(name, nodeId) {
+                if (this.pointers[name]) {
+                    this.pointers[name].nodeId = nodeId;
+                    this.render();
+                }
+            },
+            removePointer(name) {
+                delete this.pointers[name];
+                this.render();
+            },
+
+            getNextId(nodeId) {
+                const node = this.data.find(n => n.id === nodeId);
+                return node ? node.nextId : null;
+            },
+            getPrevId(nodeId) {
+                const node = this.data.find(n => n.id === nodeId);
+                return node ? node.prevId : null;
+            },
+
+            link(fromId, toId, direction = 'next') {
+                const node = this.data.find(n => n.id === fromId);
+                if (node) {
+                    if (direction === 'next') node.nextId = toId;
+                    else node.prevId = toId;
+                    this.render();
+                }
+            },
+
+            unlink(id, direction = 'both') {
+                const node = this.data.find(n => n.id === id);
+                if (node) {
+                    if (direction === 'next' || direction === 'both') node.nextId = null;
+                    if (direction === 'prev' || direction === 'both') node.prevId = null;
+                    this.render();
+                }
+            },
+
+            addFirst(val) {
+                const newNode = this._makeNode(val);
+                if (this.data.length > 0) {
+                    newNode.nextId = this.data[0].id;
+                    this.data[0].prevId = newNode.id;
+                }
+                this.data.unshift(newNode);
+                this.render();
+            },
+
+            addLast(val) {
+                const newNode = this._makeNode(val);
+                if (this.data.length > 0) {
+                    const last = this.data[this.data.length - 1];
+                    last.nextId = newNode.id;
+                    newNode.prevId = last.id;
+                }
+                this.data.push(newNode);
+                this.render();
+            },
+
+            removeFirst() {
+                if (this.data.length === 0) return;
+                const head = this.data.shift();
+                if (this.data.length > 0) {
+                    this.data[0].prevId = null;
+                }
+                this.render();
+            },
+
+            removeLast() {
+                if (this.data.length === 0) return;
+                const last = this.data.pop();
+                if (this.data.length > 0) {
+                    this.data[this.data.length - 1].nextId = null;
+                }
+                this.render();
+            },
+
+            highlight(index, color) {
+                const container = document.getElementById(`slot-${this.slotId}-content`);
+                if (!container) return;
+                const wrapper = container.querySelectorAll('.dll-node-wrapper')[index];
+                if (wrapper) {
+                    const box = wrapper.querySelector('.dll-node-box');
+                    if (box) {
+                        box.style.borderColor = color;
+                        box.style.backgroundColor = color === '' ? '' : (color + '33');
+                        box.style.boxShadow = color === '' ? '' : `0 0 15px ${color}`;
+                    }
+                }
+            },
+
+            clearHighlights() {
+                this.render();
+            },
+
+            render() {
+                const container = document.getElementById(`slot-${this.slotId}-content`);
+                if (!container) return;
+
+                if (this.data.length === 0) {
+                    container.innerHTML = '<div class="dll-wrapper" style="display:flex;align-items:center;justify-content:center;height:100%;color:#64748b;font-style:italic;">Empty DLL</div>';
+                    return;
+                }
+
+                // Default head/tail pointers
+                if (!this.pointers['head'] && this.data.length > 0) {
+                    this.pointers['head'] = { nodeId: this.data[0].id, color: '#ef4444' };
+                }
+                if (!this.pointers['tail'] && this.data.length > 0) {
+                    this.pointers['tail'] = { nodeId: this.data[this.data.length - 1].id, color: '#3b82f6' };
+                }
+
+                const nodeWidth = 100;
+                const gap = 100;
+                const startX = 40;
+                const startY = 100;
+
+                const nodeMap = {};
+                this.data.forEach((n, i) => {
+                    nodeMap[n.id] = { ...n, x: startX + i * (nodeWidth + gap), y: startY };
+                });
+
+                const totalWidth = startX + this.data.length * (nodeWidth + gap) + 100;
+                let html = `<div class="dll-wrapper" style="position: relative; width: 100%; height: 350px; overflow: auto; background: rgba(0,0,0,0.2); border-radius: 8px;">`;
+
+                html += `<svg style="position: absolute; left: 0; top: 0; width: ${totalWidth}px; height: 100%; pointer-events: none;">
+                    <defs>
+                        <marker id="dll-arrow-r-${this.slotId}" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                            <polygon points="0 0, 10 3.5, 0 7" fill="#3b82f6" />
+                        </marker>
+                        <marker id="dll-arrow-l-${this.slotId}" markerWidth="10" markerHeight="7" refX="1" refY="3.5" orient="auto">
+                            <polygon points="10 0, 0 3.5, 10 7" fill="#60a5fa" />
+                        </marker>
+                    </defs>`;
+
+                // Draw arrows
+                this.data.forEach(node => {
+                    const pos = nodeMap[node.id];
+                    if (node.nextId && nodeMap[node.nextId]) {
+                        const target = nodeMap[node.nextId];
+                        const x1 = pos.x + nodeWidth;
+                        const x2 = target.x;
+                        const y = pos.y + 35;
+                        if (Math.abs(pos.y - target.y) < 5 && pos.x < target.x) {
+                            html += `<path d="M ${x1} ${y} L ${x2} ${y}" stroke="#3b82f6" stroke-width="2" marker-end="url(#dll-arrow-r-${this.slotId})" />`;
+                        } else {
+                            const midX = (x1 + x2) / 2;
+                            const midY = (y + target.y + 35) / 2 - 40;
+                            html += `<path d="M ${x1} ${y} Q ${midX} ${midY} ${x2} ${target.y + 35}" fill="none" stroke="#3b82f6" stroke-width="2" marker-end="url(#dll-arrow-r-${this.slotId})" />`;
+                        }
+                    }
+                    if (node.prevId && nodeMap[node.prevId]) {
+                        const target = nodeMap[node.prevId];
+                        const x1 = pos.x;
+                        const x2 = target.x + nodeWidth;
+                        const y = pos.y + 55;
+                        if (Math.abs(pos.y - target.y) < 5 && pos.x > target.x) {
+                            html += `<path d="M ${x1} ${y} L ${x2} ${y}" stroke="#60a5fa" stroke-width="2" marker-end="url(#dll-arrow-l-${this.slotId})" />`;
+                        } else {
+                            const midX = (x1 + x2) / 2;
+                            const midY = (y + target.y + 55) / 2 + 40;
+                            html += `<path d="M ${x1} ${y} Q ${midX} ${midY} ${x2} ${target.y + 55}" fill="none" stroke="#60a5fa" stroke-width="2" marker-end="url(#dll-arrow-l-${this.slotId})" />`;
+                        }
+                    }
+                });
+                html += `</svg>`;
+
+                // Nodes
+                this.data.forEach((node) => {
+                    const pos = nodeMap[node.id];
+                    const nextNode = this.data.find(n => n.id === node.nextId);
+                    const prevNode = this.data.find(n => n.id === node.prevId);
+                    const nextAddr = nextNode ? nextNode.addr : 'NULL';
+                    const prevAddr = prevNode ? prevNode.addr : 'NULL';
+
+                    // Collect pointers for this node
+                    const ptrs = Object.entries(this.pointers)
+                        .filter(([_, p]) => {
+                            const nodeId = (typeof p === 'object' && p !== null) ? p.nodeId : p;
+                            return nodeId === node.id;
+                        })
+                        .map(([name, p]) => {
+                            const color = (typeof p === 'object' && p !== null) && p.color ? p.color : '#3b82f6';
+                            return `<div style="background:${color}; color:white; padding:2px 6px; border-radius:4px; font-size:0.65rem; font-weight:bold; margin:2px;">${name}</div>`;
+                        })
+                        .join('');
+
+                    html += `<div class="dll-node-wrapper" style="position: absolute; left: ${pos.x}px; top: ${pos.y}px; width: ${nodeWidth}px; display:flex; flex-direction:column; align-items:center;">
+                        <div class="dll-ptrs" style="position: absolute; top: -50px; display:flex; flex-direction:column; align-items:center; z-index:10;">${ptrs}</div>
+                        <div style="font-size: 0.65rem; color: #64748b; text-align: center; margin-bottom: 2px;">${node.addr}</div>
+                        <div class="dll-node-box" style="width:100%; background: #1e293b; border: 2px solid #334155; border-radius: 6px; position: relative; transition: all 0.2s;">
+                            <div style="padding: 4px; text-align: center; color: #4ade80; font-size: 0.6rem; border-bottom: 1px solid #334155; font-family: monospace;">P: ${prevAddr}</div>
+                            <div style="padding: 10px; text-align: center; font-weight: bold; color: white; font-size: 1.1rem;">${node.val}</div>
+                            <div style="padding: 4px; text-align: center; color: #3b82f6; font-size: 0.6rem; border-top: 1px solid #334155; font-family: monospace;">N: ${nextAddr}</div>
+                        </div>
+                    </div>`;
+                });
+
+                html += `</div>`;
+                container.innerHTML = html;
+            },
+
+            clone() { return { data: JSON.parse(JSON.stringify(this.data)), pointers: JSON.parse(JSON.stringify(this.pointers)) }; },
+            restore(state) { this.data = JSON.parse(JSON.stringify(state.data)); this.pointers = JSON.parse(JSON.stringify(state.pointers || {})); this.render(); }
+        });
+
+
+        // ============ DEQUE PRIMITIVE ============
+
+        const createDequePrimitive = (slotId) => ({
+            slotId,
+            data: [],
+
+            pushFront(v) { this.data.unshift(v); this.render(); },
+            popFront() { const v = this.data.shift(); this.render(); return v; },
+            pushBack(v) { this.data.push(v); this.render(); },
+            popBack() { const v = this.data.pop(); this.render(); return v; },
+            peekFront() { return this.data[0]; },
+            peekBack() { return this.data[this.data.length - 1]; },
+            isEmpty() { return this.data.length === 0; },
+            size() { return this.data.length; },
+            init(arr) { this.data = [...arr]; this.render(); },
+
+            highlight(i, color) {
+                const container = document.getElementById(`slot-${this.slotId}-content`);
+                if (!container) return;
+                const items = container.querySelectorAll('.deque-item');
+                if (items[i]) {
+                    items[i].style.backgroundColor = color;
+                    items[i].style.borderColor = color;
+                    if (color) items[i].style.boxShadow = `0 0 15px ${color}`;
+                }
+            },
+
+            clearHighlights() {
+                this.render();
+            },
+
+            render() {
+                const container = document.getElementById(`slot-${this.slotId}-content`);
+                if (!container) return;
+
+                if (this.data.length === 0) {
+                    container.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#64748b;font-style:italic;">Empty Deque</div>';
+                    return;
+                }
+
+                let html = `<div class="deque-wrapper" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; gap: 20px; padding: 20px;">
+                    <div class="deque-container" style="display: flex; gap: 10px; padding: 15px; background: rgba(30, 41, 59, 0.5); border: 2px dashed #475569; border-radius: 12px; position: relative;">`;
+
+                this.data.forEach((v, i) => {
+                    const isHead = i === 0;
+                    const isTail = i === this.data.length - 1;
+                    let label = '';
+                    if (isHead && isTail) label = '<span style="color:#ef4444">H/T</span>';
+                    else if (isHead) label = '<span style="color:#ef4444">Head</span>';
+                    else if (isTail) label = '<span style="color:#3b82f6">Tail</span>';
+
+                    html += `<div class="deque-item" style="
+                        width: 50px;
+                        height: 50px;
+                        background: #1e293b;
+                        border: 2px solid #334155;
+                        border-radius: 8px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        color: white;
+                        font-weight: bold;
+                        font-family: 'Fira Code', monospace;
+                        position: relative;
+                        transition: all 0.3s;
+                    ">
+                        ${v}
+                        ${label ? `<div style="position: absolute; top: -25px; font-size: 0.7rem; font-weight: bold; width: 100%; text-align: center;">${label}</div>` : ''}
+                    </div>`;
+                });
+
+                html += `</div>
+                    <div style="font-size: 0.8rem; color: #94a3b8; font-style: italic;">Double-Ended Queue (Front ⟷ Back)</div>
+                </div>`;
+                container.innerHTML = html;
+            },
+
+            clone() { return { data: [...this.data] }; },
+            restore(state) { this.data = [...state.data]; this.render(); }
         });
 
 
@@ -2967,29 +3599,52 @@
                 });
             });
 
+            container.querySelectorAll('.sll-node-box').forEach((box, i) => {
+                highlights.push({ type: 'sll-node-box', index: i, border: box.style.borderColor || '', bg: box.style.backgroundColor || '', shadow: box.style.boxShadow || '' });
+            });
+
+            container.querySelectorAll('.dll-node-box').forEach((box, i) => {
+                highlights.push({ type: 'dll-node-box', index: i, border: box.style.borderColor || '', bg: box.style.backgroundColor || '', shadow: box.style.boxShadow || '' });
+            });
+
+            container.querySelectorAll('.deque-item').forEach((item, i) => {
+                highlights.push({ type: 'deque-item', index: i, bg: item.style.backgroundColor || '', border: item.style.borderColor || '', shadow: item.style.boxShadow || '' });
+            });
+
+            container.querySelectorAll('.bt-node, .heap-node, .uf-node, .graph-node, .trie-node').forEach((node) => {
+                highlights.push({
+                    type: 'generic-node',
+                    id: node.dataset.id || node.dataset.index || node.dataset.nodeId,
+                    bg: node.style.backgroundColor || '',
+                    border: node.style.borderColor || '',
+                    shadow: node.style.boxShadow || '',
+                    transform: node.style.transform || ''
+                });
+            });
+
             return highlights;
         }
 
         // Restore highlights to a specific slot container
         function restoreSlotHighlights(slotId, highlights) {
-            const container = document.getElementById(`slot-${slotId}-content`);
-            if (!container || !highlights) return;
+            const actualContainer = document.getElementById(`slot-${slotId}-content`);
+            if (!actualContainer || !highlights) return;
 
             highlights.forEach(h => {
                 if (h.type === 'array-box') {
-                    const boxes = container.querySelectorAll('.array-box');
+                    const boxes = actualContainer.querySelectorAll('.array-box');
                     if (boxes[h.index]) {
                         boxes[h.index].style.backgroundColor = h.bg;
                         boxes[h.index].style.borderColor = h.border;
                     }
                 } else if (h.type === 'stack-item') {
-                    const items = container.querySelectorAll('.stack-item');
+                    const items = actualContainer.querySelectorAll('.stack-item');
                     if (items[h.index]) {
                         items[h.index].style.backgroundColor = h.bg;
                         items[h.index].style.borderColor = h.border;
                     }
                 } else if (h.type === 'hashmap-row') {
-                    container.querySelectorAll('.hashmap-row').forEach(row => {
+                    actualContainer.querySelectorAll('.hashmap-row').forEach(row => {
                         if (row.dataset.key === h.key) {
                             const keyEl = row.querySelector('.hashmap-key');
                             const valEl = row.querySelector('.hashmap-value');
@@ -2998,7 +3653,7 @@
                         }
                     });
                 } else if (h.type === 'grid-cell') {
-                    container.querySelectorAll('.grid-cell').forEach(cell => {
+                    actualContainer.querySelectorAll('.grid-cell').forEach(cell => {
                         if (cell.dataset.row === h.row && cell.dataset.col === h.col) {
                             cell.style.backgroundColor = h.bg;
                             cell.style.borderColor = h.border;
@@ -3006,19 +3661,50 @@
                         }
                     });
                 } else if (h.type === 'queue-vis-item') {
-                    const items = container.querySelectorAll('.queue-vis-item');
+                    const items = actualContainer.querySelectorAll('.queue-vis-item');
                     if (items[h.index]) {
                         items[h.index].style.backgroundColor = h.bg;
                         items[h.index].style.borderColor = h.border;
                     }
                 } else if (h.type === 'hashset-tag') {
-                    container.querySelectorAll('.hashset-tag').forEach(tag => {
+                    actualContainer.querySelectorAll('.hashset-tag').forEach(tag => {
                         if (tag.innerText === h.text) {
                             tag.style.background = h.bg;
                             tag.style.transform = h.transform;
                             tag.style.boxShadow = h.shadow;
                         }
                     });
+                } else if (h.type === 'sll-node-box') {
+                    const boxes = actualContainer.querySelectorAll('.sll-node-box');
+                    if (boxes[h.index]) {
+                        boxes[h.index].style.borderColor = h.border;
+                        boxes[h.index].style.backgroundColor = h.bg;
+                        boxes[h.index].style.boxShadow = h.shadow;
+                    }
+                } else if (h.type === 'dll-node-box') {
+                    const boxes = actualContainer.querySelectorAll('.dll-node-box');
+                    if (boxes[h.index]) {
+                        boxes[h.index].style.borderColor = h.border;
+                        boxes[h.index].style.backgroundColor = h.bg;
+                        boxes[h.index].style.boxShadow = h.shadow;
+                    }
+                } else if (h.type === 'deque-item') {
+                    const items = actualContainer.querySelectorAll('.deque-item');
+                    if (items[h.index]) {
+                        items[h.index].style.backgroundColor = h.bg;
+                        items[h.index].style.borderColor = h.border;
+                        items[h.index].style.boxShadow = h.shadow;
+                    }
+                } else if (h.type === 'generic-node') {
+                    const node = actualContainer.querySelector(`[data-id="${h.id}"]`) ||
+                        actualContainer.querySelector(`[data-index="${h.id}"]`) ||
+                        actualContainer.querySelector(`[data-node-id="${h.id}"]`);
+                    if (node) {
+                        node.style.backgroundColor = h.bg;
+                        node.style.borderColor = h.border;
+                        node.style.boxShadow = h.shadow;
+                        node.style.transform = h.transform;
+                    }
                 }
             });
         }
@@ -3265,7 +3951,11 @@
                 algorithmComplete = true;
                 updateButtons();
 
-                log(`✅ Finished! Result: ${JSON.stringify(result)}`);
+                if (result !== undefined) {
+                    log(`✅ Finished! Result: ${JSON.stringify(result)}`);
+                } else {
+                    log(`✅ Finished!`);
+                }
             } catch (e) {
                 log(`❌ Error: ${e.message}`);
                 console.error(e);
@@ -3276,10 +3966,12 @@
         // ============ LOAD PLACEHOLDER ============
 
         let playgroundCode = null;
-
         let playgroundInputs = [];
 
-        fetch('placeholder.json')
+        const params = new URLSearchParams(window.location.search);
+        const configFile = params.get('config') || 'placeholder.json';
+
+        fetch(configFile)
             .then(r => r.json())
             .then(data => {
                 playgroundCode = data.code;

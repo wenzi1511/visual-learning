@@ -1,0 +1,52 @@
+{
+    "id": "sliding-window-max",
+    "name": "Sliding Window Maximum (Deque)",
+    "description": "Find the maximum in each sliding window of size K using a Monotonic Deque for O(N) complexity.",
+    "tags": [
+        "Sliding Window",
+        "Deque",
+        "Monotonic Deque",
+        "Hard"
+    ],
+    "slots": [
+        {
+            "id": "arr",
+            "type": "array",
+            "label": "Input Array"
+        },
+        {
+            "id": "deque",
+            "type": "deque",
+            "label": "Monotonic Deque (Indices)"
+        },
+        {
+            "id": "res",
+            "type": "array",
+            "label": "Result (Maxes)"
+        }
+    ],
+    "inputs": [
+        {
+            "name": "nums",
+            "type": "array",
+            "default": [
+                1,
+                3,
+                -1,
+                -3,
+                5,
+                3,
+                6,
+                7
+            ],
+            "label": "Nums"
+        },
+        {
+            "name": "k",
+            "type": "number",
+            "default": 3,
+            "label": "K"
+        }
+    ],
+    "code": "class Playground {\n    constructor(slots) {\n        this.arr = slots.arr;\n        this.deque = slots.deque;\n        this.res = slots.res;\n    }\n\n    async run(inputs) {\n        const nums = inputs.nums;\n        const k = inputs.k;\n\n        this.arr.init(nums);\n        this.deque.init([]);\n        this.res.init([]);\n        log(`Starting Sliding Window Max with K=${k}`);\n        await awaitStep();\n\n        const result = [];\n        for (let i = 0; i < nums.length; i++) {\n            this.arr.highlight(i, '#3b82f6');\n            log(`Processing index ${i} (val ${nums[i]})`);\n            \n            // 1. Remove indices out of window\n            if (!this.deque.isEmpty() && this.deque.peekFront() <= i - k) {\n                log(`Index ${this.deque.peekFront()} is outside window. Removing from front.`);\n                this.deque.highlight(0, '#ef4444');\n                await awaitStep();\n                this.deque.popFront();\n                log(`Deque: [${this.deque.data.join(', ')}]`);\n                await awaitStep();\n            }\n\n            // 2. Maintain Monotonic property (descending)\n            while (!this.deque.isEmpty() && nums[this.deque.peekBack()] < nums[i]) {\n                log(`Back index ${this.deque.peekBack()} (val ${nums[this.deque.peekBack()]}) < ${nums[i]}. Removing.`);\n                this.deque.highlight(this.deque.size() - 1, '#ef4444');\n                this.arr.highlight(this.deque.peekBack(), '#ef4444');\n                await awaitStep();\n                this.deque.popBack();\n                this.arr.render(); // Reset colors\n                this.arr.highlight(i, '#3b82f6');\n            }\n\n            this.deque.pushBack(i);\n            this.deque.highlight(this.deque.size() - 1, '#10b981');\n            log(`Added index ${i} to deque.`);\n            await awaitStep();\n\n            // 3. Add to result if window is full\n            if (i >= k - 1) {\n                const maxIdx = this.deque.peekFront();\n                const maxVal = nums[maxIdx];\n                log(`Window full. Current max is input[${maxIdx}] = ${maxVal}`);\n                this.arr.highlight(maxIdx, '#10b981');\n                result.push(maxVal);\n                this.res.init(result);\n                this.res.highlight(result.length - 1, '#10b981');\n                await awaitStep();\n                this.arr.render();\n                this.arr.highlight(i, '#3b82f6');\n            }\n\n            await awaitStep();\n            this.deque.clearHighlights();\n        }\n\n        log('Sliding Window Max complete.');\n    }\n}"
+}

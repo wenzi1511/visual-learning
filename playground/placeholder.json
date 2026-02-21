@@ -1,42 +1,25 @@
 {
-    "id": "sum-root-to-leaf",
-    "name": "Sum Root to Leaf Numbers",
-    "title": "Sum Root to Leaf Numbers",
+    "id": "sll-reverse",
+    "name": "Reverse Linked List",
+    "title": "Reverse Linked List",
     "difficulty": "Medium",
-    "description": "You are given the root of a binary tree containing digits from 0 to 9 only.\n\nEach root-to-leaf path in the tree represents a number.\n\nFor example, the root-to-leaf path 1 -> 2 -> 3 represents the number 123.\nReturn the total sum of all root-to-leaf numbers.",
+    "description": "Reverse a Singly Linked List using pointers (prev, curr, temp).",
     "tags": [
-        "Binary Tree",
-        "DFS",
-        "Math"
+        "Linked List",
+        "Two Pointers"
     ],
     "slots": [
         {
-            "id": "tree",
-            "type": "binary-tree",
-            "label": "Binary Tree"
-        },
-        {
-            "id": "stack",
-            "type": "stack",
-            "label": "DFS Stack (Node, CurrentNum)"
-        },
-        {
-            "id": "pathNums",
-            "type": "array",
-            "label": "Leaf Numbers Found"
-        },
-        {
-            "id": "totalSum",
-            "type": "array",
-            "label": "Total Sum"
+            "id": "list",
+            "type": "sll",
+            "label": "Linked List"
         }
     ],
     "inputs": [
         {
-            "label": "Tree Values (Level Order)",
-            "placeholder": "1, 2, 3",
-            "default": "4, 9, 0, 5, 1"
+            "label": "Values (comma separated)",
+            "default": "10, 20, 30, 40"
         }
     ],
-    "code": "class Playground {\n    async run(inputs) {\n        const inputStr = inputs[0] || '4, 9, 0, 5, 1';\n        const vals = inputStr.split(',').map(v => {\n            v = v.trim();\n            return (v === 'null' || v === '') ? null : parseInt(v);\n        });\n\n        this.log('Initializing Tree...');\n        this.tree.init(vals);\n        this.pathNums.init([]);\n        this.totalSum.init([0]);\n        this.stack.init([]);\n        await this.await();\n\n        const root = this.tree.getRoot();\n        if (!root) return;\n\n        // Stack stores objects: { node, currentVal }\n        // But our stack visualizer expects strings/numbers.\n        // We'll manage a real stack 's' and visualize a simplified version.\n        \n        const s = [{ node: root, val: 0 }];\n        this.stack.push(`(${root.val}, 0)`);\n        this.log(`Push root ${root.val} to stack`);\n        await this.await();\n\n        let total = 0;\n\n        while (s.length > 0) {\n            const { node, val } = s.pop();\n            this.stack.pop();\n            \n            // Calculate new value for this path\n            const currentVal = val * 10 + node.val;\n            this.log(`Visiting node ${node.val}. Path number so far: ${currentVal}`);\n            this.tree.highlight(node.id, '#ec4899'); // Pink visiting\n            await this.await();\n\n            // Check if leaf\n            if (!node.left && !node.right) {\n                this.log(`Leaf found! Number: ${currentVal}`);\n                this.tree.highlight(node.id, '#10b981'); // Green leaf\n                \n                this.pathNums.push(currentVal);\n                total += currentVal;\n                this.totalSum.set(0, total);\n                await this.await();\n            } else {\n                // Create children value\n                 if (node.right) {\n                    this.log(`Push right child ${node.right.val}`);\n                    s.push({ node: node.right, val: currentVal });\n                    this.stack.push(`(${node.right.val}, ${currentVal})`);\n                    this.tree.highlight(node.right.id, '#f59e0b');\n                    await this.await();\n                }\n                if (node.left) {\n                    this.log(`Push left child ${node.left.val}`);\n                    s.push({ node: node.left, val: currentVal });\n                    this.stack.push(`(${node.left.val}, ${currentVal})`);\n                    this.tree.highlight(node.left.id, '#f59e0b');\n                    await this.await();\n                }\n            }\n            \n            // Optional: reset color if not leaf?\n            // this.tree.highlight(node.id, '#1e293b'); \n            // Let's keep the path highlighted or just clear marks occasionally?\n            // For DFS, maybe we don't clear immediate visited nodes to show trace.\n        }\n\n        this.log(`Traversal Complete. Final Sum: ${total}`);\n    }\n}"
+    "code": "class Playground {\n    async run(inputs) {\n        // Setup\n        const inputStr = inputs[0] || '10, 20, 30, 40';\n        const vals = inputStr.split(',').map(s => s.trim());\n        \n        this.log('Initializing list...');\n        this.list.init(vals);\n        await this.await();\n\n        // Initialize pointers\n        this.log('Initializing pointers: prev = NULL, curr = HEAD');\n        let prev = null;\n        let curr = this.list.pointers['head']; // Get ID of head node\n        \n        this.list.createPointer('prev', null);\n        this.list.createPointer('curr', curr);\n        await this.await();\n\n        while (curr) {\n            // 1. Save next\n            this.log('Save next: temp = curr.next');\n            const nextNodeId = this.list.getNextId(curr);\n            let temp = nextNodeId;\n            this.list.createPointer('temp', temp);\n            await this.await();\n            \n            // 2. Reverse link\n            this.log('Reverse link: curr.next = prev');\n            this.list.link(curr, prev);\n            // Note: link(from, to) updates the visual link.\n            // If prev is null, it removes the link (sets next to null).\n            if (!prev) this.list.unlink(curr);\n            else this.list.link(curr, prev);\n            \n            await this.await();\n            \n            // 3. Move prev\n            this.log('Move prev: prev = curr');\n            prev = curr;\n            this.list.movePointer('prev', prev);\n            await this.await();\n            \n            // 4. Move curr\n            this.log('Move curr: curr = temp');\n            curr = temp;\n            this.list.movePointer('curr', curr);\n            await this.await();\n            \n            // Cleanup temp\n            this.list.removePointer('temp');\n        }\n        \n        // Finalize\n        this.log('Update Head: head = prev');\n        this.list.pointers['head'] = prev;\n        this.list.render();\n        await this.await();\n        \n        this.log('Done.');\n    }\n}"
 }

@@ -1,0 +1,43 @@
+{
+    "id": "graph-traversal",
+    "name": "Graph Traversal (BFS & DFS)",
+    "title": "Graph Traversal Demo",
+    "difficulty": "Medium",
+    "description": "Visualize BFS and DFS on a general graph with disconnected components.",
+    "tags": [
+        "Graph",
+        "BFS",
+        "DFS",
+        "Traversal"
+    ],
+    "slots": [
+        {
+            "id": "graph",
+            "type": "graph",
+            "label": "Graph"
+        },
+        {
+            "id": "queue",
+            "type": "queue",
+            "label": "BFS Queue"
+        },
+        {
+            "id": "stack",
+            "type": "stack",
+            "label": "DFS Stack"
+        },
+        {
+            "id": "visited",
+            "type": "array",
+            "label": "Visited Nodes"
+        }
+    ],
+    "inputs": [
+        {
+            "label": "Start Node",
+            "placeholder": "1",
+            "default": "1"
+        }
+    ],
+    "code": "class Playground {\n    async run(inputs) {\n        const startNode = inputs[0] || '1';\n\n        const nodes = [\n            { id: '1', val: 1 },\n            { id: '2', val: 2 },\n            { id: '3', val: 3 },\n            { id: '4', val: 4 },\n            { id: '5', val: 5 },\n            { id: '6', val: 6 }\n        ];\n        const edges = [\n            { source: '1', target: '2', isDirected: false },\n            { source: '1', target: '3', isDirected: false },\n            { source: '2', target: '4', isDirected: false },\n            { source: '3', target: '4', isDirected: false },\n            { source: '5', target: '6', isDirected: false }\n        ];\n\n        this.graph.init(nodes, edges);\n        this.visited.init([]);\n        this.queue.init([]);\n        this.stack.init([]);\n        await this.await();\n\n        const allNodes = nodes.map(n => n.id);\n\n        // BFS\n        this.log('Starting BFS Traversal...');\n        const bfsVisited = new Set();\n        \n        // Try start node first, then others if disconnected\n        const bfsOrder = [startNode, ...allNodes.filter(n => n !== startNode)];\n\n        for (const node of bfsOrder) {\n            if (bfsVisited.has(node)) continue;\n\n            this.log('Component BFS from ' + node);\n            const q = [node];\n            bfsVisited.add(node);\n            this.queue.enqueue(node);\n            this.visited.push(node);\n            this.graph.highlightNode(node, '#10b981');\n            await this.await();\n\n            while (q.length > 0) {\n                const curr = q.shift();\n                this.queue.dequeue();\n                this.log('Visiting ' + curr);\n                this.graph.highlightNode(curr, '#ec4899');\n                await this.await();\n\n                const neighbors = this.graph.getNeighbors(curr);\n                for (const neighbor of neighbors) {\n                    if (!bfsVisited.has(neighbor.node)) {\n                        bfsVisited.add(neighbor.node);\n                        q.push(neighbor.node);\n                        this.queue.enqueue(neighbor.node);\n                        this.visited.push(neighbor.node);\n                        this.graph.highlightNode(neighbor.node, '#f59e0b');\n                        this.graph.highlightEdge(curr, neighbor.node, '#f59e0b');\n                        this.log('Found neighbor ' + neighbor.node);\n                        await this.await();\n                    }\n                }\n                this.graph.highlightNode(curr, '#10b981');\n            }\n        }\n\n        this.log('BFS Complete.');\n        await this.await();\n\n        // DFS\n        this.log('Resetting for DFS Traversal...');\n        this.graph.clearHighlights();\n        this.visited.init([]);\n        this.stack.init([]);\n        await this.await();\n\n        const dfsVisited = new Set();\n        const dfs = async (node) => {\n            dfsVisited.add(node);\n            this.visited.push(node);\n            this.stack.push(node);\n            this.graph.highlightNode(node, '#ec4899');\n            this.log('Visiting ' + node);\n            await this.await();\n\n            const neighbors = this.graph.getNeighbors(node);\n            for (const neighbor of neighbors) {\n                if (!dfsVisited.has(neighbor.node)) {\n                    this.graph.highlightEdge(node, neighbor.node, '#f59e0b');\n                    await dfs(neighbor.node);\n                    this.graph.highlightEdge(node, neighbor.node, '#10b981');\n                }\n            }\n            this.stack.pop();\n            this.graph.highlightNode(node, '#10b981');\n        };\n\n        const dfsOrder = [startNode, ...allNodes.filter(n => n !== startNode)];\n        for (const node of dfsOrder) {\n            if (!dfsVisited.has(node)) {\n                this.log('Component DFS from ' + node);\n                await dfs(node);\n            }\n        }\n        \n        this.log('DFS Complete.');\n    }\n}\n"
+}
