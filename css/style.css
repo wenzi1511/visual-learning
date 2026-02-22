@@ -463,7 +463,7 @@ body {
 
 .section-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
     gap: 24px;
 }
 
@@ -471,27 +471,333 @@ body {
     background: rgba(30, 41, 59, 0.4);
     border: 1px solid rgba(255, 255, 255, 0.05);
     border-radius: 12px;
-    padding: 24px;
-    height: 140px;
+    padding: 20px 24px;
+    height: 120px;
     display: flex;
-    flex-direction: column;
-    justify-content: center;
+    flex-direction: row;
+    justify-content: space-between;
     align-items: center;
     cursor: pointer;
     position: relative;
     overflow: hidden;
     transition: all 0.2s ease-out;
     backdrop-filter: blur(12px);
+    gap: 15px;
 }
 
 .card h3 {
     margin: 0;
-    font-size: 1.1rem;
+    font-size: 1.2rem;
     font-weight: 600;
     z-index: 2;
     color: #e2e8f0;
-    text-align: center;
+    text-align: left;
     letter-spacing: 0.5px;
+    flex: 1;
+}
+
+.card-visual {
+    flex: 0 0 60px;
+    height: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    z-index: 2;
+    opacity: 0.6;
+    transition: opacity 0.3s, transform 0.3s;
+}
+
+.card:hover .card-visual {
+    opacity: 1;
+    transform: scale(1.05);
+}
+
+/* Linear Visuals */
+.vis-array {
+    display: flex;
+    gap: 4px;
+}
+
+.vis-array-box {
+    width: 14px;
+    height: 14px;
+    background: var(--array-bg);
+    border: 1.5px solid var(--array-border);
+    border-radius: 2px;
+}
+
+.vis-stack {
+    width: 34px;
+    height: 48px;
+    border: 2px solid var(--text-sub);
+    border-top: none;
+    border-radius: 0 0 6px 6px;
+    display: flex;
+    flex-direction: column-reverse;
+    justify-content: flex-start;
+    padding: 4px;
+    gap: 4px;
+    box-sizing: border-box;
+    background: rgba(0, 0, 0, 0.1);
+}
+
+.vis-stack-item {
+    width: 100%;
+    height: 8px;
+    background: var(--stack-bg);
+    border: 1.5px solid var(--stack-border);
+    border-radius: 1px;
+}
+
+.vis-queue {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 8px 0;
+    border-top: 2px dashed var(--text-sub);
+    border-bottom: 2px dashed var(--text-sub);
+    width: 100%;
+    justify-content: center;
+}
+
+.vis-queue-item {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--queue-bg);
+    border: 1.5px solid var(--queue-border);
+}
+
+.vis-deque {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px;
+    border: 2px dashed var(--text-sub);
+    border-radius: 8px;
+}
+
+/* Linked List */
+.vis-sll {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+
+.vis-node-box {
+    width: 14px;
+    height: 10px;
+    background: var(--node-bg);
+    border: 1.5px solid var(--node-border);
+    border-radius: 2px;
+    position: relative;
+}
+
+.vis-node-box::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 100%;
+    width: 3px;
+    background: var(--ptr-bg);
+    border-left: 1px solid var(--node-border);
+}
+
+.vis-arrow-ptr {
+    width: 8px;
+    height: 2px;
+    background: var(--text-sub);
+    position: relative;
+    margin-left: -2px;
+}
+
+.vis-arrow-ptr::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: -2.5px;
+    border-left: 4px solid var(--text-sub);
+    border-top: 3.5px solid transparent;
+    border-bottom: 3.5px solid transparent;
+}
+
+.vis-arrow-ptr-bi {
+    width: 10px;
+    height: 4px;
+    border-top: 1.5px solid var(--text-sub);
+    border-bottom: 1.5px solid var(--text-sub);
+    position: relative;
+    margin: 0 -1px;
+}
+
+.vis-arrow-ptr-bi::before {
+    content: '';
+    position: absolute;
+    left: -1px;
+    top: 1.5px;
+    border-right: 3px solid var(--text-sub);
+    border-top: 2.5px solid transparent;
+    border-bottom: 2.5px solid transparent;
+}
+
+.vis-arrow-ptr-bi::after {
+    content: '';
+    position: absolute;
+    right: -1px;
+    top: -4px;
+    border-left: 3px solid var(--text-sub);
+    border-top: 2.5px solid transparent;
+    border-bottom: 2.5px solid transparent;
+}
+
+.vis-arrow-ptr-curve {
+    width: 26px;
+    height: 18px;
+    border: 1.5px solid var(--text-sub);
+    border-bottom: none;
+    border-radius: 14px 14px 0 0;
+    position: absolute;
+    top: -14px;
+    left: 4px;
+}
+
+.vis-arrow-ptr-curve::after {
+    content: '';
+    position: absolute;
+    left: -2px;
+    bottom: -1px;
+    border-right: 3.5px solid transparent;
+    border-left: 3.5px solid transparent;
+    border-top: 4.5px solid var(--text-sub);
+    transform: rotate(20deg);
+}
+
+/* Tree / Graph */
+.vis-tree {
+    position: relative;
+    width: 50px;
+    height: 40px;
+}
+
+.vis-tree-circle {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--node-bg);
+    border: 1.5px solid var(--node-border);
+    position: absolute;
+}
+
+.vis-tree-edge {
+    position: absolute;
+    background: var(--text-sub);
+    height: 1.5px;
+    transform-origin: 0 50%;
+}
+
+/* Grid */
+.vis-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+}
+
+.vis-grid-cell {
+    width: 12px;
+    height: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+}
+
+.vis-grid-cell.active {
+    background: #3b82f6;
+    border-color: #60a5fa;
+}
+
+/* Hash */
+.vis-hash {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    width: 100%;
+    border: 1.5px solid #334155;
+    border-radius: 4px;
+    padding: 3px;
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.vis-hash-row {
+    display: flex;
+    gap: 3px;
+    align-items: center;
+}
+
+.vis-hash-key {
+    width: 16px;
+    height: 10px;
+    background: #3b82f6;
+    border-radius: 2px;
+}
+
+.vis-hash-val {
+    flex: 1;
+    height: 10px;
+    background: #10b981;
+    border-radius: 2px;
+}
+
+/* LinkedHashMap */
+.vis-linkedhash {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    width: 100%;
+    padding: 2px;
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+}
+
+.vl-node {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    width: 12px;
+    background: var(--node-bg);
+    border: 1px solid var(--node-border);
+    padding: 1px;
+    border-radius: 2px;
+}
+
+.vl-key {
+    height: 4px;
+    background: #3b82f6;
+    border-radius: 1px;
+}
+
+.vl-val {
+    height: 4px;
+    background: #10b981;
+    border-radius: 1px;
+}
+
+.vl-arrow {
+    width: 6px;
+    height: 1.5px;
+    background: var(--text-sub);
+    position: relative;
+}
+
+.vl-arrow::after {
+    content: '';
+    position: absolute;
+    right: -1px;
+    top: -1.5px;
+    border-left: 2.5px solid var(--text-sub);
+    border-top: 2px solid transparent;
+    border-bottom: 2px solid transparent;
 }
 
 .card:hover {

@@ -1,37 +1,37 @@
 {
-  "id": "union-find-basics",
-  "name": "Union Find (Disjoint Set Union)",
+  "id": "binary-search",
+  "name": "Binary Search",
   "difficulty": "Easy",
-  "description": "<p>A <strong>Disjoint Set Union (DSU)</strong>, also known as <strong>Union-Find</strong>, is a data structure that keeps track of elements partitioned into a number of disjoint (non-overlapping) sets.</p><p>It provides two primary operations:</p><ul><li><code>find(i)</code>: Determine which set element <code>i</code> belongs to. This can be used for determining if two elements are in the same set.</li><li><code>union(i, j)</code>: Join two disjoint sets into a single set.</li></ul><p>The visualization demonstrates <strong>Path Compression</strong> and <strong>Union by Rank/Size</strong>, which optimize the structure to nearly constant time per operation.</p>",
+  "description": "<p>Binary Search is an efficient algorithm for finding an item from a <strong>sorted list</strong> of items. It works by repeatedly dividing in half the portion of the list that could contain the item, until you've narrowed down the possible locations to just one.</p><ul><li><strong>Time Complexity:</strong> O(log n)</li><li><strong>Space Complexity:</strong> O(1)</li><li><strong>Pre-condition:</strong> The input array must be sorted.</li></ul>",
   "tags": [
-    "Union Find",
-    "Disjoint Set",
-    "Graph",
-    "Algorithms"
+    "Array",
+    "Searching",
+    "Binary Search",
+    "Divide and Conquer"
   ],
   "slots": [
     {
-      "id": "uf",
-      "type": "union-find",
-      "label": "Disjoint Set Structure"
+      "id": "array",
+      "type": "array",
+      "label": "Sorted Array"
     },
     {
       "id": "vars",
       "type": "hashmap",
-      "label": "State Variables"
+      "label": "Pointers & State"
     }
   ],
   "inputs": [
     {
-      "label": "Number of Elements",
-      "default": "8",
-      "placeholder": "e.g. 8"
+      "label": "Sorted Array",
+      "default": "[2, 5, 8, 12, 16, 23, 38, 56, 72, 91]",
+      "placeholder": "Enter a sorted array"
     },
     {
-      "label": "Unions (u-v pairs)",
-      "default": "0-1, 2-3, 4-5, 6-7, 1-3, 5-7, 0-7",
-      "placeholder": "e.g. 0-1, 1-2"
+      "label": "Target",
+      "default": "23",
+      "placeholder": "Value to find"
     }
   ],
-  "code": "class Playground {\n    async run(inputs) {\n        const n = parseInt(inputs[0]) || 8;\n        const unionString = inputs[1] || \"\";\n\n        // Initialize structures\n        this.uf.init(n);\n        this.vars.init([\n            [\"Status\", \"Initialized\"],\n            [\"Operation\", \"None\"],\n            [\"Result\", \"N/A\"]\n        ]);\n\n        this.log(`Initialized Union Find with ${n} elements (0 to ${n - 1}).`);\n        await this.await();\n\n        // Parse input pairs\n        const pairs = unionString.split(',')\n            .map(p => p.trim().split('-').map(Number))\n            .filter(p => p.length === 2 && !isNaN(p[0]) && !isNaN(p[1]));\n\n        for (const [u, v] of pairs) {\n            this.vars.put(\"Status\", \"Processing\");\n            this.vars.put(\"Operation\", `union(${u}, ${v})`);\n            \n            this.log(`Starting Union operation for nodes ${u} and ${v}`);\n            this.uf.highlightNode(u, \"var(--primary)\");\n            this.uf.highlightNode(v, \"var(--primary)\");\n            await this.await();\n\n            // Step 1: Find roots\n            this.log(`Finding root of element ${u}...`);\n            const rootU = this.uf.find(u);\n            this.uf.highlightNode(rootU, \"orange\");\n            this.vars.put(\"Result\", `root(${u}) = ${rootU}`);\n            await this.await();\n\n            this.log(`Finding root of element ${v}...`);\n            const rootV = this.uf.find(v);\n            this.uf.highlightNode(rootV, \"orange\");\n            this.vars.put(\"Result\", `root(${v}) = ${rootV}`);\n            await this.await();\n\n            // Step 2: Union if roots are different\n            if (rootU !== rootV) {\n                this.log(`Roots are different (${rootU} != ${rootV}). Merging sets.`);\n                this.uf.union(u, v);\n                this.vars.put(\"Result\", \"Sets Merged\");\n                await this.await();\n            } else {\n                this.log(`Roots are the same (${rootU}). Nodes are already in the same set.`);\n                this.vars.put(\"Result\", \"Already in same set\");\n                await this.await();\n            }\n\n            // Cleanup highlights for next iteration\n            this.uf.highlightNode(u, null);\n            this.uf.highlightNode(v, null);\n            this.uf.highlightNode(rootU, null);\n            this.uf.highlightNode(rootV, null);\n            this.vars.put(\"Operation\", \"Waiting\");\n            await this.await();\n        }\n\n        this.vars.put(\"Status\", \"Finished\");\n        this.vars.put(\"Operation\", \"None\");\n        this.log(\"All union operations completed.\");\n        \n        // Final state representation\n        const parents = this.uf.getValues();\n        return {\n            message: \"Union Find completed\",\n            parentArray: parents\n        };\n    }\n}"
+  "code": "class Playground {\n    async run(inputs) {\n        // 1. Parse inputs\n        const nums = JSON.parse(inputs[0]);\n        const target = parseInt(inputs[1]);\n\n        // 2. Initialize Data Structures\n        await this.array.init(nums);\n        await this.vars.init([\n            [\"low\", 0],\n            [\"high\", nums.length - 1],\n            [\"mid\", \"-\"],\n            [\"status\", \"Initializing\"]\n        ]);\n\n        this.log(`Starting Binary Search for target: ${target}`);\n        await this.await();\n\n        let low = 0;\n        let high = nums.length - 1;\n\n        while (low <= high) {\n            // Update variables\n            const mid = Math.floor(low + (high - low) / 2);\n            this.vars.put(\"low\", low);\n            this.vars.put(\"high\", high);\n            this.vars.put(\"mid\", mid);\n            this.vars.put(\"status\", \"Calculating Mid\");\n\n            // Visualization: Clear previous highlights and show current search range\n            for (let i = 0; i < nums.length; i++) {\n                this.array.highlight(i, \"transparent\");\n            }\n            this.array.highlightRange(low, high, \"rgba(0, 150, 255, 0.2)\");\n            this.array.highlight(mid, \"orange\");\n\n            this.log(`Range [${low}, ${high}]. Mid index: ${mid}, Mid value: ${this.array.get(mid)}`);\n            await this.await();\n\n            const midVal = this.array.get(mid);\n\n            if (midVal === target) {\n                // Target Found\n                this.array.highlight(mid, \"#4CAF50\"); // Green\n                this.vars.put(\"status\", \"Target Found!\");\n                this.log(`Success: Target ${target} found at index ${mid}`);\n                await this.await();\n                return mid;\n            } \n            \n            if (midVal < target) {\n                // Target is in the right half\n                this.log(`${midVal} < ${target}. Ignoring the left half (moving low).`);\n                this.vars.put(\"status\", \"Searching Right\");\n                low = mid + 1;\n            } else {\n                // Target is in the left half\n                this.log(`${midVal} > ${target}. Ignoring the right half (moving high).`);\n                this.vars.put(\"status\", \"Searching Left\");\n                high = mid - 1;\n            }\n            \n            await this.await();\n        }\n\n        // Target Not Found\n        this.log(`Target ${target} was not found in the array.`);\n        this.vars.put(\"status\", \"Not Found\");\n        this.vars.put(\"low\", low);\n        this.vars.put(\"high\", high);\n        this.vars.put(\"mid\", \"-\");\n        \n        // Cleanup highlights\n        for (let i = 0; i < nums.length; i++) {\n            this.array.highlight(i, \"rgba(255, 0, 0, 0.1)\");\n        }\n        \n        await this.await();\n        return -1;\n    }\n}"
 }

@@ -20,15 +20,44 @@
             <div class="section-grid">
                 <div class="card" onclick="selectStructure('array')">
                     <h3>Arrays</h3>
+                    <div class="card-visual">
+                        <div class="vis-array">
+                            <div class="vis-array-box"></div>
+                            <div class="vis-array-box"></div>
+                            <div class="vis-array-box"></div>
+                            <div class="vis-array-box"></div>
+                        </div>
+                    </div>
                 </div>
                 <div class="card" onclick="selectStructure('stack')">
                     <h3>Stacks</h3>
+                    <div class="card-visual">
+                        <div class="vis-stack">
+                            <div class="vis-stack-item"></div>
+                            <div class="vis-stack-item"></div>
+                            <div class="vis-stack-item"></div>
+                        </div>
+                    </div>
                 </div>
                 <div class="card" onclick="selectStructure('queue')">
                     <h3>Queue</h3>
+                    <div class="card-visual">
+                        <div class="vis-queue">
+                            <div class="vis-queue-item"></div>
+                            <div class="vis-queue-item"></div>
+                            <div class="vis-queue-item"></div>
+                        </div>
+                    </div>
                 </div>
                 <div class="card" onclick="selectStructure('deque')">
                     <h3>Deque</h3>
+                    <div class="card-visual">
+                        <div class="vis-deque">
+                            <div class="vis-queue-item"></div>
+                            <div class="vis-queue-item"></div>
+                            <div class="vis-queue-item"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -39,12 +68,34 @@
             <div class="section-grid">
                 <div class="card" onclick="selectStructure('sll')">
                     <h3>Singly Linked List</h3>
+                    <div class="card-visual">
+                        <div class="vis-sll">
+                            <div class="vis-node-box"></div>
+                            <div class="vis-arrow-ptr"></div>
+                            <div class="vis-node-box"></div>
+                        </div>
+                    </div>
                 </div>
                 <div class="card" onclick="selectStructure('dll')">
                     <h3>Doubly Linked List</h3>
+                    <div class="card-visual">
+                        <div class="vis-sll">
+                            <div class="vis-node-box"></div>
+                            <div class="vis-arrow-ptr-bi"></div>
+                            <div class="vis-node-box"></div>
+                        </div>
+                    </div>
                 </div>
                 <div class="card" onclick="selectStructure('cll')">
                     <h3>Circular Linked List</h3>
+                    <div class="card-visual">
+                        <div class="vis-sll" style="position:relative;">
+                            <div class="vis-node-box"></div>
+                            <div class="vis-arrow-ptr"></div>
+                            <div class="vis-node-box"></div>
+                            <div class="vis-arrow-ptr-curve"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -52,18 +103,62 @@
         <!-- Hierarchical Structures -->
         <div class="category-section">
             <div class="section-title">Hierarchical</div>
-            <div class="section-grid">
+            <div class="section-grid tree-grid">
                 <div class="card" onclick="selectStructure('bt')">
                     <h3>Binary Tree</h3>
+                    <div class="card-visual">
+                        <div class="vis-tree">
+                            <div class="vis-tree-circle" style="top:0; left:19px; width:16px; height:16px;"></div>
+                            <div class="vis-tree-edge"
+                                style="top:12px; left:25px; width:15px; transform:rotate(135deg);"></div>
+                            <div class="vis-tree-edge"
+                                style="top:12px; left:27px; width:15px; transform:rotate(45deg);"></div>
+                            <div class="vis-tree-circle" style="top:20px; left:2px; width:10px; height:10px;"></div>
+                            <div class="vis-tree-circle" style="top:20px; left:36px; width:14px; height:14px;"></div>
+                        </div>
+                    </div>
                 </div>
                 <div class="card" onclick="selectStructure('bst')">
                     <h3>Binary Search Tree</h3>
+                    <div class="card-visual">
+                        <div class="vis-tree">
+                            <div class="vis-tree-circle" style="top:0; left:19px; width:14px; height:14px;"></div>
+                            <div class="vis-tree-edge"
+                                style="top:11px; left:25px; width:15px; transform:rotate(135deg);"></div>
+                            <div class="vis-tree-edge"
+                                style="top:11px; left:26px; width:15px; transform:rotate(45deg);"></div>
+                            <div class="vis-tree-circle" style="top:18px; left:4px; width:10px; height:10px;"></div>
+                            <div class="vis-tree-circle" style="top:18px; left:35px; width:18px; height:18px;"></div>
+                        </div>
+                    </div>
                 </div>
                 <div class="card" onclick="selectStructure('minheap')">
                     <h3>Min Heap</h3>
+                    <div class="card-visual">
+                        <div class="vis-tree">
+                            <div class="vis-tree-circle" style="top:0; left:21px; width:10px; height:10px;"></div>
+                            <div class="vis-tree-edge"
+                                style="top:9px; left:25px; width:15px; transform:rotate(135deg);"></div>
+                            <div class="vis-tree-edge" style="top:9px; left:26px; width:15px; transform:rotate(45deg);">
+                            </div>
+                            <div class="vis-tree-circle" style="top:18px; left:4px; width:16px; height:16px;"></div>
+                            <div class="vis-tree-circle" style="top:18px; left:33px; width:18px; height:18px;"></div>
+                        </div>
+                    </div>
                 </div>
                 <div class="card" onclick="selectStructure('maxheap')">
                     <h3>Max Heap</h3>
+                    <div class="card-visual">
+                        <div class="vis-tree">
+                            <div class="vis-tree-circle" style="top:0; left:16px; width:20px; height:20px;"></div>
+                            <div class="vis-tree-edge"
+                                style="top:15px; left:25px; width:15px; transform:rotate(135deg);"></div>
+                            <div class="vis-tree-edge"
+                                style="top:15px; left:26px; width:15px; transform:rotate(45deg);"></div>
+                            <div class="vis-tree-circle" style="top:22px; left:6px; width:12px; height:12px;"></div>
+                            <div class="vis-tree-circle" style="top:22px; left:35px; width:10px; height:10px;"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -74,6 +169,19 @@
             <div class="section-grid">
                 <div class="card" onclick="selectStructure('graph')">
                     <h3>Graph</h3>
+                    <div class="card-visual">
+                        <div class="vis-tree">
+                            <div class="vis-tree-circle" style="top:0; left:19px;"></div>
+                            <div class="vis-tree-circle" style="top:20px; left:2px;"></div>
+                            <div class="vis-tree-circle" style="top:20px; left:36px;"></div>
+                            <div class="vis-tree-edge"
+                                style="top:10px; left:25px; width:22px; transform:rotate(135deg);"></div>
+                            <div class="vis-tree-edge"
+                                style="top:10px; left:25px; width:22px; transform:rotate(45deg);"></div>
+                            <div class="vis-tree-edge" style="top:26px; left:12px; width:26px; transform:rotate(0deg);">
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -84,6 +192,19 @@
             <div class="section-grid">
                 <div class="card" onclick="selectStructure('grid')">
                     <h3>Grid</h3>
+                    <div class="card-visual">
+                        <div class="vis-grid">
+                            <div class="vis-grid-cell active"></div>
+                            <div class="vis-grid-cell"></div>
+                            <div class="vis-grid-cell active"></div>
+                            <div class="vis-grid-cell"></div>
+                            <div class="vis-grid-cell active"></div>
+                            <div class="vis-grid-cell"></div>
+                            <div class="vis-grid-cell"></div>
+                            <div class="vis-grid-cell"></div>
+                            <div class="vis-grid-cell active"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -94,21 +215,96 @@
             <div class="section-grid">
                 <div class="card" onclick="selectStructure('hashmap')">
                     <h3>HashMap</h3>
+                    <div class="card-visual">
+                        <div class="vis-hash">
+                            <div class="vis-hash-row">
+                                <div class="vis-hash-key"></div>
+                                <div class="vis-hash-val"></div>
+                            </div>
+                            <div class="vis-hash-row">
+                                <div class="vis-hash-key"></div>
+                                <div class="vis-hash-val"></div>
+                            </div>
+                            <div class="vis-hash-row">
+                                <div class="vis-hash-key"></div>
+                                <div class="vis-hash-val"></div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="card" onclick="selectStructure('hashmap-simple')">
                     <h3>HashMap (Simple)</h3>
+                    <div class="card-visual">
+                        <div class="vis-hash">
+                            <div class="vis-hash-row">
+                                <div class="vis-hash-key"></div>
+                                <div class="vis-hash-val"></div>
+                            </div>
+                            <div class="vis-hash-row">
+                                <div class="vis-hash-key"></div>
+                                <div class="vis-hash-val"></div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="card" onclick="selectStructure('hashset')">
                     <h3>HashSet</h3>
+                    <div class="card-visual">
+                        <div class="vis-hash">
+                            <div class="vis-hash-row">
+                                <div class="vis-hash-key" style="width:100%"></div>
+                            </div>
+                            <div class="vis-hash-row">
+                                <div class="vis-hash-key" style="width:100%"></div>
+                            </div>
+                            <div class="vis-hash-row">
+                                <div class="vis-hash-key" style="width:100%"></div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="card" onclick="selectStructure('hashset-simple')">
                     <h3>HashSet (Simple)</h3>
+                    <div class="card-visual">
+                        <div class="vis-hash">
+                            <div class="vis-hash-row">
+                                <div class="vis-hash-key" style="width:100%"></div>
+                            </div>
+                            <div class="vis-hash-row">
+                                <div class="vis-hash-key" style="width:100%"></div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="card" onclick="selectStructure('treemap')">
                     <h3>TreeMap</h3>
+                    <div class="card-visual">
+                        <div class="vis-tree">
+                            <div class="vis-tree-circle" style="top:0; left:19px;"></div>
+                            <div class="vis-tree-edge"
+                                style="top:10px; left:25px; width:15px; transform:rotate(135deg);"></div>
+                            <div class="vis-tree-edge"
+                                style="top:10px; left:25px; width:15px; transform:rotate(45deg);"></div>
+                            <div class="vis-tree-circle" style="top:16px; left:4px;"></div>
+                            <div class="vis-tree-circle" style="top:16px; left:34px;"></div>
+                        </div>
+                    </div>
                 </div>
                 <div class="card" onclick="selectStructure('linkedhashmap')">
                     <h3>LinkedHashMap</h3>
+                    <div class="card-visual">
+                        <div class="vis-hash">
+                            <div class="vis-hash-row">
+                                <div class="vis-hash-key"></div>
+                                <div class="vis-hash-val"></div>
+                                <div class="vis-arrow" style="width:6px"></div>
+                            </div>
+                            <div class="vis-hash-row">
+                                <div class="vis-hash-key"></div>
+                                <div class="vis-hash-val"></div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -121,9 +317,37 @@
             <div class="section-grid">
                 <div class="card" onclick="selectStructure('trie')">
                     <h3>Trie (Prefix Tree)</h3>
+                    <div class="card-visual">
+                        <div class="vis-tree">
+                            <div class="vis-tree-circle" style="top:0; left:19px;"></div>
+                            <div class="vis-tree-edge"
+                                style="top:10px; left:25px; width:15px; transform:rotate(135deg);"></div>
+                            <div class="vis-tree-edge"
+                                style="top:10px; left:25px; width:15px; transform:rotate(45deg);"></div>
+                            <div class="vis-tree-circle" style="top:16px; left:4px;"></div>
+                            <div class="vis-tree-circle" style="top:16px; left:34px;"></div>
+                            <div class="vis-tree-edge"
+                                style="top:26px; left:10px; width:10px; transform:rotate(90deg);"></div>
+                            <div class="vis-tree-circle" style="top:32px; left:4px; border-color:#10b981;"></div>
+                        </div>
+                    </div>
                 </div>
                 <div class="card" onclick="selectStructure('union_find')">
                     <h3>Union Find (DSU)</h3>
+                    <div class="card-visual">
+                        <div class="vis-tree">
+                            <div class="vis-tree-circle" style="top:0; left:4px; border-color:#3b82f6;"></div>
+                            <div class="vis-tree-circle" style="top:16px; left:4px; border-color:#3b82f6;"></div>
+                            <div class="vis-tree-edge"
+                                style="top:16px; left:10px; width:10px; transform:rotate(-90deg); background:#3b82f6;">
+                            </div>
+                            <div class="vis-tree-circle" style="top:0; left:30px; border-color:#10b981;"></div>
+                            <div class="vis-tree-circle" style="top:16px; left:30px; border-color:#10b981;"></div>
+                            <div class="vis-tree-edge"
+                                style="top:16px; left:36px; width:10px; transform:rotate(-90deg); background:#10b981;">
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
