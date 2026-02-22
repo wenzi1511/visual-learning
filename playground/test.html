@@ -1535,6 +1535,252 @@
             }
         };
 
+        const createCallstackPrimitive = (slotId) => ({
+            slotId,
+            frames: [], // Array of { name, args: {}, locals: {}, retVal?: string }
+            init() {
+                this.frames = [];
+                this.render();
+            },
+            pushFrame(name, args = {}) {
+                this.frames.push({ name, args, locals: {} });
+                this.render();
+            },
+            popFrame(retVal) {
+                if (this.frames.length > 0) {
+                    if (retVal !== undefined) {
+                        this.frames[this.frames.length - 1].retVal = retVal;
+                        this.render();
+                    }
+                    this.frames.pop();
+                    this.render();
+                }
+            },
+            updateLocal(key, val) {
+                if (this.frames.length > 0) {
+                    this.frames[this.frames.length - 1].locals[key] = val;
+                    this.render();
+                }
+            },
+            render() {
+                const container = document.getElementById(`slot-${this.slotId}-content`);
+                if (!container) return;
+
+                if (this.frames.length === 0) {
+                    container.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#64748b;font-style:italic;">Call Stack Empty</div>';
+                    return;
+                }
+
+                let html = '<div class="callstack-wrapper" style="display:flex;flex-direction:column-reverse;gap:10px;padding:20px;width:100%;align-items:center;min-height:300px;">';
+
+                this.frames.forEach((frame, idx) => {
+                    const isTop = idx === this.frames.length - 1;
+                    const opacity = isTop ? '1' : '0.6';
+                    const border = isTop ? 'border: 2px solid #3b82f6;' : 'border: 1px solid #64748b;';
+                    const transform = isTop ? 'transform: translateX(0);' : 'transform: translateX(-10px) scale(0.95);';
+
+                    let varsHtml = '';
+                    const allVars = { ...frame.args, ...frame.locals };
+                    for (const [k, v] of Object.entries(allVars)) {
+                        varsHtml += `<div style="font-family:\\'Fira Code\\',monospace;font-size:0.85rem;color:#e2e8f0;margin-top:2px;"><span style="color:#94a3b8;">${k}:</span> ${v}</div>`;
+                    }
+                    if (Object.keys(allVars).length === 0) {
+                        varsHtml = `<div style="font-size:0.75rem;color:#64748b;font-style:italic;">No locals</div>`;
+                    }
+
+                    let retHtml = frame.retVal !== undefined ? `<div style="font-family:\\'Fira Code\\',monospace;font-size:0.85rem;color:#10b981;margin-top:6px;border-top:1px dashed #10b981;padding-top:4px;font-weight:bold;">return: ${frame.retVal}</div>` : '';
+
+                    html += `
+                    <div class="callstack-frame" style="background:linear-gradient(145deg, rgba(30,41,59,0.9), rgba(15,23,42,0.8));${border}border-radius:10px;padding:14px;width:85%;max-width:320px;min-width:220px;opacity:${opacity};${transform}box-shadow:0 8px 16px rgba(0,0,0,0.3);transition:all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
+                        <div style="font-weight:bold;color:#60a5fa;margin-bottom:10px;border-bottom:1px solid rgba(100,116,139,0.5);padding-bottom:6px;font-family:\\'Fira Code\\',monospace;font-size:1rem;letter-spacing:0.5px;">${frame.name}()</div>
+                        <div class="callstack-vars">
+                            ${varsHtml}
+                            ${retHtml}
+                        </div>
+                    </div>`;
+                });
+
+                html += '</div>';
+                container.innerHTML = html;
+            },
+            clone() {
+                return { frames: JSON.parse(JSON.stringify(this.frames)) };
+            },
+            restore(state) {
+                this.frames = JSON.parse(JSON.stringify(state.frames));
+                this.render();
+            }
+        });
+
+        const createRecursionTreePrimitive = (slotId) => ({
+            slotId,
+            nodes: new Map(),
+            rootId: null,
+            activeId: null,
+            cacheLinks: [],
+            init() {
+                this.nodes.clear();
+                this.rootId = null;
+                this.activeId = null;
+                this.cacheLinks = [];
+                this.render();
+            },
+            enterNode(nodeId, label, color = null) {
+                if (this.nodes.has(nodeId)) {
+                    this.activeId = nodeId;
+                } else {
+                    const newNode = { id: nodeId, label, color, parentId: this.activeId, childrenIds: [], x: 0, y: 0 };
+                    if (this.activeId && this.nodes.has(this.activeId)) {
+                        const parent = this.nodes.get(this.activeId);
+                        newNode.parentId = parent.id;
+                        if (!parent.childrenIds.includes(nodeId)) parent.childrenIds.push(nodeId);
+                    } else {
+                        this.rootId = nodeId;
+                    }
+                    this.nodes.set(nodeId, newNode);
+                    this.activeId = nodeId;
+                }
+                this.render();
+            },
+            exitNode(statusColor = null) {
+                if (this.activeId && this.nodes.has(this.activeId)) {
+                    if (statusColor) this.nodes.get(this.activeId).color = statusColor;
+                    this.activeId = this.nodes.get(this.activeId).parentId;
+                    this.render();
+                }
+            },
+            cacheHit(nodeId) {
+                if (this.activeId && this.nodes.has(nodeId)) {
+                    this.cacheLinks.push({ fromId: this.activeId, toId: nodeId });
+                    const active = this.nodes.get(this.activeId);
+                    if (active && (!active.color || active.color === '#1e293b' || active.color === '')) {
+                        active.color = '#f59e0b';
+                    }
+                    this.render();
+                }
+            },
+            highlight(nodeId, color) {
+                if (this.nodes.has(nodeId)) {
+                    this.nodes.get(nodeId).color = color;
+                    this.render();
+                }
+            },
+            render() {
+                const container = document.getElementById(`slot-${this.slotId}-content`);
+                if (!container) return;
+
+                if (this.nodes.size === 0 || !this.rootId) {
+                    container.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#64748b;font-style:italic;">Recursion Tree Empty</div>';
+                    return;
+                }
+
+                let leafCount = 0;
+                const nodeWidth = 75; // Increased width to fit 'dist(X, Y)'
+                const nodeHeight = 44; // Kept height standard for an oval
+                const gapX = 40;
+                const gapY = 80;
+
+                const dfs = (id, depth) => {
+                    const node = this.nodes.get(id);
+                    if (!node) return;
+                    if (node.childrenIds.length === 0) {
+                        node.x = leafCount * (nodeWidth + gapX);
+                        leafCount++;
+                    } else {
+                        let minX = Infinity;
+                        let maxX = -Infinity;
+                        node.childrenIds.forEach(cId => {
+                            dfs(cId, depth + 1);
+                            const childNode = this.nodes.get(cId);
+                            if (childNode) {
+                                minX = Math.min(minX, childNode.x);
+                                maxX = Math.max(maxX, childNode.x);
+                            }
+                        });
+                        node.x = (minX + maxX) / 2;
+                    }
+                    node.y = depth * gapY;
+                };
+
+                dfs(this.rootId, 0);
+
+                let minXOut = Infinity, maxXOut = -Infinity, maxYOut = 0;
+                this.nodes.forEach(n => {
+                    minXOut = Math.min(minXOut, n.x);
+                    maxXOut = Math.max(maxXOut, n.x);
+                    maxYOut = Math.max(maxYOut, n.y);
+                });
+
+                const treeWidth = maxXOut - minXOut;
+                const stageWidth = Math.max(treeWidth + 180, 600); // Increased padding to handle wide nodes on edges
+                const stageHeight = Math.max(maxYOut + 100, 300);
+
+                // Adjust offset to ensure minXOut starts at least 90px from left edge
+                // So minXOut + offsetX = 90
+                const offsetX = 90 - minXOut;
+                const offsetY = 50;
+
+                let html = `<div class="rt-wrapper" style="position: relative; width: 100%; height: 100%; min-height: 400px; overflow: auto; display: flex; justify-content: flex-start; padding-right: 20px;">
+                             <div class="rt-stage" style="position: relative; width: ${stageWidth}px; height: ${stageHeight}px; flex-shrink: 0; margin: 0 auto;">`;
+                html += `<svg style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none;">`;
+
+                const drawEdge = (id) => {
+                    const node = this.nodes.get(id);
+                    if (!node) return '';
+                    let s = '';
+                    node.childrenIds.forEach(cId => {
+                        const child = this.nodes.get(cId);
+                        if (child) {
+                            s += `<line x1="${node.x + offsetX}" y1="${node.y + offsetY}" x2="${child.x + offsetX}" y2="${child.y + offsetY}" stroke="#64748b" stroke-width="2" />`;
+                            s += drawEdge(child.id);
+                        }
+                    });
+                    return s;
+                };
+                html += drawEdge(this.rootId);
+
+                this.cacheLinks.forEach(link => {
+                    const fromNode = this.nodes.get(link.fromId);
+                    const toNode = this.nodes.get(link.toId);
+                    if (fromNode && toNode) {
+                        html += `<path d="M ${fromNode.x + offsetX} ${fromNode.y + offsetY} Q ${(fromNode.x + toNode.x) / 2 + offsetX} ${(fromNode.y + toNode.y) / 2 - 40 + offsetY} ${toNode.x + offsetX} ${toNode.y + offsetY}" stroke="#f59e0b" stroke-width="2" stroke-dasharray="5,5" fill="none" />`;
+                    }
+                });
+
+                html += `</svg>`;
+
+                this.nodes.forEach(node => {
+                    const isActive = this.activeId === node.id;
+                    const bg = node.color ? node.color : (isActive ? '#3b82f6' : '#1e293b');
+                    const border = isActive ? '#a78bfa' : '#64748b';
+                    const glow = isActive ? `box-shadow: 0 0 20px ${bg}; transform: translate(-50%, -50%) scale(1.15); border-width: 3px; z-index: 10;` : 'box-shadow: 0 4px 6px rgba(0,0,0,0.3); transform: translate(-50%, -50%); z-index: 2;';
+
+                    html += `<div class="rt-node" style="position:absolute; left:${node.x + offsetX}px; top:${node.y + offsetY}px; width:${nodeWidth}px; height:${nodeHeight}px; background:${bg}; border:2px solid ${border}; border-radius:12px; color:white; display:flex; align-items:center; justify-content:center; text-align:center; white-space:nowrap; font-family:'Fira Code', monospace; font-size:0.8rem; font-weight:bold; ${glow} transition:all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);" title="ID: ${node.id}">${node.label}</div>`;
+                });
+
+                html += `</div></div>`;
+                container.innerHTML = html;
+            },
+            clone() {
+                const nodesClone = [];
+                this.nodes.forEach(v => nodesClone.push(JSON.parse(JSON.stringify(v))));
+                return {
+                    nodesArray: nodesClone,
+                    rootId: this.rootId,
+                    activeId: this.activeId,
+                    cacheLinks: JSON.parse(JSON.stringify(this.cacheLinks))
+                };
+            },
+            restore(state) {
+                this.nodes.clear();
+                state.nodesArray.forEach(v => this.nodes.set(v.id, v));
+                this.rootId = state.rootId;
+                this.activeId = state.activeId;
+                this.cacheLinks = state.cacheLinks;
+                this.render();
+            }
+        });
+
         // Build slots from JSON config
         function buildSlots(slots) {
             const slotsContainer = document.getElementById('slots-container');
@@ -1583,6 +1829,12 @@
                     case 'stack':
                         primitive = createStackPrimitive(slotId);
                         break;
+                    case 'callstack':
+                        primitive = createCallstackPrimitive(slotId);
+                        break;
+                    case 'recursion-tree':
+                        primitive = createRecursionTreePrimitive(slotId);
+                        break;
                     case 'hashmap':
                     case 'hashmap-simple':
                         primitive = createHashmapPrimitive(slotId);
@@ -1620,6 +1872,12 @@
                         break;
                     case 'graph':
                         primitive = createGraphPrimitive(slotId);
+                        break;
+                    case 'callstack':
+                        primitive = createCallstackPrimitive(slotId);
+                        break;
+                    case 'recursion-tree':
+                        primitive = createRecursionTreePrimitive(slotId);
                         break;
                     default:
                         primitive = createArrayPrimitive(slotId);
@@ -4370,8 +4628,8 @@
                             option.value = modelId;
                             option.textContent = model.displayName || modelId;
 
-                            // Select gemini-2.5-pro or gemini-2.5-flash as default if available
-                            if (modelId === 'gemini-2.5-pro' || modelId === 'gemini-2.5-flash') {
+                            // Select gemini-3-flash-preview, gemini-2.5-pro, or gemini-2.5-flash as default if available
+                            if (modelId === 'gemini-3-flash-preview' || modelId === 'gemini-2.5-pro' || modelId === 'gemini-2.5-flash') {
                                 option.selected = true;
                             }
 
@@ -4387,7 +4645,11 @@
             } catch (error) {
                 console.error(error);
                 modelSelect.innerHTML = '<option value="">Error loading models</option>';
-                alert("Model Unavailable : " + error.message);
+                if (error.message.includes('Failed to fetch')) {
+                    alert('Error: Could not connect to the local server. Please ensure you have started it by running "node server.js" in your terminal, and access the playground via http://localhost:3000/playground/test.html');
+                } else {
+                    alert("Model Unavailable : " + error.message);
+                }
             }
         }
 
@@ -4453,6 +4715,10 @@
                 console.error(error);
                 statusEl.textContent = 'Error: ' + error.message;
                 statusEl.style.color = '#f87171';
+
+                if (error.message.includes('Failed to fetch')) {
+                    alert('Error: Could not connect to the local server. Please ensure you have started it by running "node server.js" in your terminal.');
+                }
             } finally {
                 document.getElementById('btn-generate-ai').disabled = false;
                 document.getElementById('btn-generate-ai').style.opacity = '1';

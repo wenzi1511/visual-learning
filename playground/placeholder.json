@@ -1,48 +1,47 @@
 {
-    "id": "graph-dijkstras-algorithm",
-    "name": "Dijkstra's Shortest Path",
-    "difficulty": "Medium",
-    "description": "<h3>Dijkstra's Algorithm</h3><p>Dijkstra's algorithm finds the shortest path from a starting node to all other reachable nodes in a <b>weighted</b> graph with non-negative edge weights.</p><ul><li><b>Priority Queue (Min-Heap):</b> Always explores the node with the lowest cumulative distance from the start node first.</li><li><b>Relaxation:</b> It updates the shortest known distance to a neighbor if passing through the current node yields a shorter path.</li><li><b>Visited Set:</b> Once a node is popped from the priority queue, its shortest path is guaranteed and it is marked visited.</li></ul>",
-    "tags": [
-        "Graph",
-        "Shortest Path",
-        "Heap",
-        "Priority Queue",
-        "Dijkstra"
-    ],
-    "slots": [
-        {
-            "id": "graph_ds",
-            "type": "graph",
-            "label": "Graph Topology (Weighted)"
-        },
-        {
-            "id": "pq_ds",
-            "type": "heap",
-            "label": "Priority Queue (Min Heap)"
-        },
-        {
-            "id": "visited_ds",
-            "type": "hashset",
-            "label": "Settled Nodes"
-        },
-        {
-            "id": "dist_ds",
-            "type": "hashmap",
-            "label": "Distances from Source"
-        }
-    ],
-    "inputs": [
-        {
-            "label": "Start Node",
-            "default": "A",
-            "placeholder": "A"
-        },
-        {
-            "label": "Weighted Edges (u-v:weight)",
-            "default": "A-B:4, A-C:2, C-B:1, B-D:2, C-D:5, D-E:3",
-            "placeholder": "A-B:4, B-C:1"
-        }
-    ],
-    "code": "class Playground {\n    async run(inputs) {\n        const startNodeId = inputs[0].trim();\n        const edgeStrings = inputs[1].split(',').map(s => s.trim());\n\n        // 1. Parse Graph\n        const nodesSet = new Set();\n        const edges = [];\n        edgeStrings.forEach(str => {\n            const parts = str.split(':');\n            const uv = parts[0].split('-');\n            const u = uv[0];\n            const v = uv[1];\n            const weight = parts[1] ? parseInt(parts[1]) : 1;\n            \n            if (u && v) {\n                nodesSet.add(u);\n                nodesSet.add(v);\n                edges.push({ u, v, directed: false, weight });\n            }\n        });\n\n        const nodes = Array.from(nodesSet).map(id => ({ id, val: id }));\n        \n        // 2. Initialize slots\n        this.graph_ds.init(nodes, edges);\n        this.pq_ds.init([], 'min');\n        this.visited_ds.init([]);\n        this.dist_ds.init([]);\n\n        if (!nodesSet.has(startNodeId)) {\n            this.log(`Error: Start node ${startNodeId} not found in graph.`);\n            return \"Node not found\";\n        }\n\n        this.log(`Starting Dijkstra's Algorithm from node: ${startNodeId}`);\n        \n        // 3. Initialize distances\n        const distances = {};\n        nodes.forEach(n => {\n            distances[n.id] = Infinity;\n            this.dist_ds.put(n.id, \"∞\");\n        });\n        \n        distances[startNodeId] = 0;\n        this.dist_ds.put(startNodeId, 0);\n        \n        // PQ stores strings format: \"dist-node\" so lexical sort acts like a basic heap for single digits, but we just use val for visual.\n        // We will maintain a real JS array heap internally for exactness\n        const pq = [{ dist: 0, node: startNodeId }];\n        this.pq_ds.push(`0-${startNodeId}`);\n        \n        this.graph_ds.highlightNode(startNodeId, \"#3b82f6\"); // Initial blue\n        await this.await();\n\n        while (pq.length > 0) {\n            // JS doesn't have a native heap, so we sort to simulate extract-min\n            pq.sort((a, b) => a.dist - b.dist);\n            const current = pq.shift();\n            const u = current.node;\n            const d = current.dist;\n            \n            this.pq_ds.pop();\n            \n            // Skip if we've already found a better path\n            if (this.visited_ds.has(u)) continue;\n\n            this.log(`Extracted min: ${u} with distance ${d}. Marking as settled.`);\n            this.graph_ds.highlightNode(u, \"#eab308\"); // Processing yellow\n            this.visited_ds.add(u);\n            await this.await();\n\n            const neighbors = this.graph_ds.getNeighbors(u);\n            for (const neighborObj of neighbors) {\n                const v = neighborObj.node;\n                const weight = neighborObj.weight;\n                \n                if (this.visited_ds.has(v)) continue;\n                \n                this.graph_ds.highlightEdge(u, v, \"#eab308\"); // Highlight edge under consideration\n                this.log(`Evaluating edge ${u}-${v} (weight: ${weight}). Current best dist to ${v} is ${distances[v] === Infinity ? '∞' : distances[v]}.`);\n                await this.await();\n                \n                const newDist = d + weight;\n                if (newDist < distances[v]) {\n                    this.log(`Relaxation successful: ${newDist} < ${distances[v] === Infinity ? '∞' : distances[v]}. Updating path to ${v}.`);\n                    distances[v] = newDist;\n                    this.dist_ds.put(v, newDist);\n                    \n                    pq.push({ dist: newDist, node: v });\n                    this.pq_ds.push(`${newDist}-${v}`);\n                    this.graph_ds.highlightNode(v, \"#3b82f6\"); // Blue to indicate updated\n                } else {\n                     this.log(`Path through ${u} is not shorter (${newDist} >= ${distances[v]}). Skipping.`);\n                }\n                \n                // Reset edge highlight\n                this.graph_ds.highlightEdge(u, v, \"#64748b\");\n                await this.await();\n            }\n\n            this.graph_ds.highlightNode(u, \"#10b981\"); // Completed green\n            this.log(`Finished processing neighbors of ${u}`);\n            await this.await();\n        }\n\n        this.log(\"Dijkstra's Algorithm completed. Shortest paths found.\");\n        return distances;\n    }\n}"
+  "id": "edit-distance-dp-backtracking",
+  "name": "Edit Distance (Levenshtein Distance)",
+  "difficulty": "Hard",
+  "description": "Given two strings <code>word1</code> and <code>word2</code>, return the minimum number of operations required to convert <code>word1</code> to <code>word2</code>.<br/><br/>You have the following three operations permitted on a word:<ul><li>Insert a character</li><li>Delete a character</li><li>Replace a character</li></ul><p>This visualizer demonstrates both the <b>DP Tabulation</b> (Grid) and the <b>Recursive Backtracking</b> (Recursion Tree) approaches.</p>",
+  "tags": [
+    "Dynamic Programming",
+    "String",
+    "Recursion",
+    "Memoization"
+  ],
+  "slots": [
+    {
+      "id": "dpTable",
+      "type": "grid",
+      "label": "DP Tabulation Table"
+    },
+    {
+      "id": "vars",
+      "type": "hashmap",
+      "label": "State Variables"
+    },
+    {
+      "id": "callstack",
+      "type": "callstack",
+      "label": "Call Stack"
+    },
+    {
+      "id": "recTree",
+      "type": "recursion-tree",
+      "label": "Recursion Tree (Memoized)"
+    }
+  ],
+  "inputs": [
+    {
+      "label": "Word 1",
+      "default": "horse",
+      "placeholder": "Enter first word"
+    },
+    {
+      "label": "Word 2",
+      "default": "ros",
+      "placeholder": "Enter second word"
+    }
+  ],
+  "code": "class Playground {\n    async run(inputs) {\n        const word1 = inputs[0] || \"\";\n        const word2 = inputs[1] || \"\";\n        const m = word1.length;\n        const n = word2.length;\n\n        // 1. INITIALIZATION\n        this.vars.init([]);\n        this.callstack.init();\n        this.recTree.init();\n        \n        this.log(\"--- PART 1: DP TABULATION ---\");\n        const dp = Array.from({ length: m + 1 }, () => Array(n + 1).fill(0));\n        this.dpTable.init(dp);\n        await this.await();\n\n        // Fill base cases\n        for (let i = 0; i <= m; i++) {\n            dp[i][0] = i;\n            this.dpTable.setCell(i, 0, i);\n            this.dpTable.highlight(i, 0, \"#3b82f6\");\n            this.log(`Base case: converting \"${word1.substring(0, i)}\" to empty string requires ${i} deletions.`);\n            await this.await();\n        }\n        for (let j = 0; j <= n; j++) {\n            dp[0][j] = j;\n            this.dpTable.setCell(0, j, j);\n            this.dpTable.highlight(0, j, \"#3b82f6\");\n            this.log(`Base case: converting empty string to \"${word2.substring(0, j)}\" requires ${j} insertions.`);\n            await this.await();\n        }\n\n        // Fill the rest of the DP table\n        for (let i = 1; i <= m; i++) {\n            for (let j = 1; j <= n; j++) {\n                this.vars.put(\"i\", i);\n                this.vars.put(\"j\", j);\n                this.vars.put(\"char1\", word1[i-1]);\n                this.vars.put(\"char2\", word2[j-1]);\n                this.dpTable.highlight(i, j, \"#eab308\");\n\n                if (word1[i - 1] === word2[j - 1]) {\n                    this.log(`Characters '${word1[i-1]}' match! No new operation needed.`);\n                    dp[i][j] = dp[i - 1][j - 1];\n                } else {\n                    this.log(`Mismatch: taking min of Replace(${dp[i-1][j-1]}), Insert(${dp[i][j-1]}), Delete(${dp[i-1][j]}) + 1`);\n                    dp[i][j] = Math.min(\n                        dp[i - 1][j - 1], // replace\n                        dp[i][j - 1],     // insert\n                        dp[i - 1][j]      // delete\n                    ) + 1;\n                }\n                \n                this.dpTable.setCell(i, j, dp[i][j]);\n                await this.await();\n                this.dpTable.highlight(i, j, \"#22c55e\");\n            }\n        }\n\n        const dpResult = dp[m][n];\n        this.log(`Tabulation Complete. Min Distance: ${dpResult}`);\n        await this.await();\n\n        // 2. RECURSIVE BACKTRACKING (With Memoization visualization)\n        this.log(\"--- PART 2: RECURSIVE BACKTRACKING ---\");\n        const memo = new Map();\n\n        const solve = async (i, j) => {\n            const nodeId = `node-${i}-${j}`;\n            const label = `dist(${i}, ${j})`;\n            \n            this.callstack.pushFrame(\"minDist\", { i, j });\n            this.recTree.enterNode(nodeId, label);\n            await this.await();\n\n            if (memo.has(`${i}-${j}`)) {\n                this.log(`Cache hit for (${i}, ${j})`);\n                this.recTree.cacheHit(nodeId);\n                const val = memo.get(`${i}-${j}`);\n                this.callstack.popFrame(val);\n                this.recTree.exitNode(\"#22c55e\");\n                return val;\n            }\n\n            // Base Cases\n            if (i === 0) {\n                this.log(`Base Case: i=0, return j=${j}`);\n                this.callstack.popFrame(j);\n                this.recTree.exitNode(\"#3b82f6\");\n                return j;\n            }\n            if (j === 0) {\n                this.log(`Base Case: j=0, return i=${i}`);\n                this.callstack.popFrame(i);\n                this.recTree.exitNode(\"#3b82f6\");\n                return i;\n            }\n\n            let res;\n            if (word1[i - 1] === word2[j - 1]) {\n                this.log(`Characters match at indices ${i-1}, ${j-1}`);\n                res = await solve(i - 1, j - 1);\n            } else {\n                this.log(`Branching for Replace, Insert, Delete at (${i}, ${j})`);\n                const replace = await solve(i - 1, j - 1);\n                const insert = await solve(i, j - 1);\n                const del = await solve(i - 1, j);\n                res = Math.min(replace, insert, del) + 1;\n            }\n\n            memo.set(`${i}-${j}`, res);\n            this.callstack.popFrame(res);\n            this.recTree.exitNode(\"#22c55e\");\n            return res;\n        };\n\n        // Run recursion on a subset or full depending on size to keep visualization readable\n        // Note: For visualization clarity, we call recursion last.\n        const recResult = await solve(m, n);\n        \n        this.log(`Final Result: ${recResult}`);\n        return recResult;\n    }\n}"
 }

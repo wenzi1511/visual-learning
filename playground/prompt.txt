@@ -18,7 +18,7 @@ You must return only a valid JSON object following this template:
 }
 
 ### AVAILABLE STRUCTURE TYPES
-"array", "stack", "queue", "deque", "sll", "dll", "hashmap", "hashset", "graph", "grid", "binary-tree", "heap", "union-find", "trie"
+"array", "stack", "callstack", "recursion-tree", "queue", "deque", "sll", "dll", "hashmap", "hashset", "graph", "grid", "binary-tree", "heap", "union-find", "trie"
 
 ### API REFERENCE FOR SLOTS
 Each slot is accessible via `this.slotId`. Global utilities: `this.log(msg)` and `await this.await()`.
@@ -98,6 +98,19 @@ Each slot is accessible via `this.slotId`. Global utilities: `this.log(msg)` and
     - `insert(word)`, `search(word)`.
     - `highlight(nodeOrIdOrWord, color)`.
 
+14. **Call Stack**:
+    - `init()`.
+    - `pushFrame(name, args)`: args is an object `{key: val}`.
+    - `popFrame(retVal?)`.
+    - `updateLocal(key, val)`.
+
+15. **Recursion Tree**:
+    - `init()`.
+    - `enterNode(nodeId, label, color?)`.
+    - `exitNode(statusColor?)`.
+    - `cacheHit(nodeId)`.
+    - `highlight(nodeId, color)`.
+
 ### IMPORTANT CODING RULES
 - **Snapshot Requirement**: You MUST call `await this.await()` after every significant state change (swap, push, highlight, pointer move) to allow the user to step through.
 - **Logging**: Use `this.log("Descriptive message")` before `await this.await()` to explain what the algorithm is doing.
@@ -107,7 +120,8 @@ Each slot is accessible via `this.slotId`. Global utilities: `this.log(msg)` and
 - **Explicit Returns**: Always return a meaningful result at the end of the `run` method. If no solution is found, return a technical "not found" value (e.g., `[-1, -1]` for index-based problems, `null` or `false` for others) rather than returning nothing.
 - **Advanced Visualization**: 
     - **Priority Queue Note**: When a problem requires a Priority Queue (like Dijkstra's), you SHOULD use a `Heap` with `init([], 'min')`.
-    - **Mandatory Variable Tracking**: You MUST create a `HashMap` slot labeled "Variables" or "State" to track important algorithm variables (e.g., `count`, `maxProgress`, `currentSum`). Use `put(varName, value)` to keep these updated on the screen during the `run` method.
+    - **Iterative Variable Tracking**: For iterative algorithms, you MUST create a `HashMap` slot labeled "Variables" or "State" to track important variables. Use `put(varName, value)` to keep these updated on the screen during the `run` method.
+    - **Strict Recursion Rule**: ANY recursive function (e.g. `dfs`, backtracking, DP) MUST begin with `this.callstack.pushFrame(...)` and `this.recursionTree.enterNode(...)`, and MUST end every return branch with `this.callstack.popFrame(...)` and `this.recursionTree.exitNode(...)`. You MUST NOT use a global `HashMap` for local variables in recursive algorithms; update variables using `this.callstack.updateLocal(key, val)`. When a DP cache is hit, log it and call `this.recursionTree.cacheHit(nodeId)`.
     - **Mandatory Visited States**: For Grid and Graph problems, you MUST create a second slot (Grid or Array/HashSet) specifically to track "Visited" nodes. DO NOT modify the input structure to mark nodes as visited. This allows the user to see both the original problem and the traversal state side-by-side.
     - **Mandatory Traversal Frontier**: For DFS or BFS problems, you MUST create a `Stack` (for DFS) or `Queue` (for BFS) slot to visualize the frontier of nodes waiting to be processed. Synchronize this slot with your code's internal data structures.
 - **Robustness**: Always check for null or undefined before accessing properties.
