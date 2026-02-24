@@ -1383,3 +1383,38 @@ input[type=number]::-webkit-outer-spin-button {
         border-color: rgba(138, 88, 216, 0.7);
     }
 }
+
+/* --- CODE VISUALIZER CARD STYLES --- */
+#code-visualizer-card {
+    background: linear-gradient(135deg, rgba(251, 191, 36, 0.05), rgba(30, 41, 59, 0.6));
+    border: 1.5px solid rgba(251, 191, 36, 0.5);
+    box-shadow: 0 0 15px rgba(251, 191, 36, 0.2);
+    animation: goldPulseGlow 3s infinite alternate;
+    justify-content: center;
+}
+
+#code-visualizer-card h3 {
+    text-align: center;
+    color: #fef3c7;
+    font-size: 1.4rem;
+    letter-spacing: 1px;
+}
+
+#code-visualizer-card:hover {
+    transform: translateY(-4px);
+    background: linear-gradient(135deg, rgba(251, 191, 36, 0.15), rgba(30, 41, 59, 0.8));
+    border-color: rgba(251, 191, 36, 0.9);
+    box-shadow: 0 10px 30px rgba(251, 191, 36, 0.4);
+}
+
+@keyframes goldPulseGlow {
+    from {
+        box-shadow: 0 0 10px rgba(251, 191, 36, 0.1);
+        border-color: rgba(251, 191, 36, 0.3);
+    }
+
+    to {
+        box-shadow: 0 0 20px rgba(251, 191, 36, 0.5);
+        border-color: rgba(251, 191, 36, 0.7);
+    }
+}

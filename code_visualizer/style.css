@@ -1,0 +1,433 @@
+/* Code Visualizer Specific Styles (Extending base vars) */
+
+.cv-sidebar {
+    width: 40%;
+    min-width: 300px;
+    max-width: 80vw;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    flex-shrink: 0;
+}
+
+.editor-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 15px;
+    margin-bottom: 10px;
+}
+
+.editor-title {
+    font-size: 0.9rem;
+    color: var(--text-sub);
+    font-weight: 500;
+}
+
+.editor-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.run-btn {
+    background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%) !important;
+    border-color: #f59e0b !important;
+    color: #fff !important;
+}
+
+.run-btn:hover {
+    box-shadow: 0 0 15px rgba(251, 191, 36, 0.4) !important;
+}
+
+.editor-container {
+    position: relative;
+    flex-grow: 1;
+    min-height: 400px;
+    background: var(--bg-body);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+#monaco-editor {
+    flex: 1;
+    width: 100%;
+}
+
+/* Base font for editor and highlight */
+.editor-font {
+    font-family: "Fira Code", monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    padding: 15px;
+    white-space: pre;
+    overflow-wrap: normal;
+    tab-size: 4;
+}
+
+#code-editor {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    color: var(--text-main);
+    border: none;
+    resize: none;
+    z-index: 2;
+    caret-color: #fbbf24;
+    outline: none;
+}
+
+#editor-highlight {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    color: transparent;
+    /* Text is invisible, only background highlights show */
+    z-index: 1;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+#code-editor,
+#editor-highlight {
+    font-family: "Fira Code", monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    padding: 15px;
+    white-space: pre;
+    tab-size: 4;
+    box-sizing: border-box;
+}
+
+.active-line-highlight {
+    background-color: rgba(251, 191, 36, 0.2);
+    /* Golden highlight */
+    display: block;
+    width: 100%;
+    border-left: 3px solid #fbbf24;
+    border-radius: 2px;
+}
+
+/* Execution Controls */
+.step-controls-wrapper {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.step-controls-wrapper button {
+    flex: 1;
+}
+
+.play-btn {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+    border-color: #34d399 !important;
+}
+
+.speed-control-cv {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--text-sub);
+    font-size: 0.85rem;
+}
+
+.speed-control-cv input[type=range] {
+    flex: 1;
+    accent-color: #fbbf24;
+}
+
+/* Visual Area */
+.cv-visual-area {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    padding: 30px;
+    gap: 20px;
+    background-image: radial-gradient(rgba(251, 191, 36, 0.1) 1px, transparent 1px) !important;
+    overflow: hidden;
+    /* Prevent body scroll */
+}
+
+.visual-header {
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.visual-header h2 {
+    color: #fbbf24;
+    font-size: 1.8rem;
+    margin: 0;
+    letter-spacing: -0.5px;
+}
+
+.state-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    flex: 1;
+    min-height: 0;
+    /* Important for flex child scrolling */
+}
+
+@media (min-width: 1000px) {
+    .state-container {
+        flex-direction: row;
+        gap: 0;
+    }
+}
+
+.state-panel {
+    background: linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%);
+    border: 1px solid rgba(251, 191, 36, 0.2);
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+    flex: 1;
+    min-height: 0;
+    /* Crucial: allows internal scrolling */
+}
+
+.panel-subtitle {
+    color: var(--text-sub);
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-top: 0;
+    margin-bottom: 15px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 10px;
+}
+
+.variables-list,
+.console-output {
+    flex: 1;
+    overflow-y: auto;
+    font-family: "Fira Code", monospace;
+    font-size: 0.9rem;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(251, 191, 36, 0.5) transparent;
+}
+
+.empty-state {
+    color: #64748b;
+    font-style: italic;
+    text-align: center;
+    margin-top: 50px;
+}
+
+.var-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    border-bottom: 1px dashed rgba(255, 255, 255, 0.05);
+    align-items: center;
+}
+
+.var-name {
+    color: #fbbf24;
+    font-weight: 600;
+}
+
+.var-val {
+    color: #38bdf8;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 4px 8px;
+    border-radius: 4px;
+    word-break: break-all;
+}
+
+.console-output {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 6px;
+    padding: 10px;
+}
+
+.log-entry {
+    color: #e2e8f0;
+    margin-bottom: 5px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    padding-bottom: 5px;
+}
+
+.log-entry:last-child {
+    border-bottom: none;
+}
+
+/* --- Inline Visual Learning Data Structures --- */
+
+.cv-array-container {
+    display: flex;
+    gap: 4px;
+    overflow-x: auto;
+    padding: 8px;
+    background: rgba(15, 23, 42, 0.4);
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    margin-top: 6px;
+}
+
+.cv-array-container::-webkit-scrollbar {
+    height: 4px;
+}
+
+.cv-array-container::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 4px;
+}
+
+.cv-array-cell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 40px;
+}
+
+.cv-array-box {
+    width: 100%;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    color: white;
+    border-radius: 4px;
+    font-weight: 600;
+    font-family: 'Fira Code', monospace;
+    font-size: 0.85rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.cv-array-idx {
+    font-size: 0.7rem;
+    color: #94a3b8;
+    margin-top: 4px;
+    font-family: 'Fira Code', monospace;
+}
+
+.cv-dict-container {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 8px;
+    background: rgba(15, 23, 42, 0.4);
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    max-height: 200px;
+    overflow-y: auto;
+    margin-top: 6px;
+}
+
+.cv-dict-container::-webkit-scrollbar {
+    width: 4px;
+}
+
+.cv-dict-container::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 4px;
+}
+
+.cv-dict-row {
+    display: flex;
+    gap: 2px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.cv-dict-key {
+    padding: 6px 10px;
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    color: white;
+    font-weight: 600;
+    font-family: 'Fira Code', monospace;
+    font-size: 0.8rem;
+    flex: 1;
+    display: flex;
+    align-items: center;
+}
+
+.cv-dict-val {
+    padding: 6px 10px;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    font-family: 'Fira Code', monospace;
+    font-size: 0.8rem;
+    flex: 2;
+    display: flex;
+    align-items: center;
+}
+
+.cv-set-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 8px;
+    background: rgba(15, 23, 42, 0.4);
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    margin-top: 6px;
+}
+
+.cv-set-tag {
+    padding: 4px 10px;
+    background: rgb(12, 71, 97);
+    border: 1px solid rgb(56, 180, 218);
+    color: white;
+    border-radius: 12px;
+    font-family: 'Fira Code', monospace;
+    font-size: 0.8rem;
+    font-weight: 600;
+    box-shadow: 0 2px 4px rgba(56, 180, 218, 0.2);
+}
+
+/* --- Resizer Handle --- */
+.resizer {
+    width: 6px;
+    background: transparent;
+    cursor: col-resize;
+    z-index: 10;
+    transition: background 0.2s;
+    height: 100%;
+}
+
+.resizer:hover,
+.resizer.dragging {
+    background: rgba(59, 130, 246, 0.5);
+    /* Soft blue highlight */
+}
+
+/* --- Console Resizer Handle --- */
+.console-resizer {
+    display: none;
+}
+
+@media (min-width: 1000px) {
+    .console-resizer {
+        display: block;
+        width: 10px;
+        cursor: col-resize;
+        background: transparent;
+        z-index: 10;
+        transition: background 0.2s;
+        margin: 0 10px;
+        /* Provides the 20px total gap replacement visually */
+    }
+
+    .console-resizer:hover,
+    .console-resizer.dragging {
+        background: rgba(16, 185, 129, 0.5);
+        /* Soft green highlight */
+    }
+}

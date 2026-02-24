@@ -1,42 +1,32 @@
 {
-  "id": "maximum-sum-subarray-of-size-k",
-  "name": "Maximum Sum Subarray of Size K",
-  "difficulty": "Easy",
-  "description": "<p>Given an array of integers <code>arr</code> and an integer <code>k</code>, find the maximum sum of any contiguous subarray of size <code>k</code>.</p>\n<p>A <strong>sliding window</strong> is a conceptual window that moves across the array. For this problem, the window size is fixed at <code>k</code>. We calculate the sum of elements within the current window and then slide the window one position to the right, updating the sum efficiently.</p>\n\n<p><strong>Example:</strong></p>\n<pre><code>arr = [2, 1, 5, 1, 3, 2]\nk = 3\n</code></pre>\n\n<p><strong>Steps:</strong></p>\n<ul>\n  <li>Initialize a window of size <code>k</code> (first 3 elements): <code>[2, 1, 5]</code>. Sum = 8.</li>\n  <li>Slide the window one position to the right: <code>[1, 5, 1]</code>. To get the new sum, subtract the element leaving the window (2) and add the new element entering the window (1). New sum = 8 - 2 + 1 = 7.</li>\n  <li>Slide again: <code>[5, 1, 3]</code>. Sum = 7 - 1 + 3 = 9.</li>\n  <li>Slide again: <code>[1, 3, 2]</code>. Sum = 9 - 5 + 3 = 7.</li>\n</ul>\n<p>The maximum sum found is 9.</p>",
+  "id": "container-with-most-water",
+  "name": "Container With Most Water",
+  "difficulty": "Medium",
+  "description": "<p>Given <code>n</code> non-negative integers <code>a1, a2, ..., an</code>, where each represents a point at coordinate <code>(i, ai)</code>. <code>n</code> vertical lines are drawn such that the two endpoints of the line <code>i</code> is at <code>(i, ai)</code> and <code>(i, 0)</code>.</p><p>Find two lines, which, together with the x-axis forms a container, such that the container contains the most water.</p><ul><li><b>Area Formula:</b> <code>min(height[i], height[j]) * (j - i)</code></li><li><b>Optimal Strategy:</b> Use two pointers starting at both ends and move the pointer pointing to the shorter line inward.</li></ul>",
   "tags": [
     "Array",
-    "Sliding Window",
-    "Sum"
+    "Two Pointers",
+    "Greedy"
   ],
   "slots": [
     {
-      "id": "arr",
+      "id": "heights",
       "type": "array",
-      "label": "Array",
+      "label": "Heights",
       "display": "bar"
     },
     {
-      "id": "current_window_sum",
+      "id": "vars",
       "type": "hashmap",
-      "label": "Current Window Sum"
-    },
-    {
-      "id": "max_sum",
-      "type": "hashmap",
-      "label": "Maximum Sum"
+      "label": "State Variables"
     }
   ],
   "inputs": [
     {
-      "label": "Array (comma-separated)",
-      "default": "2,1,5,1,3,2",
-      "placeholder": "e.g., 1,2,3,4,5"
-    },
-    {
-      "label": "Window Size (k)",
-      "default": "3",
-      "placeholder": "e.g., 3"
+      "label": "Heights Array (comma separated)",
+      "default": "1,8,6,2,5,4,8,3,7",
+      "placeholder": "e.g. 1,8,6,2,5"
     }
   ],
-  "code": "class Playground {\n    async run(inputs) {\n        const arrVals = inputs[0].split(',').map(Number);\n        const k = parseInt(inputs[1]);\n\n        if (!arrVals || arrVals.length === 0 || k <= 0 || k > arrVals.length) {\n            this.log('Invalid input. Please provide a valid array and a positive window size k <= array length.');\n            return null;\n        }\n\n        await this.arr.init(arrVals);\n        await this.current_window_sum.put('sum', 0);\n        await this.max_sum.put('max_sum', -Infinity);\n\n        let windowStart = 0;\n        let windowSum = 0;\n\n        for (let windowEnd = 0; windowEnd < arrVals.length; windowEnd++) {\n            const currentElement = arrVals[windowEnd];\n            windowSum += currentElement;\n\n            // Highlight the current element being added to the window\n            this.log(`Adding element ${currentElement} at index ${windowEnd} to the window.`);\n            await this.arr.highlight(windowEnd, '#ffb703'); // Orange for current element\n            await this.await();\n\n            // Once we have reached the window size 'k'\n            if (windowEnd >= k - 1) {\n                this.log(`Window size reached: [${windowStart} to ${windowEnd}]`);\n                await this.current_window_sum.put('sum', windowSum);\n                await this.max_sum.put('max_sum', Math.max(this.max_sum.getEntries()[0][1], windowSum));\n                await this.await();\n\n                // Highlight the current window\n                await this.arr.highlightRange(windowStart, windowEnd, '#00e0ff'); // Blue for current window\n                await this.await();\n\n                // Slide the window: subtract the element going out\n                const elementLeaving = arrVals[windowStart];\n                windowSum -= elementLeaving;\n                this.log(`Sliding window. Subtracting element ${elementLeaving} at index ${windowStart}.`);\n                await this.arr.highlight(windowStart, '#f08080'); // Light red for element leaving\n                await this.await();\n                await this.arr.highlightRange(windowStart, windowEnd, '#00e0ff'); // Keep current window highlighted\n                await this.await();\n                await this.arr.highlight(windowStart, '#00f5a0'); // Green for element no longer in window\n                await this.await();\n\n                windowStart++;\n                await this.current_window_sum.put('sum', windowSum);\n                await this.max_sum.put('max_sum', Math.max(this.max_sum.getEntries()[0][1], windowSum));\n                await this.await();\n            }\n            \n            // Reset highlight for the element that was just added\n            await this.arr.highlight(windowEnd, '#00f5a0'); // Green for visited/processed\n            await this.await();\n        }\n\n        this.log('Finished traversing the array.');\n        await this.arr.highlightRange(0, arrVals.length - 1, '#cccccc'); // Light gray for all processed\n        await this.await();\n\n        const finalMaxSum = this.max_sum.getEntries()[0][1];\n        this.log(`The maximum sum of a subarray of size ${k} is: ${finalMaxSum}`);\n        return finalMaxSum;\n    }\n}"
+  "code": "class Playground {\n    async run(inputs) {\n        // Parse Input\n        const inputStr = inputs[0] || \"1,8,6,2,5,4,8,3,7\";\n        const heights = inputStr.split(',').map(num => parseInt(num.trim()));\n\n        // Initialize Visualizer Slots\n        await this.heights.init(heights);\n        await this.vars.init([]);\n\n        let left = 0;\n        let right = heights.length - 1;\n        let maxArea = 0;\n\n        this.vars.put(\"maxArea\", 0);\n        this.vars.put(\"left\", left);\n        this.vars.put(\"right\", right);\n\n        while (left < right) {\n            // Update State Visualization\n            this.vars.put(\"left\", left);\n            this.vars.put(\"right\", right);\n\n            const hLeft = heights[left];\n            const hRight = heights[right];\n            const width = right - left;\n            const minHeight = Math.min(hLeft, hRight);\n            const currentArea = minHeight * width;\n\n            this.vars.put(\"currentArea\", currentArea);\n            this.vars.put(\"width\", width);\n            this.vars.put(\"minHeight\", minHeight);\n\n            // Highlight the two bars forming the container\n            this.heights.highlight(left, \"#00e0ff\");\n            this.heights.highlight(right, \"#00e0ff\");\n\n            if (currentArea > maxArea) {\n                maxArea = currentArea;\n                this.vars.put(\"maxArea\", maxArea);\n                this.log(`New max area found: ${maxArea} (Min Height: ${minHeight} * Width: ${width})`);\n            } else {\n                this.log(`Current area: ${currentArea}. Max area remains: ${maxArea}`);\n            }\n\n            await this.await();\n\n            // Clear highlights before moving pointers\n            this.heights.highlight(left, null);\n            this.heights.highlight(right, null);\n\n            // Logic: Move the smaller pointer to potentially find a taller bar \n            // that offsets the loss in width.\n            if (hLeft < hRight) {\n                this.log(`Left height (${hLeft}) < Right height (${hRight}). Incrementing Left pointer.`);\n                left++;\n            } else {\n                this.log(`Right height (${hRight}) <= Left height (${hLeft}). Decrementing Right pointer.`);\n                right--;\n            }\n            \n            await this.await();\n        }\n\n        this.log(`Algorithm finished. Maximum water volume: ${maxArea}`);\n        return maxArea;\n    }\n}"
 }
