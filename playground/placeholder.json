@@ -1,32 +1,41 @@
 {
-  "id": "container-with-most-water",
-  "name": "Container With Most Water",
+  "id": "subarray-sum-equals-k",
+  "name": "Subarray Sum Equals K",
   "difficulty": "Medium",
-  "description": "<p>Given <code>n</code> non-negative integers <code>a1, a2, ..., an</code>, where each represents a point at coordinate <code>(i, ai)</code>. <code>n</code> vertical lines are drawn such that the two endpoints of the line <code>i</code> is at <code>(i, ai)</code> and <code>(i, 0)</code>.</p><p>Find two lines, which, together with the x-axis forms a container, such that the container contains the most water.</p><ul><li><b>Area Formula:</b> <code>min(height[i], height[j]) * (j - i)</code></li><li><b>Optimal Strategy:</b> Use two pointers starting at both ends and move the pointer pointing to the shorter line inward.</li></ul>",
+  "description": " <p>Given an array of integers <code>nums</code> and an integer <code>k</code>, return the total number of subarrays whose sum equals to <code>k</code>.</p><p>A <strong>subarray</strong> is a contiguous non-empty sequence of elements within an array.</p><ul><li>Example 1: <code>nums = [1,1,1], k = 2</code> → Output: <code>2</code></li><li>Example 2: <code>nums = [1,2,3], k = 3</code> → Output: <code>2</code></li></ul><p>The optimal approach uses a <b>Prefix Sum</b> logic combined with a <b>Hash Map</b> to store the frequency of prefix sums encountered so far.</p>",
   "tags": [
     "Array",
-    "Two Pointers",
-    "Greedy"
+    "Hashmap",
+    "Prefix Sum"
   ],
   "slots": [
     {
-      "id": "heights",
+      "id": "numsArray",
       "type": "array",
-      "label": "Heights",
-      "display": "bar"
+      "label": "Input Array"
     },
     {
-      "id": "vars",
+      "id": "prefixSumMap",
       "type": "hashmap",
-      "label": "State Variables"
+      "label": "Prefix Sum Frequencies"
+    },
+    {
+      "id": "state",
+      "type": "hashmap",
+      "label": "Variables"
     }
   ],
   "inputs": [
     {
-      "label": "Heights Array (comma separated)",
-      "default": "1,8,6,2,5,4,8,3,7",
-      "placeholder": "e.g. 1,8,6,2,5"
+      "label": "Numbers (comma-separated)",
+      "default": "1,2,1,2,1",
+      "placeholder": "1,2,3"
+    },
+    {
+      "label": "Target Sum (k)",
+      "default": "3",
+      "placeholder": "3"
     }
   ],
-  "code": "class Playground {\n    async run(inputs) {\n        // Parse Input\n        const inputStr = inputs[0] || \"1,8,6,2,5,4,8,3,7\";\n        const heights = inputStr.split(',').map(num => parseInt(num.trim()));\n\n        // Initialize Visualizer Slots\n        await this.heights.init(heights);\n        await this.vars.init([]);\n\n        let left = 0;\n        let right = heights.length - 1;\n        let maxArea = 0;\n\n        this.vars.put(\"maxArea\", 0);\n        this.vars.put(\"left\", left);\n        this.vars.put(\"right\", right);\n\n        while (left < right) {\n            // Update State Visualization\n            this.vars.put(\"left\", left);\n            this.vars.put(\"right\", right);\n\n            const hLeft = heights[left];\n            const hRight = heights[right];\n            const width = right - left;\n            const minHeight = Math.min(hLeft, hRight);\n            const currentArea = minHeight * width;\n\n            this.vars.put(\"currentArea\", currentArea);\n            this.vars.put(\"width\", width);\n            this.vars.put(\"minHeight\", minHeight);\n\n            // Highlight the two bars forming the container\n            this.heights.highlight(left, \"#00e0ff\");\n            this.heights.highlight(right, \"#00e0ff\");\n\n            if (currentArea > maxArea) {\n                maxArea = currentArea;\n                this.vars.put(\"maxArea\", maxArea);\n                this.log(`New max area found: ${maxArea} (Min Height: ${minHeight} * Width: ${width})`);\n            } else {\n                this.log(`Current area: ${currentArea}. Max area remains: ${maxArea}`);\n            }\n\n            await this.await();\n\n            // Clear highlights before moving pointers\n            this.heights.highlight(left, null);\n            this.heights.highlight(right, null);\n\n            // Logic: Move the smaller pointer to potentially find a taller bar \n            // that offsets the loss in width.\n            if (hLeft < hRight) {\n                this.log(`Left height (${hLeft}) < Right height (${hRight}). Incrementing Left pointer.`);\n                left++;\n            } else {\n                this.log(`Right height (${hRight}) <= Left height (${hLeft}). Decrementing Right pointer.`);\n                right--;\n            }\n            \n            await this.await();\n        }\n\n        this.log(`Algorithm finished. Maximum water volume: ${maxArea}`);\n        return maxArea;\n    }\n}"
+  "code": "class Playground {\n    async run(inputs) {\n        const nums = inputs[0].split(',').map(Number);\n        const k = parseInt(inputs[1]);\n\n        // 1. Initialize Visualizations\n        await this.numsArray.init(nums);\n        // We initialize the map with {0: 1} to handle cases where (currentSum === k)\n        await this.prefixSumMap.init([[0, 1]]);\n        await this.state.init([\n            [\"count\", 0],\n            [\"currentSum\", 0],\n            [\"targetToFind\", \"-\"]\n        ]);\n\n        this.log(\"Initialized map with {0: 1} to account for subarrays starting from index 0.\");\n        await this.await();\n\n        let count = 0;\n        let currentSum = 0;\n\n        for (let i = 0; i < nums.length; i++) {\n            // Reset highlights and focus on current element\n            this.numsArray.highlight(i, \"#00e0ff\");\n            currentSum += nums[i];\n            \n            const targetToFind = currentSum - k;\n            \n            this.state.put(\"currentSum\", currentSum);\n            this.state.put(\"targetToFind\", targetToFind);\n            this.state.highlight(\"targetToFind\", \"#ffb703\");\n            \n            this.log(`Index ${i}: val=${nums[i]}, sum=${currentSum}. Looking for prefix sum (sum - k) = ${targetToFind}`);\n            await this.await();\n\n            // Check if the target prefix sum exists in our map\n            if (this.prefixSumMap.has(targetToFind)) {\n                const frequency = this.prefixSumMap.get(targetToFind);\n                count += frequency;\n                \n                this.prefixSumMap.highlight(targetToFind, \"#00f5a0\");\n                this.state.put(\"count\", count);\n                this.state.highlight(\"count\", \"#00f5a0\");\n                \n                this.log(`Found! Prefix sum ${targetToFind} occurred ${frequency} time(s). Total subarrays updated to ${count}.`);\n                await this.await();\n            } else {\n                this.log(`Prefix sum ${targetToFind} not found in map.`);\n                await this.await();\n            }\n\n            // Update the frequency of the current prefix sum in the map\n            const currentFreq = this.prefixSumMap.has(currentSum) ? this.prefixSumMap.get(currentSum) : 0;\n            this.prefixSumMap.put(currentSum, currentFreq + 1);\n            this.prefixSumMap.highlight(currentSum, \"#6c8cff\");\n            \n            this.log(`Updated map: freq of sum ${currentSum} is now ${currentFreq + 1}`);\n            await this.await();\n\n            // Clean up highlights for next iteration\n            this.numsArray.highlight(i, null);\n            this.prefixSumMap.highlight(targetToFind, null);\n            this.prefixSumMap.highlight(currentSum, null);\n            this.state.highlight(\"count\", null);\n            this.state.highlight(\"targetToFind\", null);\n        }\n\n        this.log(`Finished! Total subarrays with sum ${k} is ${count}`);\n        return count;\n    }\n}"
 }

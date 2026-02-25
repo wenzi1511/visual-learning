@@ -4187,6 +4187,17 @@
                 });
             });
 
+            container.querySelectorAll('.array-box-bar').forEach((box, i) => {
+                highlights.push({
+                    type: 'array-box-bar',
+                    index: i,
+                    bg: box.style.background || '',
+                    border: box.style.borderColor || '',
+                    shadow: box.style.boxShadow || '',
+                    transform: box.style.transform || ''
+                });
+            });
+
             container.querySelectorAll('.stack-item').forEach((item, i) => {
                 highlights.push({
                     type: 'stack-item',
@@ -4274,6 +4285,14 @@
                     if (boxes[h.index]) {
                         boxes[h.index].style.backgroundColor = h.bg;
                         boxes[h.index].style.borderColor = h.border;
+                    }
+                } else if (h.type === 'array-box-bar') {
+                    const boxes = actualContainer.querySelectorAll('.array-box-bar');
+                    if (boxes[h.index]) {
+                        boxes[h.index].style.background = h.bg;
+                        boxes[h.index].style.borderColor = h.border;
+                        boxes[h.index].style.boxShadow = h.shadow;
+                        boxes[h.index].style.transform = h.transform;
                     }
                 } else if (h.type === 'stack-item') {
                     const items = actualContainer.querySelectorAll('.stack-item');
