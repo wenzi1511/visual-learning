@@ -1,0 +1,47 @@
+{
+  "id": "trigonometric-landscape-sine-cosine",
+  "name": "Trigonometric Landscape: The Sine-Cosine Surface",
+  "difficulty": "3D Calculus",
+  "description": "This interactive 3D surface plot visualizes the mathematical function <code>z = sin(x) * cos(y)</code>. It generates a dynamic landscape of peaks and valleys, demonstrating how the product of two simple trigonometric functions can create a complex, wave-like surface in three dimensions. The interaction allows you to rotate and zoom, exploring the periodic nature and the intricate patterns formed by the sine and cosine waves interfering with each other across the XY-plane. This type of visualization is fundamental in understanding concepts like wave propagation, interference patterns, and scalar fields in physics and engineering.",
+  "tags": [
+    "3D",
+    "Surface",
+    "Trigonometry",
+    "Calculus",
+    "Mathematics",
+    "Waves"
+  ],
+  "dataGenerationCode": "const x = [];\nconst y = [];\nconst z = [];\nconst numPoints = 70; // Number of points along each axis\nconst range = 5; // Range from -range to +range\n\n// Generate x and y values\nfor (let i = 0; i <= numPoints; i++) {\n    const val = (i / numPoints) * (2 * range) - range; // Scale from -range to +range\n    x.push(val);\n    y.push(val);\n}\n\n// Generate z values (2D array)\nfor (let i = 0; i < x.length; i++) {\n    z.push([]);\n    for (let j = 0; j < y.length; j++) {\n        // Calculate z = sin(x) * cos(y)\n        z[i].push(Math.sin(x[i]) * Math.cos(y[j]));\n    }\n}\n\nreturn [{\n    type: 'surface',\n    x: x,\n    y: y,\n    z: z,\n    colorscale: 'Viridis', // A vibrant and perceptually uniform colorscale\n    lighting: {\n        ambient: 0.7, // Overall light intensity\n        diffuse: 0.8, // Diffuse reflection coefficient\n        specular: 0.2, // Specular reflection coefficient\n        roughness: 0.5, // Roughness of the surface\n        fresnel: 0.05 // Fresnel effect (light reflection based on angle)\n    },\n    contours: {\n        z: {\n            show: true,\n            start: -1, // Start of contour lines\n            end: 1, // End of contour lines\n            size: 0.2, // Step between contour lines\n            highlight: false // Do not highlight a specific contour\n        }\n    }\n}];",
+  "plotLayout": {
+    "title": "Interactive 3D Surface: <i>z = sin(x) * cos(y)</i>",
+    "autosize": true,
+    "paper_bgcolor": "rgba(0,0,0,0)",
+    "plot_bgcolor": "rgba(0,0,0,0)",
+    "font": {
+      "color": "#cbd5e1"
+    },
+    "scene": {
+      "xaxis": {
+        "title": "X-axis",
+        "gridcolor": "#334155",
+        "zerolinecolor": "#475569",
+        "backgroundcolor": "#0f172a",
+        "showbackground": true
+      },
+      "yaxis": {
+        "title": "Y-axis",
+        "gridcolor": "#334155",
+        "zerolinecolor": "#475569",
+        "backgroundcolor": "#0f172a",
+        "showbackground": true
+      },
+      "zaxis": {
+        "title": "Z-axis: sin(x) * cos(y)",
+        "gridcolor": "#334155",
+        "zerolinecolor": "#475569",
+        "backgroundcolor": "#0f172a",
+        "showbackground": true
+      }
+    }
+  }
+}

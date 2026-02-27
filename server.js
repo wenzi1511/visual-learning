@@ -183,6 +183,37 @@ app.get('/api/history', async (req, res) => {
     }
 });
 
+app.delete('/api/history', (req, res) => {
+    try {
+        const { path: filePath } = req.body;
+
+        if (!filePath || typeof filePath !== 'string') {
+            return res.status(400).json({ error: 'Path to delete is required.' });
+        }
+
+        if (!filePath.startsWith('history/')) {
+            return res.status(400).json({ error: 'Invalid path.' });
+        }
+
+        const absolutePath = path.join(__dirname, filePath);
+
+        // Security: Prevent directory traversal 
+        if (!absolutePath.startsWith(path.join(__dirname, 'history'))) {
+            return res.status(400).json({ error: 'Invalid path traversal detected.' });
+        }
+
+        if (fs.existsSync(absolutePath)) {
+            fs.unlinkSync(absolutePath);
+            res.json({ success: true, message: 'File deleted successfully.' });
+        } else {
+            res.status(404).json({ error: 'File not found.' });
+        }
+    } catch (error) {
+        console.error('Error deleting history file:', error);
+        res.status(500).json({ error: error.message || 'Failed to delete history file.' });
+    }
+});
+
 app.listen(PORT, () => {
     console.log(`Server listening at http://localhost:${PORT}`);
     console.log(`Playground available at http://localhost:${PORT}/playground/test.html`);

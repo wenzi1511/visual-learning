@@ -1139,22 +1139,40 @@
 </head>
 
 <body>
-    <a href="../index.html?section=dsa" class="home-btn" title="Back to DSA Modules" style="text-decoration: none;">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-            stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="15 18 9 12 15 6"></polyline>
-        </svg>
-    </a>
     <button class="sidebar-toggle" id="sidebar-toggle" title="Toggle sidebar">
         <span class="arrow">◀</span>
     </button>
 
     <div class="container">
         <div class="header-flex"
-            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-            <h1 style="margin-bottom: 0;">Algorithm Visualizer Playground</h1>
+            style="display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; margin-bottom: 24px; position: relative;">
 
-            <div class="history-controls">
+            <!-- Column 1: Back Button -->
+            <div style="justify-self: start;">
+                <a href="../index.html?section=dsa" class="home-btn" title="Back to DSA Modules"
+                    style="text-decoration: none; display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 10px; background: var(--bg-panel); border: 1px solid var(--border); color: var(--text-sub); transition: all 0.25s ease;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="15 18 9 12 15 6"></polyline>
+                    </svg>
+                </a>
+            </div>
+
+            <!-- Column 2: Centered Title -->
+            <h1 style="margin-bottom: 0; justify-self: center;">Algorithm Visualizer Playground</h1>
+
+            <!-- Column 3: History Controls -->
+            <div class="history-controls" style="display: flex; gap: 12px; align-items: center; justify-self: end;">
+
+                <button id="delete-visual-btn" title="Delete Current Visual" onclick="deleteCurrentHistory()"
+                    style="display: none; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 8px; background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); transition: all 0.2s; cursor: pointer;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="3 6 5 6 21 6"></polyline>
+                        <path d="M19 6V20a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    </svg>
+                </button>
+
                 <a href="?config=placeholder.json" title="New Blank Problem"
                     style="display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 8px; background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); transition: all 0.2s; cursor: pointer;">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
@@ -4878,6 +4896,10 @@
                 if (dropdown) dropdown.innerHTML = '<div style="padding: 12px 16px; color: #f87171; font-size: 0.8rem;">Failed to load history</div>';
             });
 
+        if (configFile !== 'placeholder.json') {
+            document.getElementById('delete-visual-btn').style.display = 'flex';
+        }
+
         fetch(configFile)
             .then(r => r.json())
             .then(data => {
@@ -5196,6 +5218,41 @@
             } finally {
                 document.getElementById('btn-generate-ai').disabled = false;
                 document.getElementById('btn-generate-ai').style.opacity = '1';
+            }
+        }
+
+        async function deleteCurrentHistory() {
+            const urlParams = new URLSearchParams(window.location.search);
+            let configPath = urlParams.get('config');
+
+            if (!configPath || configPath === 'placeholder.json') return;
+
+            // Strip '../' if it exists since server expects 'history/...'
+            if (configPath.startsWith('../')) {
+                configPath = configPath.substring(3);
+            }
+
+            if (!confirm("Are you sure you want to permanently delete this visual?")) {
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/history', {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ path: configPath })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    window.location.search = '?config=placeholder.json';
+                } else {
+                    alert("Failed to delete: " + (data.error || "Unknown error"));
+                }
+            } catch (error) {
+                console.error("Delete Error", error);
+                alert("Error deleting file.");
             }
         }
     </script>
