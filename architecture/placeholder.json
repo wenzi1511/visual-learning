@@ -1,14 +1,5 @@
 {
-  "id": "dsa-learning-roadmap-mindmap",
-  "name": "Data Structures and Algorithms Learning Path",
-  "difficulty": "Beginner to Advanced",
-  "description": "A comprehensive, hierarchical mind map designed for software engineers to master <b>Data Structures and Algorithms (DSA)</b>. This roadmap breaks down the field into three primary pillars: <b>Complexity Analysis</b> (the mathematical foundation), <b>Data Structures</b> (how we organize data), and <b>Algorithmic Paradigms</b> (how we solve problems). It transitions from basic linear structures to complex non-linear graphs and advanced optimization techniques like Dynamic Programming.",
-  "tags": [
-    "DSA",
-    "Computer Science",
-    "Learning Path",
-    "Algorithms",
-    "Technical Interview"
-  ],
-  "code": "graph LR\n  Root((DSA Mastery)) --> Foundations\n  Root --> Structures\n  Root --> Paradigms\n\n  subgraph Foundations [1. Complexity & Foundations]\n    F1[Big O / Omega / Theta Notation]\n    F2[Space vs Time Complexity]\n    F3[Recursion & Memoization]\n    F4[Bit Manipulation]\n  end\n\n  subgraph Structures [2. Data Structures]\n    subgraph Linear [Linear Structures]\n      L1[Arrays & Dynamic Arrays]\n      L2[Strings & Pattern Matching]\n      L3[Linked Lists - Singly/Doubly]\n      L4[Stacks & Queues]\n    end\n    subgraph NonLinear [Non-Linear Structures]\n      N1[Trees - BST, AVL, Segment]\n      N2[Tries - Prefix Trees]\n      N3[Heaps - Min/Max, Priority Queues]\n      N4[Graphs - Matrix/Adjacency List]\n      N5[Hash Tables & Collisions]\n    end\n  end\n\n  subgraph Paradigms [3. Algorithmic Patterns]\n    subgraph SearchSort [Searching & Sorting]\n      A1[Binary Search]\n      A2[Merge/Quick/Heap Sort]\n      A3[BFS / DFS Traversal]\n    end\n    subgraph Logic [Optimization Patterns]\n      P1[Two Pointers]\n      P2[Sliding Window]\n      P3[Greedy Algorithms]\n      P4[Backtracking]\n      P5[Dynamic Programming - Top-down/Bottom-up]\n      P6[Topological Sort / Dijkstra]\n    end\n  end\n\n  %% Styling the Root Node\n  style Root fill:#0f172a,stroke:#334155,stroke-width:4px,color:#fff\n\n  %% Styling Subgraphs for transparency and visibility\n  style Foundations fill:transparent,stroke:#94a3b8,stroke-width:2px,stroke-dasharray: 5 5\n  style Structures fill:transparent,stroke:#94a3b8,stroke-width:2px,stroke-dasharray: 5 5\n  style Paradigms fill:transparent,stroke:#94a3b8,stroke-width:2px,stroke-dasharray: 5 5\n  style Linear fill:transparent,stroke:#64748b,stroke-width:1px,stroke-dasharray: 2 2\n  style NonLinear fill:transparent,stroke:#64748b,stroke-width:1px,stroke-dasharray: 2 2\n  style SearchSort fill:transparent,stroke:#64748b,stroke-width:1px,stroke-dasharray: 2 2\n  style Logic fill:transparent,stroke:#64748b,stroke-width:1px,stroke-dasharray: 2 2\n\n  %% Individual Node Styling\n  classDef item fill:#ffffff,stroke:#1e293b,stroke-width:1px,color:#000\n  class F1,F2,F3,F4,L1,L2,L3,L4,N1,N2,N3,N4,N5,A1,A2,A3,P1,P2,P3,P4,P5,P6 item"
+  "name": "Waiting for Context...",
+  "difficulty": "New",
+  "code": "graph TD\n  A[Awaiting Generation] --> B[Enter context to begin]"
 }

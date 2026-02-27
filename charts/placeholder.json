@@ -1,51 +1,35 @@
 {
-  "id": "algorithm-time-complexity-analysis",
-  "name": "Computational Complexity: Big O Notation Visualizer",
-  "difficulty": "Algorithms",
-  "description": "This chart visualizes the growth rates of common algorithmic time complexities, fundamental to Computer Science and Software Engineering. <br><br><b>Key Insights:</b><ul><li><b>O(1) & O(log n):</b> Excellent scalability; the execution time remains nearly constant regardless of input size.</li><li><b>O(n):</b> Linear growth; typically seen in simple loops through arrays.</li><li><b>O(n log n):</b> The complexity of efficient sorting algorithms like Merge Sort or Quick Sort.</li><li><b>O(n²) & O(n³):</b> Polynomial growth; performance degrades rapidly as <i>n</i> increases, often involving nested loops.</li><li><b>O(2ⁿ):</b> Exponential growth; the complexity doubles with each additional input, making large inputs computationally infeasible.</li></ul>The chart is restricted to a specific range of <i>n</i> to demonstrate the point at which different algorithms begin to diverge significantly.",
-  "tags": [
-    "Algorithms",
-    "Big O",
-    "Performance",
-    "Computer Science"
-  ],
-  "dataGenerationCode": "const n_linear = [];\nfor (let i = 1; i <= 50; i += 1) { n_linear.push(i); }\n\nconst n_smooth = [];\nfor (let i = 1; i <= 50; i += 0.5) { n_smooth.push(i); }\n\nconst data = [\n  {\n    x: n_linear,\n    y: n_linear.map(() => 1),\n    name: 'O(1) - Constant',\n    type: 'scatter',\n    mode: 'lines',\n    line: { color: '#94a3b8', width: 3 }\n  },\n  {\n    x: n_smooth,\n    y: n_smooth.map(n => Math.log2(n)),\n    name: 'O(log n) - Logarithmic',\n    type: 'scatter',\n    mode: 'lines',\n    line: { color: '#10b981', width: 3 }\n  },\n  {\n    x: n_linear,\n    y: n_linear,\n    name: 'O(n) - Linear',\n    type: 'scatter',\n    mode: 'lines',\n    line: { color: '#3b82f6', width: 3 }\n  },\n  {\n    x: n_smooth,\n    y: n_smooth.map(n => n * Math.log2(n)),\n    name: 'O(n log n) - Log-linear',\n    type: 'scatter',\n    mode: 'lines',\n    line: { color: '#f59e0b', width: 3 }\n  },\n  {\n    x: n_smooth,\n    y: n_smooth.map(n => Math.pow(n, 2)),\n    name: 'O(n²) - Quadratic',\n    type: 'scatter',\n    mode: 'lines',\n    line: { color: '#f97316', width: 3 }\n  },\n  {\n    x: n_smooth,\n    y: n_smooth.map(n => Math.pow(n, 3)),\n    name: 'O(n³) - Cubic',\n    type: 'scatter',\n    mode: 'lines',\n    line: { color: '#ef4444', width: 3 }\n  },\n  {\n    x: n_smooth.filter(n => n <= 12),\n    y: n_smooth.filter(n => n <= 12).map(n => Math.pow(2, n)),\n    name: 'O(2ⁿ) - Exponential',\n    type: 'scatter',\n    mode: 'lines',\n    line: { color: '#ec4899', width: 3, dash: 'dot' }\n  }\n];\nreturn data;",
+  "name": "Waiting for Context...",
+  "difficulty": "New",
+  "dataGenerationCode": "const x = ['A', 'B', 'C', 'D'];\nconst y = [1, 2, 3, 4];\n\nconst data = [\n  {\n    x: x,\n    y: y,\n    type: 'bar',\n    marker: {\n      color: ['#60a5fa', '#34d399', '#fbbf24', '#f87171']\n    }\n  }\n];\nreturn data;",
   "plotLayout": {
-    "title": "Growth of Operations vs. Input Size (n)",
-    "autosize": true,
-    "paper_bgcolor": "rgba(0,0,0,0)",
-    "plot_bgcolor": "rgba(0,0,0,0)",
+    "title": "Awaiting Generation",
+    "paper_bgcolor": "rgba(15, 23, 42, 0.4)",
+    "plot_bgcolor": "rgba(30, 41, 59, 0.5)",
     "font": {
-      "color": "#cbd5e1"
+      "family": "Inter, sans-serif",
+      "color": "#94a3b8"
     },
     "xaxis": {
-      "title": "Input Size (n)",
-      "gridcolor": "#334155",
-      "zerolinecolor": "#475569",
-      "range": [
-        0,
-        50
-      ]
+      "gridcolor": "rgba(100, 116, 139, 0.2)",
+      "zerolinecolor": "rgba(100, 116, 139, 0.4)",
+      "tickfont": {
+        "color": "#94a3b8"
+      }
     },
     "yaxis": {
-      "title": "Number of Operations",
-      "gridcolor": "#334155",
-      "zerolinecolor": "#475569",
-      "range": [
-        0,
-        1500
-      ]
-    },
-    "legend": {
-      "font": {
-        "size": 12
+      "gridcolor": "rgba(100, 116, 139, 0.2)",
+      "zerolinecolor": "rgba(100, 116, 139, 0.4)",
+      "tickfont": {
+        "color": "#94a3b8"
       }
     },
     "margin": {
-      "l": 60,
-      "r": 30,
-      "t": 80,
-      "b": 60
-    }
+      "t": 60,
+      "b": 50,
+      "l": 50,
+      "r": 30
+    },
+    "hovermode": "closest"
   }
 }

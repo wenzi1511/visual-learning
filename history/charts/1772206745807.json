@@ -1,0 +1,51 @@
+{
+  "id": "stochastic-cluster-analysis",
+  "name": "Multivariate Gaussian Cluster Analysis",
+  "difficulty": "Data Analytics",
+  "description": "<p>This interactive scatter plot demonstrates <b>multivariate Gaussian distributions</b>, commonly used in machine learning for cluster analysis and anomaly detection. Each point represents an individual observation sampled from a distinct probability distribution.</p><ul><li><b>Clusters:</b> The grouping of points indicates a high density of occurrences around a central mean (centroid).</li><li><b>Variance:</b> The 'spread' of each cluster represents the standard deviation of the underlying data; wider clusters indicate higher variance.</li><li><b>Overlapping Regions:</b> Areas where different colored points mix suggest regions of uncertainty where a classification model might struggle to distinguish between classes.</li></ul><p>Scatter plots are the primary tool for <i>Exploratory Data Analysis (EDA)</i>, allowing researchers to visually identify correlations, trends, and outliers before applying algorithmic processing.</p>",
+  "tags": [
+    "Scatter Plot",
+    "Statistics",
+    "Machine Learning",
+    "Data Science"
+  ],
+  "dataGenerationCode": "const generateCluster = (count, meanX, meanY, stdDev, color, label) => {\n  const x = [];\n  const y = [];\n  for (let i = 0; i < count; i++) {\n    // Box-Muller transform for normal distribution\n    let u = 0, v = 0;\n    while(u === 0) u = Math.random();\n    while(v === 0) v = Math.random();\n    const z0 = Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);\n    \n    u = 0, v = 0;\n    while(u === 0) u = Math.random();\n    while(v === 0) v = Math.random();\n    const z1 = Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);\n\n    x.push(meanX + z0 * stdDev);\n    y.push(meanY + z1 * stdDev);\n  }\n  return {\n    x: x,\n    y: y,\n    mode: 'markers',\n    type: 'scatter',\n    name: label,\n    marker: {\n      size: 8,\n      color: color,\n      opacity: 0.6,\n      line: {\n        width: 1,\n        color: '#1e293b'\n      }\n    }\n  };\n};\n\nconst traces = [\n  generateCluster(300, 2, 3, 0.75, '#3b82f6', 'Alpha Segment'),\n  generateCluster(250, -2, -1, 1.2, '#ef4444', 'Beta Segment'),\n  generateCluster(200, 4, -4, 0.5, '#10b981', 'Gamma Segment'),\n  generateCluster(150, -5, 5, 0.9, '#f59e0b', 'Delta Segment')\n];\n\nreturn traces;",
+  "plotLayout": {
+    "title": "Multivariate Cluster Distribution",
+    "autosize": true,
+    "paper_bgcolor": "rgba(0,0,0,0)",
+    "plot_bgcolor": "rgba(0,0,0,0)",
+    "font": {
+      "color": "#cbd5e1",
+      "family": "Inter, sans-serif"
+    },
+    "margin": {
+      "t": 60,
+      "b": 60,
+      "l": 60,
+      "r": 30
+    },
+    "xaxis": {
+      "title": "Feature Variance X",
+      "gridcolor": "#334155",
+      "zerolinecolor": "#475569",
+      "tickfont": {
+        "color": "#94a3b8"
+      }
+    },
+    "yaxis": {
+      "title": "Feature Variance Y",
+      "gridcolor": "#334155",
+      "zerolinecolor": "#475569",
+      "tickfont": {
+        "color": "#94a3b8"
+      }
+    },
+    "hovermode": "closest",
+    "legend": {
+      "bgcolor": "rgba(15, 23, 42, 0.8)",
+      "bordercolor": "#334155",
+      "borderwidth": 1
+    }
+  }
+}

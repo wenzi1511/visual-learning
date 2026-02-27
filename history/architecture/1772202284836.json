@@ -1,0 +1,14 @@
+{
+  "id": "hadoop-1-architecture",
+  "name": "Hadoop 1.x (Classic) Architecture",
+  "difficulty": "System Design",
+  "description": "<h3>The Classic Master-Slave Distributed Framework</h3><p>Hadoop 1.x represents the foundational architecture for processing vast amounts of data across clusters. It consists of two primary layers: <b>HDFS (Hadoop Distributed File System)</b> for storage and <b>MapReduce</b> for computation.</p><ul><li><b>NameNode:</b> The master of HDFS, managing file system metadata and block mapping.</li><li><b>JobTracker:</b> The master of MapReduce, responsible for resource management and task scheduling.</li><li><b>DataNodes & TaskTrackers:</b> The worker nodes that store data and execute computational logic, respectively.</li></ul><p><b>Note:</b> A key characteristic of Hadoop 1.x is the tight coupling between resource management and the MapReduce programming model, which was later decoupled in Hadoop 2.x via YARN.</p>",
+  "tags": [
+    "Big Data",
+    "Distributed Systems",
+    "Hadoop",
+    "HDFS",
+    "MapReduce"
+  ],
+  "code": "graph TD\n  Client[Client Application] -- Submit Job --> JT\n  Client -- Get File Metadata --> NN\n\n  subgraph MasterNode [Master Node Components]\n    NN[NameNode <br/>Metadata Master] \n    JT[JobTracker <br/>Resource & Task Master]\n    SNN[Secondary NameNode <br/>Metadata Checkpoint]\n  end\n\n  subgraph Slave1 [Worker/Slave Node 1]\n    DN1[DataNode <br/>Blocks Storage]\n    TT1[TaskTracker <br/>Map/Reduce Tasks]\n  end\n\n  subgraph Slave2 [Worker/Slave Node 2]\n    DN2[DataNode <br/>Blocks Storage]\n    TT2[TaskTracker <br/>Map/Reduce Tasks]\n  end\n\n  %% Communication Flows\n  JT -- Schedules Tasks --> TT1\n  JT -- Schedules Tasks --> TT2\n  TT1 -- Heartbeat/Status --> JT\n  TT2 -- Heartbeat/Status --> JT\n\n  NN -- Metadata Sync --> SNN\n  DN1 -- Block Reports --> NN\n  DN2 -- Block Reports --> NN\n\n  Client -- Read/Write Data --> DN1\n  Client -- Read/Write Data --> DN2\n\n  %% Styling\n  classDef component fill:#ffffff,stroke:#334155,stroke-width:2px,color:#000;\n  classDef masterGroup fill:none,stroke:#64748b,stroke-width:2px,stroke-dasharray: 5 5;\n  classDef slaveGroup fill:none,stroke:#94a3b8,stroke-width:1px,stroke-dasharray: 5 5;\n\n  class NN,JT,SNN,DN1,DN2,TT1,TT2,Client component;\n  style MasterNode fill:none,stroke:#64748b,stroke-width:2px,stroke-dasharray: 5 5\n  style Slave1 fill:none,stroke:#94a3b8,stroke-width:1px,stroke-dasharray: 5 5\n  style Slave2 fill:none,stroke:#94a3b8,stroke-width:1px,stroke-dasharray: 5 5"
+}

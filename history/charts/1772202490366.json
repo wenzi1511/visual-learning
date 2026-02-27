@@ -1,0 +1,47 @@
+{
+  "id": "big-o-time-complexity-analysis",
+  "name": "Big O Complexity Growth Comparison",
+  "difficulty": "Algorithms",
+  "description": "This visualization illustrates the rate of growth for common Big O time complexities used in algorithm analysis. As the input size <b>n</b> increases, the number of operations required by different algorithms diverges significantly. <br/><br/><ul><li><b>O(1) & O(log n):</b> Excellent efficiency, remaining nearly flat even as data grows.</li><li><b>O(n):</b> Linear growth, typical of a single pass through a collection.</li><li><b>O(n log n):</b> Efficient sorting algorithms like Merge Sort or Quick Sort.</li><li><b>O(n²):</b> Quadratic growth, common in nested loops (e.g., Bubble Sort).</li><li><b>O(2ⁿ):</b> Exponential growth, where adding one element doubles the work, quickly becoming computationally infeasible.</li></ul>The chart is capped at a Y-value of 400 to show the intersection points and the 'explosion' of exponential and quadratic curves relative to efficient ones.",
+  "tags": [
+    "Computer Science",
+    "Big O",
+    "Performance",
+    "Optimization"
+  ],
+  "dataGenerationCode": "const n = [];\nfor (let i = 1; i <= 25; i += 0.5) n.push(i);\n\nconst o1 = n.map(() => 1);\nconst oLogN = n.map(v => Math.log2(v));\nconst oN = n.map(v => v);\nconst oNLogN = n.map(v => v * Math.log2(v));\nconst oN2 = n.map(v => Math.pow(v, 2));\nconst o2N = n.map(v => Math.pow(2, v));\n\nconst common = { mode: 'lines', line: { width: 3 } };\n\nreturn [\n  { ...common, x: n, y: o1, name: 'O(1) - Constant', line: { color: '#94a3b8', width: 2 } },\n  { ...common, x: n, y: oLogN, name: 'O(log n) - Logarithmic', line: { color: '#10b981' } },\n  { ...common, x: n, y: oN, name: 'O(n) - Linear', line: { color: '#3b82f6' } },\n  { ...common, x: n, y: oNLogN, name: 'O(n log n) - Linearithmic', line: { color: '#8b5cf6' } },\n  { ...common, x: n, y: oN2, name: 'O(n²) - Quadratic', line: { color: '#f59e0b' } },\n  { ...common, x: n, y: o2N, name: 'O(2ⁿ) - Exponential', line: { color: '#ef4444' } }\n];",
+  "plotLayout": {
+    "title": "Big O Complexity Comparison",
+    "autosize": true,
+    "paper_bgcolor": "rgba(0,0,0,0)",
+    "plot_bgcolor": "rgba(0,0,0,0)",
+    "font": {
+      "color": "#cbd5e1",
+      "family": "Inter, system-ui, sans-serif"
+    },
+    "xaxis": {
+      "title": "Input Size (n)",
+      "gridcolor": "#334155",
+      "zerolinecolor": "#475569",
+      "range": [
+        0,
+        25
+      ]
+    },
+    "yaxis": {
+      "title": "Operations / Time",
+      "gridcolor": "#334155",
+      "zerolinecolor": "#475569",
+      "range": [
+        0,
+        400
+      ]
+    },
+    "legend": {
+      "bgcolor": "rgba(15, 23, 42, 0.8)",
+      "bordercolor": "#334155",
+      "borderwidth": 1
+    },
+    "hovermode": "closest"
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "id": "big-o-complexity-analysis",
+  "name": "Big O Notation: Visualizing Algorithmic Time Complexities",
+  "difficulty": "Algorithms",
+  "description": "<p>This visualization compares the growth rates of common algorithmic time complexities, often referred to as <strong>Big O Notation</strong>. As the input size (<i>n</i>) increases, the difference in the number of operations required becomes staggering.</p><ul><li><strong>O(1) & O(log n):</strong> These represent highly efficient algorithms (e.g., hash table lookups or binary search) that scale exceptionally well.</li><li><strong>O(n):</strong> Linear growth where time increases proportionally with data size (e.g., simple array iteration).</li><li><strong>O(n log n):</strong> Typical of efficient sorting algorithms like Merge Sort or Quick Sort.</li><li><strong>O(n²) & O(2ⁿ):</strong> These are computationally expensive. $O(n²)$ is common in nested loops, while $O(2ⁿ)$ represents exponential growth, often seen in recursive solutions for the traveling salesperson problem or brute-force searches.</li></ul><p>Note: The y-axis is constrained to emphasize the 'knee' where inefficient algorithms become impractical for real-world datasets.</p>",
+  "tags": [
+    "Big O",
+    "Computer Science",
+    "Performance",
+    "Optimization"
+  ],
+  "dataGenerationCode": "const n = []; for(let i=1; i<=30; i+=0.5) { n.push(i); }\n\nconst o_1 = n.map(() => 1);\nconst o_log_n = n.map(v => Math.log2(v));\nconst o_n = n.map(v => v);\nconst o_n_log_n = n.map(v => v * Math.log2(v));\nconst o_n_2 = n.map(v => Math.pow(v, 2));\nconst o_2_n = n.map(v => Math.pow(2, v));\n\nconst createTrace = (x, y, name, color, dash) => ({\n  x, y, name, \n  type: 'scatter', \n  mode: 'lines', \n  line: { color, width: 3, dash: dash || 'solid' },\n  hovertemplate: `<b>${name}</b><br>n: %{x}<br>Ops: %{y:.2f}<extra></extra>`\n});\n\nreturn [\n  createTrace(n, o_1, 'O(1) - Constant', '#94a3b8', 'dot'),\n  createTrace(n, o_log_n, 'O(log n) - Logarithmic', '#10b981'),\n  createTrace(n, o_n, 'O(n) - Linear', '#3b82f6'),\n  createTrace(n, o_n_log_n, 'O(n log n) - Linearithmic', '#8b5cf6'),\n  createTrace(n, o_n_2, 'O(n²) - Quadratic', '#f59e0b'),\n  createTrace(n, o_2_n, 'O(2ⁿ) - Exponential', '#ef4444')\n];",
+  "plotLayout": {
+    "title": "Time Complexity Growth Rates",
+    "autosize": true,
+    "paper_bgcolor": "rgba(0,0,0,0)",
+    "plot_bgcolor": "rgba(0,0,0,0)",
+    "font": {
+      "color": "#cbd5e1",
+      "family": "Inter, system-ui, sans-serif"
+    },
+    "xaxis": {
+      "title": "Input Size (n)",
+      "gridcolor": "#334155",
+      "zerolinecolor": "#475569",
+      "range": [
+        1,
+        30
+      ]
+    },
+    "yaxis": {
+      "title": "Operations / Time Complexity",
+      "gridcolor": "#334155",
+      "zerolinecolor": "#475569",
+      "range": [
+        0,
+        100
+      ],
+      "fixedrange": false
+    },
+    "legend": {
+      "bgcolor": "rgba(15, 23, 42, 0.8)",
+      "bordercolor": "#475569",
+      "borderwidth": 1
+    },
+    "margin": {
+      "t": 60,
+      "b": 60,
+      "l": 60,
+      "r": 30
+    }
+  }
+}

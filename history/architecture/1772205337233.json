@@ -1,0 +1,13 @@
+{
+  "id": "java-collections-framework-architecture",
+  "name": "Java Collections Framework Architecture",
+  "difficulty": "Intermediate",
+  "description": "An architectural deep-dive into the <b>Java Collections Framework (JCF)</b>. This diagram illustrates the core hierarchy starting from the <code>Iterable</code> and <code>Collection</code> interfaces, branching into the specialized <code>List</code>, <code>Set</code>, and <code>Queue</code> sub-hierarchies. It also showcases the separate but integral <code>Map</code> hierarchy. This map helps developers understand which concrete implementation (like <code>ArrayList</code>, <code>HashSet</code>, or <code>HashMap</code>) to choose based on performance requirements and data structure behavior.",
+  "tags": [
+    "Java",
+    "Data Structures",
+    "JCF",
+    "Object-Oriented Design"
+  ],
+  "code": "graph TD\n  Iterable[Iterable Interface] --> Collection[Collection Interface]\n  \n  subgraph ListHierarchy [List Hierarchy]\n    Collection --> List[List Interface]\n    List -.-> ArrayList[ArrayList]\n    List -.-> LinkedList[LinkedList]\n    List -.-> Vector[Vector]\n  end\n\n  subgraph SetHierarchy [Set Hierarchy]\n    Collection --> Set[Set Interface]\n    Set -.-> HashSet[HashSet]\n    Set -.-> LinkedHashSet[LinkedHashSet]\n    Set --> SortedSet[SortedSet Interface]\n    SortedSet -.-> TreeSet[TreeSet]\n  end\n\n  subgraph QueueHierarchy [Queue Hierarchy]\n    Collection --> Queue[Queue Interface]\n    Queue -.-> PriorityQueue[PriorityQueue]\n    Queue --> Deque[Deque Interface]\n    Deque -.-> ArrayDeque[ArrayDeque]\n    Deque -.-> LinkedList\n  end\n\n  subgraph MapHierarchy [Map Hierarchy]\n    Map[Map Interface] -.-> HashMap[HashMap]\n    Map -.-> Hashtable[Hashtable]\n    Map -.-> LinkedHashMap[LinkedHashMap]\n    Map --> SortedMap[SortedMap Interface]\n    SortedMap -.-> TreeMap[TreeMap]\n  end\n\n  %% Styling nodes for visibility\n  classDef interfaceNode fill:#e1f5fe,stroke:#01579b,stroke-width:2px,color:#000\n  classDef classNode fill:#fff3e0,stroke:#e65100,stroke-width:2px,color:#000\n  \n  class Iterable,Collection,List,Set,SortedSet,Queue,Deque,Map,SortedMap interfaceNode\n  class ArrayList,LinkedList,Vector,HashSet,LinkedHashSet,TreeSet,PriorityQueue,ArrayDeque,HashMap,Hashtable,LinkedHashMap,TreeMap classNode\n\n  %% Subgraph Styling\n  style ListHierarchy fill:transparent,stroke:#94a3b8,stroke-dasharray: 5 5\n  style SetHierarchy fill:transparent,stroke:#94a3b8,stroke-dasharray: 5 5\n  style QueueHierarchy fill:transparent,stroke:#94a3b8,stroke-dasharray: 5 5\n  style MapHierarchy fill:transparent,stroke:#94a3b8,stroke-dasharray: 5 5"
+}

@@ -70,11 +70,24 @@ app.post('/api/generate', async (req, res) => {
         // Validate that it's parseable JSON
         const parsedJson = JSON.parse(jsonStr);
 
-        // Overwrite placeholder.json
-        const placeholderPath = path.join(__dirname, section, 'placeholder.json');
-        fs.writeFileSync(placeholderPath, JSON.stringify(parsedJson, null, 2), 'utf-8');
+        // Save History
+        const historyDir = path.join(__dirname, 'history', section);
+        if (!fs.existsSync(historyDir)) {
+            fs.mkdirSync(historyDir, { recursive: true });
+        }
 
-        res.json({ success: true, message: 'placeholder.json updated successfully.' });
+        const timestamp = Date.now();
+        const historyFilename = `${timestamp}.json`;
+        const historyPath = path.join(historyDir, historyFilename);
+
+        fs.writeFileSync(historyPath, JSON.stringify(parsedJson, null, 2), 'utf-8');
+
+        // Return the relative path to the new history file
+        res.json({
+            success: true,
+            message: 'Visual generated and saved to history successfully.',
+            historyPath: `history/${section}/${historyFilename}`
+        });
     } catch (error) {
         console.error('Error generating AI content:', error);
         res.status(500).json({ error: error.message || 'Failed to generate visual.' });
@@ -123,6 +136,50 @@ app.post('/api/models', async (req, res) => {
     } catch (error) {
         console.error('Error fetching models:', error);
         res.status(500).json({ error: error.message || 'Failed to fetch models.' });
+    }
+});
+
+app.get('/api/history', async (req, res) => {
+    try {
+        const { section } = req.query;
+        if (!section) {
+            return res.status(400).json({ error: 'Section query parameter is required.' });
+        }
+
+        const historyDir = path.join(__dirname, 'history', section);
+        const historyFiles = [];
+
+        if (fs.existsSync(historyDir)) {
+            const files = fs.readdirSync(historyDir);
+
+            for (const file of files) {
+                if (file.endsWith('.json')) {
+                    const filePath = path.join(historyDir, file);
+                    try {
+                        const fileContent = fs.readFileSync(filePath, 'utf-8');
+                        const jsonData = JSON.parse(fileContent);
+
+                        historyFiles.push({
+                            filename: file,
+                            path: `history/${section}/${file}`,
+                            name: jsonData.name || 'Untitled Generation',
+                            difficulty: jsonData.difficulty || 'Unknown',
+                            timestamp: parseInt(file.replace('.json', ''), 10)
+                        });
+                    } catch (e) {
+                        console.error(`Error parsing history file ${file}:`, e);
+                    }
+                }
+            }
+        }
+
+        // Sort new to old
+        historyFiles.sort((a, b) => b.timestamp - a.timestamp);
+
+        res.json({ success: true, history: historyFiles });
+    } catch (error) {
+        console.error('Error fetching history:', error);
+        res.status(500).json({ error: error.message || 'Failed to fetch history.' });
     }
 });
 

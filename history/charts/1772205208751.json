@@ -1,0 +1,53 @@
+{
+  "id": "big-o-complexity-analysis",
+  "name": "Computational Complexity: Big O Notation Comparison",
+  "difficulty": "Algorithms & Data Structures",
+  "description": "This chart visualizes the growth rates of common algorithmic complexities as the input size (<i>n</i>) increases. <br><br><b>Key Insights:</b><ul><li><b>O(1) & O(log n):</b> Represent highly efficient algorithms that scale exceptionally well.</li><li><b>O(n):</b> Linear growth, where performance scales proportionally with input.</li><li><b>O(n log n):</b> The standard complexity for efficient sorting algorithms like Mergesort and Heapsort.</li><li><b>O(n²):</b> Quadratic growth, typical of simple nested loops (e.g., Bubble Sort). Note how quickly it diverges from linear paths.</li><li><b>O(2ⁿ):</b> Exponential growth, common in recursive solutions for NP-complete problems; these become computationally expensive almost immediately.</li></ul>The chart helps developers understand why choosing the right algorithm is critical for high-performance software engineering.",
+  "tags": [
+    "Big O",
+    "Algorithms",
+    "Computer Science",
+    "Performance"
+  ],
+  "dataGenerationCode": "const n = []; for (let i = 1; i <= 30; i++) { n.push(i); } const o1 = n.map(() => 1); const oLogN = n.map(val => Math.log2(val)); const oN = n.map(val => val); const oNLogN = n.map(val => val * Math.log2(val)); const oN2 = n.map(val => Math.pow(val, 2)); const o2N = n.map(val => Math.pow(2, val)); const oFact = n.map(val => { let f = 1; for(let j=1; j<=val; j++) f *= j; return f; }); return [ { x: n, y: o1, name: 'O(1) Constant', type: 'scatter', mode: 'lines', line: { color: '#64748b', width: 2 } }, { x: n, y: oLogN, name: 'O(log n) Logarithmic', type: 'scatter', mode: 'lines', line: { color: '#10b981', width: 3 } }, { x: n, y: oN, name: 'O(n) Linear', type: 'scatter', mode: 'lines', line: { color: '#3b82f6', width: 3 } }, { x: n, y: oNLogN, name: 'O(n log n) Linearithmic', type: 'scatter', mode: 'lines', line: { color: '#f59e0b', width: 3 } }, { x: n, y: oN2, name: 'O(n²) Quadratic', type: 'scatter', mode: 'lines', line: { color: '#ef4444', width: 3 } }, { x: n, y: o2N, name: 'O(2ⁿ) Exponential', type: 'scatter', mode: 'lines', line: { color: '#a855f7', width: 3, dash: 'dot' } } ];",
+  "plotLayout": {
+    "title": "Algorithmic Growth Rates (Big O)",
+    "autosize": true,
+    "paper_bgcolor": "rgba(0,0,0,0)",
+    "plot_bgcolor": "rgba(0,0,0,0)",
+    "font": {
+      "color": "#cbd5e1",
+      "family": "Inter, system-ui, sans-serif"
+    },
+    "xaxis": {
+      "title": "Input Size (n)",
+      "gridcolor": "#334155",
+      "zerolinecolor": "#475569",
+      "range": [
+        0,
+        30
+      ]
+    },
+    "yaxis": {
+      "title": "Operations / Time",
+      "gridcolor": "#334155",
+      "zerolinecolor": "#475569",
+      "range": [
+        0,
+        100
+      ],
+      "hoverformat": ".2f"
+    },
+    "legend": {
+      "bgcolor": "rgba(15, 23, 42, 0.8)",
+      "bordercolor": "#334155",
+      "borderwidth": 1
+    },
+    "margin": {
+      "l": 50,
+      "r": 30,
+      "t": 80,
+      "b": 50
+    }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "id": "hadoop-1x-architecture",
+  "name": "Hadoop 1.x (HDFS & MapReduce v1) Architecture",
+  "difficulty": "Advanced",
+  "description": "Hadoop 1.x is the foundational architecture of the Apache Hadoop project, following a strictly <b>Master-Slave</b> model. It is composed of two primary layers: <b>HDFS</b> for storage and <b>MapReduce v1</b> for processing. Unlike modern versions (YARN), the 1.x architecture uses a centralized <b>JobTracker</b> to handle both resource management and task scheduling, which often became a bottleneck. The <b>NameNode</b> manages the file system namespace and metadata, representing a Single Point of Failure (SPOF) in this version. The <b>Secondary NameNode</b> assists by merging edit logs with the FsImage but does not provide high availability.",
+  "tags": [
+    "Big Data",
+    "Distributed Systems",
+    "Hadoop",
+    "HDFS",
+    "MapReduce"
+  ],
+  "code": "graph TD\n  subgraph Client_Layer [Client Interaction]\n    Client[Hadoop Client]\n  end\n\n  subgraph Master_Node [Master Node - NameNode & JobTracker]\n    NN[NameNode<br/>Metadata & FS Namespace] \n    JT[JobTracker<br/>Resource Management & Scheduling]\n  end\n\n  subgraph Secondary_Master [Helper Node]\n    SNN[Secondary NameNode<br/>Checkpointing Metadata]\n  end\n\n  subgraph Worker_Node_1 [Worker Node 1]\n    DN1[DataNode<br/>Storage]\n    TT1[TaskTracker<br/>Execution]\n  end\n\n  subgraph Worker_Node_N [Worker Node N]\n    DNn[DataNode<br/>Storage]\n    TTn[TaskTracker<br/>Execution]\n  end\n\n  %% Client Flows\n  Client -- Submit Job --> JT\n  Client -- Metadata Request --> NN\n  Client -- Read/Write Data --> DN1\n\n  %% Master Flows\n  JT -- Map/Reduce Tasks --> TT1\n  JT -- Map/Reduce Tasks --> TTn\n  NN -- Replication/Management --> DN1\n  NN -- Replication/Management --> DNn\n  \n  %% Maintenance Flow\n  SNN -- Periodic Checkpoint --> NN\n\n  %% Local Node interactions\n  TT1 -- Data Locality Read --> DN1\n  TTn -- Data Locality Read --> DNn\n\n  %% Styling\n  classDef master fill:#f1f5f9,stroke:#334155,stroke-width:2px,color:#000\n  classDef worker fill:#ecfdf5,stroke:#059669,stroke-width:2px,color:#000\n  classDef helper fill:#fff7ed,stroke:#c2410c,stroke-width:2px,color:#000\n  \n  class NN,JT master\n  class DN1,TT1,DNn,TTn worker\n  class SNN helper\n\n  style Client_Layer fill:none,stroke:#64748b,stroke-width:2px,stroke-dasharray: 5 5\n  style Master_Node fill:none,stroke:#64748b,stroke-width:2px,stroke-dasharray: 5 5\n  style Secondary_Master fill:none,stroke:#64748b,stroke-width:2px,stroke-dasharray: 5 5\n  style Worker_Node_1 fill:none,stroke:#64748b,stroke-width:2px,stroke-dasharray: 5 5\n  style Worker_Node_N fill:none,stroke:#64748b,stroke-width:2px,stroke-dasharray: 5 5"
+}
