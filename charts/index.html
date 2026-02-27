@@ -874,19 +874,37 @@
                 return;
             }
 
+            // Deep clone layout to safely restore after export
+            const originalLayout = JSON.parse(JSON.stringify(graphContainer.layout || {}));
+
             try {
                 const title = document.getElementById('architecture-title').textContent || 'chart';
                 const filename = `${title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_${backgroundType}`;
 
                 // Temporarily update layout background for white export if needed
                 if (backgroundType === 'white') {
-                    await Plotly.relayout(graphContainer, {
+                    const update = {
                         paper_bgcolor: '#ffffff',
                         plot_bgcolor: '#ffffff',
                         'font.color': '#1e293b',
                         'legend.bgcolor': 'rgba(255, 255, 255, 0.8)',
                         'legend.bordercolor': '#e2e8f0'
-                    });
+                    };
+
+                    if (graphContainer.layout && graphContainer.layout.scene) {
+                        update['scene.bgcolor'] = '#ffffff';
+                        update['scene.xaxis.backgroundcolor'] = '#ffffff';
+                        update['scene.yaxis.backgroundcolor'] = '#ffffff';
+                        update['scene.zaxis.backgroundcolor'] = '#ffffff';
+                        update['scene.xaxis.gridcolor'] = '#e2e8f0';
+                        update['scene.yaxis.gridcolor'] = '#e2e8f0';
+                        update['scene.zaxis.gridcolor'] = '#e2e8f0';
+                        update['scene.xaxis.zerolinecolor'] = '#94a3b8';
+                        update['scene.yaxis.zerolinecolor'] = '#94a3b8';
+                        update['scene.zaxis.zerolinecolor'] = '#94a3b8';
+                    }
+
+                    await Plotly.relayout(graphContainer, update);
                 }
 
                 await Plotly.downloadImage(graphContainer, {
@@ -897,18 +915,17 @@
                 });
 
                 if (backgroundType === 'white') {
-                    // revert back to dark layout
-                    await Plotly.relayout(graphContainer, {
-                        paper_bgcolor: 'rgba(0,0,0,0)',
-                        plot_bgcolor: 'rgba(0,0,0,0)',
-                        'font.color': '#cbd5e1',
-                        'legend.bgcolor': 'rgba(15, 23, 42, 0.8)',
-                        'legend.bordercolor': '#334155'
-                    });
+                    // revert back to original layout using Plotly.react for deep restore
+                    await Plotly.react(graphContainer, graphContainer.data, originalLayout);
                 }
             } catch (err) {
                 console.error("Export Failed", err);
                 alert("Failed to export chart: " + err.message);
+
+                // Ensure we revert even on error
+                if (backgroundType === 'white') {
+                    Plotly.react(graphContainer, graphContainer.data, originalLayout);
+                }
             }
         }
 

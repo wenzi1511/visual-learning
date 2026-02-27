@@ -1,0 +1,14 @@
+{
+  "id": "hand-gesture-navigation-system",
+  "name": "AI-Powered Hand Gesture Mouse Navigation System",
+  "difficulty": "Advanced",
+  "description": "<h3>Architecture Overview</h3><p>This system enables touchless human-computer interaction by transforming real-time video frames from a standard PC camera into system-level mouse events. The architecture utilizes a <strong>Computer Vision (CV) pipeline</strong> to detect hand landmarks and a <strong>Logic Engine</strong> to map those landmarks to screen coordinates and click actions.</p><h4>Key Components:</h4><ul><li><strong>Frame Capture & Pre-processing:</strong> Normalizes raw video data for high-performance processing.</li><li><strong>Landmark Detection:</strong> Typically powered by MediaPipe or OpenCV, identifying 21 distinct hand points.</li><li><strong>Coordinate Mapping:</strong> Translates hand movement within the camera's FOV to the screen resolution.</li><li><strong>Signal Smoothing:</strong> Uses Kalman Filters or Weighted Moving Averages to prevent 'shaky' cursor movement.</li><li><strong>Input Simulation:</strong> Leverages OS-level APIs to inject mouse events into the system event queue.</li></ul>",
+  "tags": [
+    "Computer Vision",
+    "Human-Computer Interaction",
+    "MediaPipe",
+    "Python",
+    "System Design"
+  ],
+  "code": "graph TD\n  subgraph sgInput [Input Layer]\n    Camera[PC WebCam] --> Capture[Frame Capture Engine]\n    Capture --> PreProc[Image Pre-processing & Normalization]\n  end\n\n  subgraph sgCV [Computer Vision Pipeline]\n    PreProc --> LandmarkDet[Hand Landmark Detection - MediaPipe/OpenCV]\n    LandmarkDet --> FeatureEx[Feature Extraction - Landmark Coordinates]\n  end\n\n  subgraph sgLogic [Gesture Interpretation Engine]\n    FeatureEx --> CoordMap[Coordinate Scaling - FOV to Resolution]\n    CoordMap --> Stabilizer[Signal Smoothing Filter - Kalman/Moving Avg]\n    Stabilizer --> GestureRec[Gesture Pattern Recognition Logic]\n  end\n\n  subgraph sgSystem [OS Integration Layer]\n    GestureRec --> ActionTrigger[Action Dispatcher]\n    ActionTrigger --> Driver[Input Simulation API - e.g. PyAutoGUI/Quartz]\n    Driver --> OS[OS Event Queue]\n    OS --> Cursor[System Mouse/Pointer Movement]\n  end\n\n  GestureRec --> Feedback[Visual HUD Overlay]\n\n  style sgInput fill:transparent,stroke:#94a3b8,stroke-dasharray: 5 5\n  style sgCV fill:transparent,stroke:#94a3b8,stroke-dasharray: 5 5\n  style sgLogic fill:transparent,stroke:#94a3b8,stroke-dasharray: 5 5\n  style sgSystem fill:transparent,stroke:#94a3b8,stroke-dasharray: 5 5\n  \n  classDef component fill:#f8fafc,stroke:#334155,stroke-width:2px,color:#000\n  class Camera,Capture,PreProc,LandmarkDet,FeatureEx,CoordMap,Stabilizer,GestureRec,ActionTrigger,Driver,OS,Cursor,Feedback component"
+}

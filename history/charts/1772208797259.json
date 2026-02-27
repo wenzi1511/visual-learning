@@ -1,0 +1,56 @@
+{
+  "id": "parabola-right-triangle-geometry",
+  "name": "Geometric Properties of Parabolic Projections",
+  "difficulty": "Geometry & Calculus",
+  "description": "<p>This visualization explores the relationship between a standard parabola $y = x^2$ and the <b>right-angled triangles</b> formed by projecting a point on the curve onto the axes.</p><ul><li><b>The Parabola:</b> Represented by the blue curve $f(x) = x^2$.</li><li><b>The Right Triangle:</b> Formed by the origin $(0,0)$, the point on the x-axis $(x, 0)$, and the point on the curve $(x, x^2)$.</li><li><b>Insight:</b> For any point $P(t, t^2)$, the height of the triangle represents the value of the function, while the base represents the input. The hypotenuse represents the distance from the origin to the point on the curve, calculated as $d = \\sqrt{t^2 + t^4}$.</li></ul>",
+  "tags": [
+    "Parabola",
+    "Trigonometry",
+    "Coordinate Geometry",
+    "Functions"
+  ],
+  "dataGenerationCode": "const xParabola = [];\nconst yParabola = [];\nfor (let i = -2.5; i <= 2.5; i += 0.05) {\n  xParabola.push(i);\n  yParabola.push(i * i);\n}\n\nconst px = 1.5;\nconst py = px * px;\n\nconst parabolaTrace = {\n  x: xParabola,\n  y: yParabola,\n  type: 'scatter',\n  mode: 'lines',\n  name: 'f(x) = x²',\n  line: { color: '#3b82f6', width: 3 }\n};\n\nconst triangleTrace = {\n  x: [0, px, px, 0],\n  y: [0, 0, py, 0],\n  fill: 'toself',\n  fillcolor: 'rgba(16, 185, 129, 0.2)',\n  line: { color: '#10b981', width: 2, dash: 'dash' },\n  name: 'Right Triangle',\n  type: 'scatter',\n  mode: 'lines+markers',\n  marker: { size: 4 }\n};\n\nconst pointTrace = {\n  x: [px],\n  y: [py],\n  mode: 'markers+text',\n  text: [`P(${px}, ${py})`],\n  textposition: 'top center',\n  marker: {\n    color: '#ef4444',\n    size: 12,\n    line: { color: '#ffffff', width: 2 }\n  },\n  name: 'Point on Curve'\n};\n\nconst angleIndicator = {\n  x: [px - 0.2, px - 0.2, px],\n  y: [0, 0.2, 0.2],\n  mode: 'lines',\n  line: { color: '#94a3b8', width: 1 },\n  showlegend: false,\n  name: 'Right Angle'\n};\n\nreturn [parabolaTrace, triangleTrace, pointTrace, angleIndicator];",
+  "plotLayout": {
+    "title": "Parabola and the Inscribed Right Triangle",
+    "autosize": true,
+    "paper_bgcolor": "rgba(0,0,0,0)",
+    "plot_bgcolor": "rgba(0,0,0,0)",
+    "font": {
+      "color": "#cbd5e1",
+      "family": "Inter, sans-serif"
+    },
+    "xaxis": {
+      "title": "x-axis",
+      "gridcolor": "#334155",
+      "zerolinecolor": "#475569",
+      "range": [
+        -3,
+        3
+      ],
+      "fixedrange": false
+    },
+    "yaxis": {
+      "title": "y = f(x)",
+      "gridcolor": "#334155",
+      "zerolinecolor": "#475569",
+      "range": [
+        -0.5,
+        7
+      ],
+      "scaleanchor": "x",
+      "scaleratio": 1
+    },
+    "margin": {
+      "l": 50,
+      "r": 50,
+      "b": 50,
+      "t": 80
+    },
+    "showlegend": true,
+    "legend": {
+      "x": 0,
+      "y": 1,
+      "bgcolor": "rgba(15, 23, 42, 0.5)"
+    }
+  }
+}
