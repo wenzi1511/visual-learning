@@ -20,3 +20,6 @@ Notes:
 1. ONLY USE MERMAID SUPPORTED SYNTAX.
 2. Focus heavily on flow, infrastructure, databases, APIs, and user interactions.
 3. Keep descriptions professional and educational.
+4. IMPORTANT STYLING: You MUST add explicit styling at the bottom of your Mermaid code to ensure text is visible on both dark and light backgrounds. Apply `color:#000` or `color:#fff` distinctly if you use custom fills.
+5. SUBGRAPH STYLING: By default, Mermaid subgraphs have a heavy grey background that looks terrible when exported to a white PNG. You MUST add the following line to the end of your Mermaid code to make subgraphs transparent with a dashed border: 
+   `style Default fill:none,stroke:#64748b,stroke-width:2px,stroke-dasharray: 5 5` (Apply this or equivalent `classDef` syntax specifically targeting your subgraphs, or explicitly style each subgraph you create with `style <subgraph_id> fill:transparent,stroke:#94a3b8,stroke-dasharray: 5 5`).
