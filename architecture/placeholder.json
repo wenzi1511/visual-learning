@@ -1,0 +1,14 @@
+{
+  "id": "mapreduce-log-processing-workflow",
+  "name": "Distributed MapReduce: HTTP Status Code Counter",
+  "difficulty": "System Design",
+  "description": "<p>This architecture demonstrates the <b>MapReduce</b> paradigm used to process a 1GB log file across a distributed cluster. The goal is to aggregate the frequency of HTTP status codes (e.g., 200, 404, 500).</p><ul><li><b>Input Splitting:</b> The 1GB file is divided into 128MB chunks (InputSplits) so multiple workers can process data in parallel.</li><li><b>Map Phase:</b> Each Mapper reads its assigned split line-by-line, parsing the status code and emitting a key-value pair: <code>(status_code, 1)</code>.</li><li><b>Shuffle & Sort:</b> This critical intermediate step groups all values associated with the same key. A <b>Hash Partitioner</b> determines which Reducer handles which key (e.g., <code>Hash(200) % NumReducers</code>).</li><li><b>Reduce Phase:</b> Each Reducer receives a key and a list of values <code>(200, [1, 1, 1...])</code>, sums them up, and writes the final count to HDFS.</li></ul>",
+  "tags": [
+    "Distributed Computing",
+    "Big Data",
+    "MapReduce",
+    "Hadoop",
+    "Data Engineering"
+  ],
+  "code": "graph LR\n  subgraph Input_Layer [Data Distribution]\n    File[1GB Access Log] --> S1[Split 1: 128MB]\n    File --> S2[Split 2: 128MB]\n    File --> Sn[Split N: 128MB]\n  end\n\n  subgraph Map_Phase [Parallel Mapping]\n    S1 --> M1[Mapper 1]\n    S2 --> M2[Mapper 2]\n    Sn --> Mn[Mapper N]\n    M1 -- \"Emit\" --> KV1[\"200, 1\"]\n    M2 -- \"Emit\" --> KV2[\"404, 1\"]\n    Mn -- \"Emit\" --> KVn[\"200, 1\"]\n  end\n\n  subgraph Shuffle_Mechanism [Partitioning & Sorting]\n    KV1 --> HP[Hash Partitioner]\n    KV2 --> HP\n    KVn --> HP\n    HP -- \"Key: 200\" --> R1\n    HP -- \"Key: 404\" --> R2\n    HP -- \"Key: 500\" --> R3\n    note[\"Logic: Hash(Key) % ReducerCount\"] -.-> HP\n  end\n\n  subgraph Reduce_Phase [Aggregation]\n    R1[Reducer 1] -- \"Summing\" --> C1[Count 200]\n    R2[Reducer 2] -- \"Summing\" --> C2[Count 404]\n    R3[Reducer 3] -- \"Summing\" --> C3[Count 500]\n  end\n\n  subgraph Storage [Output]\n    C1 --> Out[(HDFS: Final Result)]\n    C2 --> Out\n    C3 --> Out\n  end\n\n  style HP fill:#f9f,stroke:#333,stroke-width:2px\n  style File fill:#fff,stroke:#333\n  style Out fill:#dfd,stroke:#333"
+}

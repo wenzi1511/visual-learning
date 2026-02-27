@@ -212,18 +212,49 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
+    window.showLanding = () => {
+        state.currentMode = null;
+        if (state.dom.appContainer) state.dom.appContainer.classList.add('hidden');
+        if (state.dom.homeView) state.dom.homeView.classList.add('hidden');
+        if (state.dom.landingView) state.dom.landingView.classList.remove('hidden');
+    };
+
+    window.showDSAHome = () => {
+        state.currentMode = null;
+        if (state.dom.landingView) state.dom.landingView.classList.add('hidden');
+        if (state.dom.appContainer) state.dom.appContainer.classList.add('hidden');
+        if (state.dom.homeView) state.dom.homeView.classList.remove('hidden');
+    };
+
     window.showHome = () => {
         state.currentMode = null;
-        state.dom.appContainer.classList.add('hidden');
-        state.dom.homeView.classList.remove('hidden');
+        if (state.dom.appContainer) state.dom.appContainer.classList.add('hidden');
+        if (state.dom.homeView) state.dom.homeView.classList.remove('hidden');
+        if (state.dom.landingView) state.dom.landingView.classList.add('hidden');
     };
 
     window.resetZoom = resetZoom; // Expose to HTML
 
+    // Check URL parameters for returning to DSA home directly
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('section') === 'dsa') {
+        window.showDSAHome();
+    }
+
     // Keyboard
     document.addEventListener('keydown', (e) => {
-        if (e.altKey && e.key === 'ArrowLeft') if (state.currentMode) showHome();
-        if (e.altKey && e.key === 'ArrowRight') if (!state.currentMode && state.lastMode) selectStructure(state.lastMode);
+        if (e.altKey && e.key === 'ArrowLeft') {
+            if (state.currentMode) {
+                showHome();
+            } else if (state.dom.homeView && !state.dom.homeView.classList.contains('hidden')) {
+                showLanding();
+            }
+        }
+        if (e.altKey && e.key === 'ArrowRight') {
+            if (!state.currentMode && state.lastMode && state.dom.homeView && !state.dom.homeView.classList.contains('hidden')) {
+                selectStructure(state.lastMode);
+            }
+        }
     });
 
     state.dom.userInput.addEventListener('keydown', (e) => {

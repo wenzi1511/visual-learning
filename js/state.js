@@ -54,6 +54,7 @@ export const state = {
     dom: {
         stage: null,
         svgLayer: null,
+        landingView: null,
         mainInputContainer: null,
         userInput: null,
         homeView: null,
@@ -163,6 +164,7 @@ export const state = {
 export const initGlobals = () => {
     state.dom.stage = document.getElementById('stage');
     state.dom.svgLayer = document.getElementById('svg-layer');
+    state.dom.landingView = document.getElementById('landing-view');
     state.dom.mainInputContainer = document.getElementById('main-input-container');
     state.dom.userInput = document.getElementById('userInput');
     state.dom.homeView = document.getElementById('home-view');

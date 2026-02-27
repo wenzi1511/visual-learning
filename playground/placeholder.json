@@ -1,35 +1,46 @@
 {
-  "id": "search-rotated-sorted-array",
-  "name": "Search in Rotated Sorted Array",
+  "id": "subsets-backtracking",
+  "name": "Subsets (Power Set)",
   "difficulty": "Medium",
-  "description": "<p>Given the array <code>nums</code> after the possible rotation and an integer <code>target</code>, return the index of <code>target</code> if it is in <code>nums</code>, or <code>-1</code> if it is not in <code>nums</code>.</p><p>You must write an algorithm with <code>O(log n)</code> runtime complexity.</p><ul><li>The array was originally sorted in ascending order.</li><li>The array might be rotated at a pivot index.</li></ul>",
+  "description": "<p>Given an integer array <code>nums</code> of unique elements, return <em>all possible subsets (the power set)</em>.</p><p>The solution set must not contain duplicate subsets. Return the solution in any order.</p><ul><li>The decision-making process is visualized using a <strong>Recursion Tree</strong>.</li><li>At each step, we decide whether to <strong>include</strong> or <strong>exclude</strong> the current element.</li><li>The <strong>Call Stack</strong> tracks the active recursive depth.</li></ul>",
   "tags": [
     "Array",
-    "Binary Search"
+    "Backtracking",
+    "Recursion"
   ],
   "slots": [
     {
-      "id": "numsArray",
+      "id": "nums",
       "type": "array",
-      "label": "Rotated Array"
+      "label": "Input Array (nums)"
     },
     {
-      "id": "vars",
-      "type": "hashmap",
-      "label": "Variables"
+      "id": "current_subset",
+      "type": "stack",
+      "label": "Current Subset (Path)"
+    },
+    {
+      "id": "results",
+      "type": "array",
+      "label": "All Subsets Found"
+    },
+    {
+      "id": "callstack",
+      "type": "callstack",
+      "label": "Call Stack"
+    },
+    {
+      "id": "recursion_tree",
+      "type": "recursion-tree",
+      "label": "Decision Tree"
     }
   ],
   "inputs": [
     {
-      "label": "Array (nums)",
-      "default": "[4, 5, 6, 7, 0, 1, 2]",
-      "placeholder": "Enter comma separated numbers"
-    },
-    {
-      "label": "Target",
-      "default": "0",
-      "placeholder": "Enter target value"
+      "label": "Numbers (comma separated)",
+      "default": "1,2,3",
+      "placeholder": "e.g. 1,2,3"
     }
   ],
-  "code": "class Playground {\n    async run(inputs) {\n        // Parse inputs\n        const nums = JSON.parse(inputs[0]);\n        const target = parseInt(inputs[1]);\n\n        // Initialize slots\n        this.numsArray.init(nums);\n        this.vars.init([\n            [\"left\", 0],\n            [\"right\", nums.length - 1],\n            [\"target\", target]\n        ]);\n\n        let left = 0;\n        let right = nums.length - 1;\n\n        this.log(`Starting Binary Search for target: ${target}`);\n        await this.await();\n\n        while (left <= right) {\n            const mid = Math.floor((left + right) / 2);\n            const midVal = this.numsArray.get(mid);\n            const leftVal = this.numsArray.get(left);\n            const rightVal = this.numsArray.get(right);\n\n            // Update variables visualization\n            this.vars.put(\"left\", left);\n            this.vars.put(\"right\", right);\n            this.vars.put(\"mid\", mid);\n\n            // Highlight the current search range and mid\n            this.numsArray.highlightRange(0, nums.length - 1, \"rgba(255, 255, 255, 0.1)\");\n            this.numsArray.highlightRange(left, right, \"#00e0ff\"); // Cyan for range\n            this.numsArray.highlight(mid, \"#ffb703\"); // Orange for mid\n\n            this.log(`Checking mid index ${mid} (value: ${midVal})`);\n            await this.await();\n\n            if (midVal === target) {\n                this.log(`Target ${target} found at index ${mid}!`);\n                this.numsArray.highlight(mid, \"#00f5a0\"); // Green for success\n                await this.await();\n                return mid;\n            }\n\n            // Identify which half is sorted\n            if (leftVal <= midVal) {\n                // Left side is sorted\n                this.log(\"Left side is sorted.\");\n                if (target >= leftVal && target < midVal) {\n                    this.log(`${target} is within the sorted left range [${leftVal}, ${midVal}]. Moving right pointer.`);\n                    right = mid - 1;\n                } else {\n                    this.log(`${target} is NOT in the sorted left range. Moving left pointer to search the right side.`);\n                    left = mid + 1;\n                }\n            } else {\n                // Right side is sorted\n                this.log(\"Right side is sorted.\");\n                if (target > midVal && target <= rightVal) {\n                    this.log(`${target} is within the sorted right range [${midVal}, ${rightVal}]. Moving left pointer.`);\n                    left = mid + 1;\n                } else {\n                    this.log(`${target} is NOT in the sorted right range. Moving right pointer to search the left side.`);\n                    right = mid - 1;\n                }\n            }\n\n            this.vars.put(\"left\", left);\n            this.vars.put(\"right\", right);\n            await this.await();\n        }\n\n        this.log(`Target ${target} not found in the array.`);\n        return -1;\n    }\n}"
+  "code": "class Playground {\n    async run(inputs) {\n        const numsStr = inputs[0] || \"\";\n        const nums = numsStr.split(',').filter(x => x.trim() !== \"\").map(Number);\n\n        // 1. Initialize data structures\n        await this.nums.init(nums);\n        await this.current_subset.init([]);\n        await this.results.init([]);\n        await this.callstack.init();\n        await this.recursion_tree.init();\n\n        const allSubsets = [];\n\n        const backtrack = async (index, pathId) => {\n            // Prepare unique ID for recursion tree node\n            const currentPathStr = this.current_subset.getValues().join(',');\n            const nodeId = `node-${index}-${pathId}`;\n            \n            // Mandatory Recursion Visuals\n            this.callstack.pushFrame(\"backtrack\", { index: index, path: `[${currentPathStr}]` });\n            this.recursion_tree.enterNode(nodeId, `idx: ${index}`);\n            \n            this.log(`Processing index ${index}. Current path: [${currentPathStr}]`);\n            if (index < nums.length) {\n                this.nums.highlight(index, \"#00e0ff\");\n            }\n            await this.await();\n\n            // Base Case: We've made a decision for all elements\n            if (index === nums.length) {\n                const subset = [...this.current_subset.getValues()];\n                allSubsets.push(subset);\n                this.results.push(`[${subset.join(',')}]`);\n                this.log(`Reached leaf node. Adding subset [${subset.join(',')}] to results.`);\n                \n                await this.await();\n                \n                this.recursion_tree.exitNode(\"#00f5a0\"); // Green for complete path\n                this.callstack.popFrame();\n                return;\n            }\n\n            const val = nums[index];\n\n            // Decision 1: INCLUDE nums[index]\n            this.log(`Decision: INCLUDE ${val}`);\n            this.current_subset.push(val);\n            await this.await();\n            \n            await backtrack(index + 1, pathId + \"L\");\n\n            // BACKTRACK\n            this.current_subset.pop();\n            this.log(`Backtracking: Removed ${val} to explore next branch.`);\n            await this.await();\n\n            // Decision 2: EXCLUDE nums[index]\n            this.log(`Decision: EXCLUDE ${val}`);\n            await this.await();\n            \n            await backtrack(index + 1, pathId + \"R\");\n\n            // Clean up visualization state\n            this.nums.highlight(index, null);\n            this.recursion_tree.exitNode();\n            this.callstack.popFrame();\n        };\n\n        await backtrack(0, \"root\");\n\n        this.log(\"Backtracking complete. All subsets found.\");\n        return allSubsets;\n    }\n}"
 }

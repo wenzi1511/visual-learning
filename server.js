@@ -17,7 +17,7 @@ app.use(express.static(path.join(__dirname)));
 
 app.post('/api/generate', async (req, res) => {
     try {
-        const { apiKey, problemDescription, platform = 'gemini' } = req.body;
+        const { apiKey, problemDescription, platform = 'gemini', section = 'playground' } = req.body;
 
         if (!apiKey) {
             return res.status(400).json({ error: 'API key is required.' });
@@ -28,7 +28,7 @@ app.post('/api/generate', async (req, res) => {
 
         const selectedModel = req.body.model || 'gemini-2.5-pro';
 
-        const promptPath = path.join(__dirname, 'playground', 'prompt.txt');
+        const promptPath = path.join(__dirname, section, 'prompt.txt');
         const systemPrompt = fs.readFileSync(promptPath, 'utf-8');
 
         let textResponse = '';
@@ -71,7 +71,7 @@ app.post('/api/generate', async (req, res) => {
         const parsedJson = JSON.parse(jsonStr);
 
         // Overwrite placeholder.json
-        const placeholderPath = path.join(__dirname, 'playground', 'placeholder.json');
+        const placeholderPath = path.join(__dirname, section, 'placeholder.json');
         fs.writeFileSync(placeholderPath, JSON.stringify(parsedJson, null, 2), 'utf-8');
 
         res.json({ success: true, message: 'placeholder.json updated successfully.' });

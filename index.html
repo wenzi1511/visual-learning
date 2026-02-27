@@ -10,9 +10,46 @@
 
 <body>
 
+    <!-- LANDING VIEW (New) -->
+    <div id="landing-view">
+        <div class="main-title" style="margin-bottom: 20px;">Visual Learning</div>
+        <p style="text-align: center; color: var(--text-sub); margin-bottom: 50px; font-size: 1.2rem;">Select a module
+            to explore interactively.</p>
+
+        <div class="category-section">
+            <div class="section-grid" style="grid-template-columns: 1fr 1fr; max-width: 800px; margin: 0 auto;">
+                <div class="card" onclick="showDSAHome()"
+                    style="height: 150px; justify-content: center; flex-direction: column; text-align: center;">
+                    <h3 style="font-size: 1.5rem; text-align: center; margin-bottom: 10px;">Data Structures & Algorithms
+                    </h3>
+                    <p style="color: var(--text-sub); font-size: 0.9rem;">Interactive visualizations for various
+                        structures</p>
+                </div>
+                <div class="card"
+                    style="height: 150px; justify-content: center; flex-direction: column; text-align: center; opacity: 0.6; cursor: not-allowed;">
+                    <h3 style="font-size: 1.5rem; text-align: center; margin-bottom: 10px;">Science</h3>
+                    <p style="color: var(--text-sub); font-size: 0.9rem;">Coming Soon...</p>
+                </div>
+                <div class="card" onclick="window.location.href='architecture/index.html'"
+                    style="height: 150px; justify-content: center; flex-direction: column; text-align: center;">
+                    <h3 style="font-size: 1.5rem; text-align: center; margin-bottom: 10px;">Architecture Diagrams / Flow
+                        Charts</h3>
+                    <p style="color: var(--text-sub); font-size: 0.9rem;">View system architecture and data flows</p>
+                </div>
+                <div class="card"
+                    style="height: 150px; justify-content: center; flex-direction: column; text-align: center; opacity: 0.6; cursor: not-allowed;">
+                    <h3 style="font-size: 1.5rem; text-align: center; margin-bottom: 10px;">Charts</h3>
+                    <p style="color: var(--text-sub); font-size: 0.9rem;">Coming Soon...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- HOME VIEW -->
-    <div id="home-view">
-        <div class="main-title">Visual Learning</div>
+    <div id="home-view" class="hidden">
+        <button class="back-btn" onclick="showLanding()" style="margin-bottom: 20px; font-size: 1rem;">← Back to
+            Modules</button>
+        <div class="main-title" style="margin-bottom: 40px; font-size: 2.5rem;">Data Structures & Algorithms</div>
 
         <!-- Linear Structures -->
         <div class="category-section">
