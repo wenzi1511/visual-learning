@@ -8,7 +8,7 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap"
         rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         /* Shared variables */
@@ -292,14 +292,14 @@
         #graph-container {
             flex: 1;
             display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: auto;
+            align-items: stretch;
+            justify-content: stretch;
             border: 1px dashed var(--border);
             border-radius: 12px;
             background: rgba(0, 0, 0, 0.2);
-            padding: 20px;
             transition: background 0.3s;
+            overflow: hidden;
+            width: 100%;
         }
 
         #graph-container.export-white {
@@ -312,10 +312,7 @@
             border: none;
         }
 
-        #graph-container svg {
-            max-width: 100%;
-            height: auto;
-        }
+
 
         /* Toggle Button */
         .toggle-sidebar-btn {
@@ -654,8 +651,6 @@
             }
         }
 
-        let currentChart = null;
-
         async function hydrateUI(data) {
             // Populate Context Panel
             if (document.getElementById('architecture-title')) {
@@ -671,26 +666,30 @@
                 document.getElementById('ai-prompt').placeholder = `Describe data to chart similar to: '${data.name}'`;
             }
 
-            // Render Chart.js Graph
+            // Render Plotly Graph
             const graphContainer = document.getElementById('graph-container');
-            if (data.chartConfig) {
+            if (data.dataGenerationCode) {
                 try {
-                    // Destroy old chart if it exists
-                    if (currentChart) {
-                        currentChart.destroy();
-                    }
+                    // Start clean
+                    graphContainer.innerHTML = '';
 
-                    // Reset container
-                    graphContainer.innerHTML = '<canvas id="myChart"></canvas>';
-                    const ctx = document.getElementById('myChart').getContext('2d');
+                    // Create dynamic function from string
+                    const dataGenFn = new Function(data.dataGenerationCode);
+                    const plotData = dataGenFn();
 
-                    // Initialize Chart
-                    currentChart = new Chart(ctx, data.chartConfig);
+                    const plotLayout = data.plotLayout || {};
+                    if (!plotLayout.paper_bgcolor) plotLayout.paper_bgcolor = 'rgba(0,0,0,0)';
+                    if (!plotLayout.plot_bgcolor) plotLayout.plot_bgcolor = 'rgba(0,0,0,0)';
+                    if (!plotLayout.font) plotLayout.font = { color: '#cbd5e1', family: 'Inter' };
+                    if (!plotLayout.autosize) plotLayout.autosize = true;
+
+                    // Initialize Plotly
+                    Plotly.newPlot(graphContainer, plotData, plotLayout, { responsive: true });
                 } catch (error) {
-                    graphContainer.innerHTML = `<span style="color: #ef4444;">Error rendering Chart: ${error}</span>`;
+                    graphContainer.innerHTML = `<span style="color: #ef4444;">Error rendering Plotly Chart: ${error}</span>`;
                 }
             } else {
-                graphContainer.innerHTML = '<span style="color: var(--text-sub);">No chart configuration provided.</span>';
+                graphContainer.innerHTML = '<span style="color: var(--text-sub);">No chart configuration generation script provided.</span>';
             }
         }
 
@@ -766,51 +765,50 @@
 
             // Re-render chart after transition
             setTimeout(() => {
-                if (currentChart) {
-                    currentChart.resize();
+                const graphContainer = document.getElementById('graph-container');
+                if (graphContainer.data) {
+                    Plotly.Plots.resize(graphContainer);
                 }
             }, 400);
         }
 
         // Export Diagram as PNG
         async function exportDiagram(backgroundType) {
-            const chartCanvas = document.getElementById('myChart');
+            const graphContainer = document.getElementById('graph-container');
 
-            if (!chartCanvas) {
+            if (!graphContainer.data) {
                 alert("No chart available to export.");
                 return;
             }
 
             try {
-                let imgData;
+                const title = document.getElementById('architecture-title').textContent || 'chart';
+                const filename = `${title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_${backgroundType}`;
 
+                // Temporarily update layout background for white export if needed
                 if (backgroundType === 'white') {
-                    // Create an off-screen canvas to paint the white background
-                    const destCanvas = document.createElement('canvas');
-                    destCanvas.width = chartCanvas.width;
-                    destCanvas.height = chartCanvas.height;
-                    const destCtx = destCanvas.getContext('2d');
-
-                    // Fill white background
-                    destCtx.fillStyle = '#ffffff';
-                    destCtx.fillRect(0, 0, destCanvas.width, destCanvas.height);
-
-                    // Draw the chart over it
-                    destCtx.drawImage(chartCanvas, 0, 0);
-                    imgData = destCanvas.toDataURL('image/png');
-                } else {
-                    // Transparent is default for Chart.js
-                    imgData = chartCanvas.toDataURL('image/png');
+                    await Plotly.relayout(graphContainer, {
+                        paper_bgcolor: '#ffffff',
+                        plot_bgcolor: '#ffffff',
+                        'font.color': '#1e293b'
+                    });
                 }
 
-                // Create download link
-                const link = document.createElement('a');
-                const title = document.getElementById('architecture-title').textContent || 'chart';
-                const filename = `${title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_${backgroundType}.png`;
+                await Plotly.downloadImage(graphContainer, {
+                    format: 'png',
+                    width: 1200,
+                    height: 800,
+                    filename: filename
+                });
 
-                link.download = filename;
-                link.href = imgData;
-                link.click();
+                if (backgroundType === 'white') {
+                    // revert back to dark layout
+                    await Plotly.relayout(graphContainer, {
+                        paper_bgcolor: 'rgba(0,0,0,0)',
+                        plot_bgcolor: 'rgba(0,0,0,0)',
+                        'font.color': '#cbd5e1'
+                    });
+                }
             } catch (err) {
                 console.error("Export Failed", err);
                 alert("Failed to export chart: " + err.message);

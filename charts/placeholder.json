@@ -1,190 +1,51 @@
 {
-  "id": "global-cdn-performance-simulation",
-  "name": "24-Hour Global CDN Traffic & Latency Simulation",
-  "difficulty": "Performance Infrastructure",
-  "description": "This visualization monitors global Content Delivery Network (CDN) health across five key regions. The data tracks request volume (primary Y-axis) and global average latency (secondary Y-axis) over a 24-hour cycle. <h3>Key Observations:</h3><ul><li><strong>Diurnal Patterns:</strong> Standard traffic follows regional daylight hours, with North America and Europe peaking between 16:00 and 20:00 UTC.</li><li><strong>The India 'Shock Event':</strong> At 14:00 UTC, a simulated 5x traffic spike occurs in the India region. Notice the corresponding surge in <strong>Global Avg Latency</strong>, which breaches the 200ms SLA threshold.</li><li><strong>Failover Recovery:</strong> Between 15:00 and 17:00, the system initiates 'Edge Scaling' and 'Traffic Rerouting'. You can observe traffic being offloaded to Southeast Asia and Australia nodes to stabilize the Indian origin, eventually bringing latency back within acceptable bounds.</li><li><strong>SLA Monitoring:</strong> Red markers and the secondary line indicate periods where packet loss and queue depth impacted user experience during peak utilization.</li></ul>",
+  "id": "algorithm-time-complexity-analysis",
+  "name": "Computational Complexity: Big O Notation Visualizer",
+  "difficulty": "Algorithms",
+  "description": "This chart visualizes the growth rates of common algorithmic time complexities, fundamental to Computer Science and Software Engineering. <br><br><b>Key Insights:</b><ul><li><b>O(1) & O(log n):</b> Excellent scalability; the execution time remains nearly constant regardless of input size.</li><li><b>O(n):</b> Linear growth; typically seen in simple loops through arrays.</li><li><b>O(n log n):</b> The complexity of efficient sorting algorithms like Merge Sort or Quick Sort.</li><li><b>O(n²) & O(n³):</b> Polynomial growth; performance degrades rapidly as <i>n</i> increases, often involving nested loops.</li><li><b>O(2ⁿ):</b> Exponential growth; the complexity doubles with each additional input, making large inputs computationally infeasible.</li></ul>The chart is restricted to a specific range of <i>n</i> to demonstrate the point at which different algorithms begin to diverge significantly.",
   "tags": [
-    "DevOps",
-    "Edge Computing",
-    "Traffic Engineering",
-    "Reliability"
+    "Algorithms",
+    "Big O",
+    "Performance",
+    "Computer Science"
   ],
-  "chartConfig": {
-    "type": "line",
-    "data": {
-      "labels": [
-        "00:00",
-        "02:00",
-        "04:00",
-        "06:00",
-        "08:00",
-        "10:00",
-        "12:00",
-        "14:00",
-        "16:00",
-        "18:00",
-        "20:00",
-        "22:00"
-      ],
-      "datasets": [
-        {
-          "label": "India (Req/s)",
-          "data": [
-            12000,
-            10000,
-            8000,
-            15000,
-            25000,
-            45000,
-            50000,
-            250000,
-            180000,
-            90000,
-            50000,
-            30000
-          ],
-          "backgroundColor": "rgba(245, 158, 11, 0.1)",
-          "borderColor": "#f59e0b",
-          "borderWidth": 3,
-          "fill": true,
-          "tension": 0.4
-        },
-        {
-          "label": "North America (Req/s)",
-          "data": [
-            80000,
-            60000,
-            40000,
-            30000,
-            35000,
-            50000,
-            75000,
-            90000,
-            110000,
-            125000,
-            115000,
-            95000
-          ],
-          "backgroundColor": "rgba(59, 130, 246, 0.1)",
-          "borderColor": "#3b82f6",
-          "borderWidth": 2,
-          "fill": true,
-          "tension": 0.4
-        },
-        {
-          "label": "Europe (Req/s)",
-          "data": [
-            40000,
-            30000,
-            25000,
-            45000,
-            70000,
-            95000,
-            105000,
-            100000,
-            90000,
-            80000,
-            70000,
-            55000
-          ],
-          "backgroundColor": "rgba(16, 185, 129, 0.1)",
-          "borderColor": "#10b981",
-          "borderWidth": 2,
-          "fill": true,
-          "tension": 0.4
-        },
-        {
-          "label": "SE Asia (Req/s)",
-          "data": [
-            30000,
-            35000,
-            40000,
-            55000,
-            60000,
-            55000,
-            50000,
-            75000,
-            85000,
-            70000,
-            50000,
-            40000
-          ],
-          "backgroundColor": "rgba(139, 92, 246, 0.1)",
-          "borderColor": "#8b5cf6",
-          "borderWidth": 2,
-          "fill": true,
-          "tension": 0.4
-        },
-        {
-          "label": "Avg Latency (ms)",
-          "data": [
-            45,
-            42,
-            40,
-            48,
-            55,
-            65,
-            70,
-            245,
-            190,
-            85,
-            60,
-            50
-          ],
-          "borderColor": "#ef4444",
-          "borderWidth": 2,
-          "borderDash": [
-            5,
-            5
-          ],
-          "fill": false,
-          "yAxisID": "y1",
-          "tension": 0.1
-        }
+  "dataGenerationCode": "const n_linear = [];\nfor (let i = 1; i <= 50; i += 1) { n_linear.push(i); }\n\nconst n_smooth = [];\nfor (let i = 1; i <= 50; i += 0.5) { n_smooth.push(i); }\n\nconst data = [\n  {\n    x: n_linear,\n    y: n_linear.map(() => 1),\n    name: 'O(1) - Constant',\n    type: 'scatter',\n    mode: 'lines',\n    line: { color: '#94a3b8', width: 3 }\n  },\n  {\n    x: n_smooth,\n    y: n_smooth.map(n => Math.log2(n)),\n    name: 'O(log n) - Logarithmic',\n    type: 'scatter',\n    mode: 'lines',\n    line: { color: '#10b981', width: 3 }\n  },\n  {\n    x: n_linear,\n    y: n_linear,\n    name: 'O(n) - Linear',\n    type: 'scatter',\n    mode: 'lines',\n    line: { color: '#3b82f6', width: 3 }\n  },\n  {\n    x: n_smooth,\n    y: n_smooth.map(n => n * Math.log2(n)),\n    name: 'O(n log n) - Log-linear',\n    type: 'scatter',\n    mode: 'lines',\n    line: { color: '#f59e0b', width: 3 }\n  },\n  {\n    x: n_smooth,\n    y: n_smooth.map(n => Math.pow(n, 2)),\n    name: 'O(n²) - Quadratic',\n    type: 'scatter',\n    mode: 'lines',\n    line: { color: '#f97316', width: 3 }\n  },\n  {\n    x: n_smooth,\n    y: n_smooth.map(n => Math.pow(n, 3)),\n    name: 'O(n³) - Cubic',\n    type: 'scatter',\n    mode: 'lines',\n    line: { color: '#ef4444', width: 3 }\n  },\n  {\n    x: n_smooth.filter(n => n <= 12),\n    y: n_smooth.filter(n => n <= 12).map(n => Math.pow(2, n)),\n    name: 'O(2ⁿ) - Exponential',\n    type: 'scatter',\n    mode: 'lines',\n    line: { color: '#ec4899', width: 3, dash: 'dot' }\n  }\n];\nreturn data;",
+  "plotLayout": {
+    "title": "Growth of Operations vs. Input Size (n)",
+    "autosize": true,
+    "paper_bgcolor": "rgba(0,0,0,0)",
+    "plot_bgcolor": "rgba(0,0,0,0)",
+    "font": {
+      "color": "#cbd5e1"
+    },
+    "xaxis": {
+      "title": "Input Size (n)",
+      "gridcolor": "#334155",
+      "zerolinecolor": "#475569",
+      "range": [
+        0,
+        50
       ]
     },
-    "options": {
-      "responsive": true,
-      "plugins": {
-        "title": {
-          "display": true,
-          "text": "Global Traffic Volume vs Latency SLA (India Spike Event)"
-        },
-        "legend": {
-          "position": "bottom"
-        }
-      },
-      "scales": {
-        "x": {
-          "title": {
-            "display": true,
-            "text": "Time (UTC)"
-          }
-        },
-        "y": {
-          "type": "linear",
-          "display": true,
-          "position": "left",
-          "title": {
-            "display": true,
-            "text": "Requests Per Second"
-          },
-          "beginAtZero": true
-        },
-        "y1": {
-          "type": "linear",
-          "display": true,
-          "position": "right",
-          "title": {
-            "display": true,
-            "text": "Latency (ms)"
-          },
-          "grid": {
-            "drawOnChartArea": false
-          },
-          "suggestedMax": 300
-        }
+    "yaxis": {
+      "title": "Number of Operations",
+      "gridcolor": "#334155",
+      "zerolinecolor": "#475569",
+      "range": [
+        0,
+        1500
+      ]
+    },
+    "legend": {
+      "font": {
+        "size": 12
       }
+    },
+    "margin": {
+      "l": 60,
+      "r": 30,
+      "t": 80,
+      "b": 60
     }
   }
 }
