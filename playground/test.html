@@ -450,15 +450,34 @@
             position: absolute;
             right: 0;
             background-color: var(--bg-panel);
-            min-width: 250px;
-            max-height: 400px;
+            min-width: 260px;
+            max-height: 60vh;
             overflow-y: auto;
-            box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.5);
+            box-shadow: 0px 8px 30px rgba(0, 0, 0, 0.8);
             border: 1px solid var(--border);
             border-radius: 8px;
             z-index: 50;
             top: 100%;
-            margin-top: 4px;
+            margin-top: 8px;
+        }
+
+        /* Custom Scrollbar for Dropdown */
+        .dropdown-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .dropdown-content::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.5);
+            border-radius: 0 8px 8px 0;
+        }
+
+        .dropdown-content::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 4px;
+        }
+
+        .dropdown-content::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
         }
 
         .dropdown-content a {
@@ -468,10 +487,15 @@
             display: block;
             font-size: 0.8rem;
             transition: background 0.2s;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .dropdown-content a:last-child {
+            border-bottom: none;
         }
 
         .dropdown-content a:hover {
-            background-color: rgba(255, 255, 255, 0.05);
+            background-color: rgba(255, 255, 255, 0.08);
             color: #60a5fa;
         }
 
