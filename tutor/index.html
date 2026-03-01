@@ -18,6 +18,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
     <style>
         /* ═══════════════════════════════════════════════
@@ -841,6 +842,62 @@
         }
 
         /* ═══════════════════════════════════════════════
+           HEADER DROPDOWNS
+           ═══════════════════════════════════════════════ */
+        .header-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .header-dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 100%;
+            margin-top: 6px;
+            background: var(--bg-panel);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            min-width: 220px;
+            max-height: 50vh;
+            overflow-y: auto;
+            z-index: 100;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+        }
+
+        .header-dropdown:hover .header-dropdown-content {
+            display: block;
+        }
+
+        .header-dropdown-content a {
+            display: block;
+            padding: 10px 16px;
+            color: var(--text-main);
+            text-decoration: none;
+            font-size: 0.8rem;
+            transition: background 0.15s;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .header-dropdown-content a:last-child {
+            border-bottom: none;
+        }
+
+        .header-dropdown-content a:hover {
+            background: rgba(99, 102, 241, 0.1);
+            color: #a5b4fc;
+        }
+
+        /* Export background classes */
+        #visual-render-target.export-white {
+            background: #ffffff !important;
+        }
+
+        #visual-render-target.export-transparent {
+            background: transparent !important;
+        }
+
+        /* ═══════════════════════════════════════════════
            RESPONSIVE
            ═══════════════════════════════════════════════ */
         @media (max-width: 900px) {
@@ -874,12 +931,65 @@
             <span class="header-badge">AI</span>
         </div>
         <div class="header-right">
-            <button class="icon-btn" onclick="clearHistory()" title="Clear Chat">
+            <!-- Delete current history -->
+            <button class="icon-btn" id="delete-visual-btn" onclick="deleteCurrentHistory()"
+                title="Delete Current Visual"
+                style="display:none; color:#ef4444; border-color:rgba(239,68,68,0.3); background:rgba(239,68,68,0.08);">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                     stroke-linecap="round" stroke-linejoin="round">
                     <polyline points="3 6 5 6 21 6"></polyline>
-                    <path d="M19 6V20a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
-                    </path>
+                    <path d="M19 6V20a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                </svg>
+            </button>
+
+            <!-- New blank state -->
+            <a href="?" class="icon-btn" title="New Chat"
+                style="color:#60a5fa; border-color:rgba(59,130,246,0.3); background:rgba(59,130,246,0.08);">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+            </a>
+
+            <!-- Export Image dropdown -->
+            <div class="header-dropdown" id="export-dropdown-wrap" style="display:none;">
+                <button class="icon-btn export-btn" title="Export Image">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                </button>
+                <div class="header-dropdown-content">
+                    <a href="#" onclick="exportVisual('transparent'); return false;">Transparent Background</a>
+                    <a href="#" onclick="exportVisual('white'); return false;">White Background</a>
+                </div>
+            </div>
+
+            <!-- History dropdown -->
+            <div class="header-dropdown">
+                <button class="icon-btn" title="History">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                </button>
+                <div class="header-dropdown-content" id="history-dropdown">
+                    <div style="padding:12px 16px; color:var(--text-muted); font-size:0.8rem; font-style:italic;">
+                        Loading history...</div>
+                </div>
+            </div>
+
+            <!-- Clear chat -->
+            <button class="icon-btn" onclick="clearHistory()" title="Clear Chat">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 6h18"></path>
+                    <path d="M8 6V4h8v2"></path>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path>
                 </svg>
             </button>
         </div>
@@ -1010,6 +1120,17 @@
                     sendPrompt();
                 }
             });
+
+            // Load history dropdown
+            loadHistoryDropdown();
+
+            // Load from config if ?config= param is present
+            const urlParams = new URLSearchParams(window.location.search);
+            const configFile = urlParams.get('config');
+            if (configFile && configFile !== 'placeholder.json') {
+                document.getElementById('delete-visual-btn').style.display = 'flex';
+                loadFromConfig(configFile);
+            }
         });
 
         function autoResize() {
@@ -1196,6 +1317,13 @@
 
                     renderAIResponse(json);
                     renderVisual(json.visualType, json.visualCode);
+
+                    // Show export button
+                    const exportWrap = document.getElementById('export-dropdown-wrap');
+                    if (exportWrap) exportWrap.style.display = 'inline-block';
+
+                    // Refresh history dropdown
+                    loadHistoryDropdown();
                 } else {
                     appendSystemMsg("Error: " + (data.error || "Unknown error"));
                 }
@@ -1412,6 +1540,134 @@
                     </div>
                 </div>
             `;
+        }
+
+        // ═══════════════════════════════════════════════
+        // HISTORY DROPDOWN
+        // ═══════════════════════════════════════════════
+        async function loadHistoryDropdown() {
+            try {
+                const res = await fetch('/api/history?section=tutor');
+                const data = await res.json();
+                const dropdown = document.getElementById('history-dropdown');
+
+                if (data.success && data.history.length > 0) {
+                    dropdown.innerHTML = '';
+                    data.history.forEach(item => {
+                        const date = new Date(item.timestamp).toLocaleString();
+                        const a = document.createElement('a');
+                        a.href = `?config=../${item.path}`;
+                        a.innerHTML = `
+                            <div style="font-weight:600; margin-bottom:3px;">${item.name}</div>
+                            <div style="font-size:0.72rem; color:var(--text-muted);">${date} &bull; ${item.difficulty || 'General'}</div>
+                        `;
+                        dropdown.appendChild(a);
+                    });
+                } else {
+                    dropdown.innerHTML = '<div style="padding:12px 16px; color:var(--text-muted); font-size:0.8rem; font-style:italic;">No history yet.</div>';
+                }
+            } catch (err) {
+                console.error('Failed to load history:', err);
+                const dropdown = document.getElementById('history-dropdown');
+                if (dropdown) dropdown.innerHTML = '<div style="padding:12px 16px; color:#f87171; font-size:0.8rem;">Failed to load history</div>';
+            }
+        }
+
+        // ═══════════════════════════════════════════════
+        // LOAD FROM CONFIG (history item)
+        // ═══════════════════════════════════════════════
+        async function loadFromConfig(configFile) {
+            try {
+                const response = await fetch(configFile);
+                if (!response.ok) throw new Error('Failed to load ' + configFile);
+                const json = await response.json();
+
+                // Hide welcome
+                const welcome = document.getElementById('chat-welcome');
+                if (welcome) welcome.remove();
+
+                // Render the saved response
+                renderAIResponse(json);
+                renderVisual(json.visualType, json.visualCode);
+
+                // Show export button
+                const exportWrap = document.getElementById('export-dropdown-wrap');
+                if (exportWrap) exportWrap.style.display = 'inline-block';
+            } catch (err) {
+                console.error('Config load error:', err);
+                appendSystemMsg('Error loading saved session: ' + err.message);
+            }
+        }
+
+        // ═══════════════════════════════════════════════
+        // DELETE CURRENT HISTORY
+        // ═══════════════════════════════════════════════
+        async function deleteCurrentHistory() {
+            const urlParams = new URLSearchParams(window.location.search);
+            let configPath = urlParams.get('config');
+            if (!configPath) return;
+
+            // Strip '../' since server expects 'history/...'
+            if (configPath.startsWith('../')) configPath = configPath.substring(3);
+
+            if (!confirm('Are you sure you want to permanently delete this item?')) return;
+
+            try {
+                const res = await fetch('/api/history', {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ path: configPath })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    window.location.search = '';
+                } else {
+                    alert('Failed to delete: ' + (data.error || 'Unknown error'));
+                }
+            } catch (err) {
+                console.error('Delete error:', err);
+                alert('Error deleting file.');
+            }
+        }
+
+        // ═══════════════════════════════════════════════
+        // EXPORT VISUAL AS IMAGE
+        // ═══════════════════════════════════════════════
+        async function exportVisual(backgroundType) {
+            const container = document.getElementById('visual-render-target');
+            if (!container || container.querySelector('.visual-placeholder')) {
+                alert('No visual available to export.');
+                return;
+            }
+
+            // Set background class
+            if (backgroundType === 'white') {
+                container.classList.add('export-white');
+            } else {
+                container.classList.add('export-transparent');
+            }
+
+            try {
+                await new Promise(r => setTimeout(r, 100));
+                const canvas = await html2canvas(container, {
+                    backgroundColor: backgroundType === 'white' ? '#ffffff' : null,
+                    scale: 2,
+                    logging: false,
+                    useCORS: true
+                });
+
+                const imgData = canvas.toDataURL('image/png');
+                const link = document.createElement('a');
+                link.download = `tutor_visual_${backgroundType}_${Date.now()}.png`;
+                link.href = imgData;
+                link.click();
+            } catch (err) {
+                console.error('Export failed:', err);
+                alert('Failed to export: ' + err.message);
+            } finally {
+                container.classList.remove('export-white');
+                container.classList.remove('export-transparent');
+            }
         }
     </script>
 </body>

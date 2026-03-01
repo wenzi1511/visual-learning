@@ -24,7 +24,7 @@ Based on the USER PROBLEM DESCRIPTION, determine the best way to visually explai
 1. **mermaid**: Use for Architecture, Flowcharts, State diagrams.
    - `visualCode` must be a valid Mermaid.js string (e.g., "graph TD\n A-->B").
    - DO NOT include markdown ticks around it.
-   - ALWAYS ADD this style line at the end: `style Default fill:none,stroke:#64748b,stroke-width:2px,stroke-dasharray: 5 5` to ensure it works on dark backgrounds.
+   - Use descriptive node IDs (e.g., A, B, C) and do NOT add any `style Default` lines — the dark theme is handled automatically.
 
 2. **html**: Use for Grids, Matrices, Maths, Simplex Tableaus, Memory structures, or text-heavy formatted blocks.
    - `visualCode` must be a valid, highly stylized HTML string.
