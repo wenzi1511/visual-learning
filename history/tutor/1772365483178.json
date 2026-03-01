@@ -1,0 +1,21 @@
+{
+  "name": "Java Collections Framework Hierarchy",
+  "difficulty": "Beginner",
+  "chatResponse": "I'll guide you through the architecture of the Java Collections Framework, explaining how interfaces and classes work together to manage groups of objects.",
+  "steps": [
+    {
+      "title": "Core Interface Hierarchy",
+      "content": "The framework is built on a hierarchy of interfaces. At the top is `Iterable`, followed by `Collection`. The `Collection` interface is then branched into three main types: `List` (ordered sequences), `Set` (unique elements), and `Queue` (elements processed in a specific order)."
+    },
+    {
+      "title": "The Map Interface",
+      "content": "Interestingly, the `Map` interface is part of the Collections Framework but does **not** extend the `Collection` interface. Maps store key-value pairs and have their own distinct hierarchy, including `SortedMap` and concrete classes like `HashMap`."
+    },
+    {
+      "title": "Concrete Implementations",
+      "content": "Interfaces define the behavior, but classes provide the implementation. Common examples include:\n- **ArrayList**: Resizable array implementation of the `List` interface.\n- **HashSet**: Backed by a hash table, ensuring uniqueness for the `Set` interface.\n- **LinkedList**: Implements both `List` and `Deque` using a doubly-linked list structure."
+    }
+  ],
+  "visualType": "mermaid",
+  "visualCode": "graph TD\n    Iterable --> Collection\n    Collection --> List\n    Collection --> Set\n    Collection --> Queue\n    \n    List --> ArrayList\n    List --> LinkedList\n    List --> Vector\n    \n    Set --> HashSet\n    Set --> LinkedHashSet\n    Set --> SortedSet\n    SortedSet --> TreeSet\n    \n    Queue --> PriorityQueue\n    Queue --> Deque\n    Deque --> LinkedList\n    Deque --> ArrayDeque\n    \n    Map --> HashMap\n    Map --> LinkedHashMap\n    Map --> Hashtable\n    Map --> SortedMap\n    SortedMap --> TreeMap"
+}

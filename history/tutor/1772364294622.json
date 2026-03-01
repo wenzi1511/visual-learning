@@ -1,0 +1,25 @@
+{
+  "name": "Apache Spark Big Data Architecture",
+  "difficulty": "Intermediate",
+  "chatResponse": "I'll guide you through Spark's master-slave architecture, illustrating how the Driver coordinates distributed data processing across a cluster of Worker nodes.",
+  "steps": [
+    {
+      "title": "The Driver Program: The Orchestrator",
+      "content": "The **Driver Program** is the process where the main method runs. It creates the `SparkSession` (or `SparkContext`), which acts as the gateway to all Spark functionality. The Driver is responsible for three main things: \n1. Converting user code into a **Logical Plan**.\n2. Transforming that plan into a **DAG (Directed Acyclic Graph)** of stages.\n3. Scheduling tasks and distributing them to the executors."
+    },
+    {
+      "title": "The Cluster Manager: Resource Allocator",
+      "content": "Spark is agnostic of its underlying resource manager. It can run on **Standalone**, **Apache Mesos**, **Hadoop YARN**, or **Kubernetes**. The Cluster Manager's sole job is to allocate resources across the cluster. When the Driver requests containers to run code, the Cluster Manager finds available slots on the Worker nodes and assigns them to the Spark application."
+    },
+    {
+      "title": "Worker Nodes and Executors: The Muscle",
+      "content": "A **Worker Node** is any node capable of running application code in the cluster. Inside these workers reside **Executors**—distributed processes dedicated to a specific Spark application. \n- **Executors** stay up for the entire duration of the app.\n- They run individual **Tasks** (the smallest unit of work).\n- They store data in-memory or on disk via the **Block Manager** for fast retrieval during iterative computations."
+    },
+    {
+      "title": "The Execution Pipeline",
+      "content": "Data is typically loaded from external storage (HDFS, S3, NoSQL). Spark partitions this data and assigns each partition to a Task. The Driver sends the task code (serialized) to the Executors, which execute the logic locally on their assigned data partition, minimizing data movement across the network."
+    }
+  ],
+  "visualType": "mermaid",
+  "visualCode": "graph TD\n    subgraph Driver_Process [Driver Program]\n        SS[SparkSession / SparkContext]\n        DAG[DAG Scheduler]\n        TS[Task Scheduler]\n    end\n\n    CM[Cluster Manager: YARN / K8s / Standalone]\n\n    subgraph Worker_1 [Worker Node A]\n        subgraph Executor_1 [Executor]\n            T1[Task 1]\n            T2[Task 2]\n            BM1[Block Manager / Cache]\n        end\n    end\n\n    subgraph Worker_2 [Worker Node B]\n        subgraph Executor_2 [Executor]\n            T3[Task 3]\n            T4[Task 4]\n            BM2[Block Manager / Cache]\n        end\n    end\n\n    SS <--> CM\n    CM --- Worker_1\n    CM --- Worker_2\n    TS -.->|Sends Tasks| Executor_1\n    TS -.->|Sends Tasks| Executor_2\n    \n    HDFS[(External Storage: HDFS/S3)] --> Worker_1\n    HDFS --> Worker_2"
+}

@@ -1,0 +1,25 @@
+{
+  "name": "Deep Dive: Java List Interface",
+  "difficulty": "Intermediate",
+  "chatResponse": "I'll break down the List interface by comparing its primary implementations and explaining when to choose one over the other based on performance and memory constraints.",
+  "steps": [
+    {
+      "title": "The List Contract",
+      "content": "The `List` interface extends `Collection` and represents an **ordered sequence** of elements (also known as a sequence). Key features include:\n- **Positional Access:** You can manipulate elements based on their numerical index.\n- **Duplicates:** Unlike Sets, Lists allow multiple identical elements.\n- **Ordering:** They maintain the insertion order of elements."
+    },
+    {
+      "title": "ArrayList: The Go-To Implementation",
+      "content": "Under the hood, `ArrayList` uses a **dynamic array**. \n- **Access:** $O(1)$ time to get an element by index.\n- **Resizing:** When the array is full, it creates a new, larger array (usually 1.5x size) and copies elements. This makes additions **amortized** $O(1)$.\n- **Efficiency:** It's the most memory-efficient for storing elements but expensive for insertions/deletions in the middle ($O(n)$) because elements must be shifted."
+    },
+    {
+      "title": "LinkedList: The Doubly-Linked Alternative",
+      "content": "Each element in a `LinkedList` is stored in a **Node** that contains a reference to the previous and next nodes.\n- **Access:** $O(n)$ time to find an element (must traverse from the head or tail).\n- **Insert/Delete:** $O(1)$ if you are already at the node (e.g., adding to the start or end).\n- **Memory:** Higher overhead than `ArrayList` because of the extra pointers stored in every node."
+    },
+    {
+      "title": "Legacy and Thread-Safe Variants",
+      "content": "- **Vector:** Similar to `ArrayList` but **synchronized** (thread-safe). It's generally slower due to locking overhead.\n- **Stack:** A subclass of `Vector` that follows LIFO (Last-In-First-Out). Modern Java suggests using `Deque` (e.g., `ArrayDeque`) instead of `Stack`.\n- **CopyOnWriteArrayList:** A thread-safe variant used in concurrent programming where every 'mutation' creates a fresh copy of the underlying array."
+    }
+  ],
+  "visualType": "html",
+  "visualCode": "<div style='background: #0f172a; padding: 20px; border-radius: 12px; font-family: sans-serif; border: 1px solid #334155;'>\n  <h3 style='color: #2dd4bf; margin-top: 0;'>List Implementation Comparison</h3>\n  <table style='width: 100%; border-collapse: collapse; color: #e2e8f0; text-align: left;'>\n    <thead>\n      <tr style='border-bottom: 2px solid #334155;'>\n        <th style='padding: 12px; color: #f472b6;'>Feature</th>\n        <th style='padding: 12px; color: #fbbf24;'>ArrayList</th>\n        <th style='padding: 12px; color: #fbbf24;'>LinkedList</th>\n        <th style='padding: 12px; color: #fbbf24;'>Vector</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr style='border-bottom: 1px solid #1e293b;'>\n        <td style='padding: 12px; font-weight: bold;'>Data Structure</td>\n        <td style='padding: 12px;'>Dynamic Array</td>\n        <td style='padding: 12px;'>Doubly Linked List</td>\n        <td style='padding: 12px;'>Dynamic Array</td>\n      </tr>\n      <tr style='border-bottom: 1px solid #1e293b;'>\n        <td style='padding: 12px; font-weight: bold;'>Get (by Index)</td>\n        <td style='padding: 12px; color: #4ade80;'>O(1) - Fast</td>\n        <td style='padding: 12px; color: #f87171;'>O(n) - Slow</td>\n        <td style='padding: 12px; color: #4ade80;'>O(1) - Fast</td>\n      </tr>\n      <tr style='border-bottom: 1px solid #1e293b;'>\n        <td style='padding: 12px; font-weight: bold;'>Insert/Delete (Ends)</td>\n        <td style='padding: 12px;'>O(1) Amortized</td>\n        <td style='padding: 12px; color: #4ade80;'>O(1)</td>\n        <td style='padding: 12px;'>O(1) Amortized</td>\n      </tr>\n      <tr style='border-bottom: 1px solid #1e293b;'>\n        <td style='padding: 12px; font-weight: bold;'>Insert/Delete (Middle)</td>\n        <td style='padding: 12px; color: #f87171;'>O(n) - Shift elements</td>\n        <td style='padding: 12px; color: #fbbf24;'>O(n) - Traverse nodes</td>\n        <td style='padding: 12px; color: #f87171;'>O(n) - Shift elements</td>\n      </tr>\n      <tr style='border-bottom: 1px solid #1e293b;'>\n        <td style='padding: 12px; font-weight: bold;'>Thread Safe</td>\n        <td style='padding: 12px; color: #f87171;'>No</td>\n        <td style='padding: 12px; color: #f87171;'>No</td>\n        <td style='padding: 12px; color: #4ade80;'>Yes (Synchronized)</td>\n      </tr>\n      <tr>\n        <td style='padding: 12px; font-weight: bold;'>Memory Overhead</td>\n        <td style='padding: 12px; color: #4ade80;'>Low</td>\n        <td style='padding: 12px; color: #f87171;'>High (Nodes/Pointers)</td>\n        <td style='padding: 12px;'>Low</td>\n      </tr>\n    </tbody>\n  </table>\n</div>"
+}

@@ -17,7 +17,7 @@ app.use(express.static(path.join(__dirname)));
 
 app.post('/api/generate', async (req, res) => {
     try {
-        const { apiKey, problemDescription, platform = 'gemini', section = 'playground' } = req.body;
+        const { apiKey, problemDescription, platform = 'gemini', section = 'playground', conversationHistory = [] } = req.body;
 
         if (!apiKey) {
             return res.status(400).json({ error: 'API key is required.' });
@@ -34,24 +34,45 @@ app.post('/api/generate', async (req, res) => {
         let textResponse = '';
         if (platform === 'groq') {
             const groq = new Groq({ apiKey: apiKey });
+
+            // Build messages: system + conversation history + new user message
+            const messages = [
+                { role: "system", content: systemPrompt }
+            ];
+
+            // Add conversation history (limit to last 20 messages to stay within context limits)
+            const recentHistory = conversationHistory.slice(-20);
+            for (const msg of recentHistory) {
+                messages.push({ role: msg.role, content: msg.content });
+            }
+
+            // Add the new user message
+            messages.push({ role: "user", content: `USER PROBLEM DESCRIPTION:\n${problemDescription}` });
+
             const completion = await groq.chat.completions.create({
-                messages: [
-                    {
-                        role: "system",
-                        content: systemPrompt
-                    },
-                    {
-                        role: "user",
-                        content: `USER PROBLEM DESCRIPTION:\n${problemDescription}`
-                    }
-                ],
+                messages,
                 model: selectedModel,
                 temperature: 0.1,
                 response_format: { type: "json_object" },
             });
             textResponse = completion.choices[0]?.message?.content || '{}';
         } else {
-            const combinedPrompt = `${systemPrompt}\n\nUSER PROBLEM DESCRIPTION:\n${problemDescription}`;
+            // For Gemini, build a single prompt with history context
+            let combinedPrompt = systemPrompt;
+
+            // Append conversation history if present
+            const recentHistory = conversationHistory.slice(-20);
+            if (recentHistory.length > 0) {
+                combinedPrompt += '\n\n--- CONVERSATION HISTORY ---\n';
+                for (const msg of recentHistory) {
+                    const role = msg.role === 'user' ? 'USER' : 'ASSISTANT';
+                    combinedPrompt += `${role}: ${msg.content}\n\n`;
+                }
+                combinedPrompt += '--- END CONVERSATION HISTORY ---\n';
+            }
+
+            combinedPrompt += `\n\nUSER PROBLEM DESCRIPTION:\n${problemDescription}`;
+
             const ai = new GoogleGenAI({ apiKey: apiKey });
             const response = await ai.models.generateContent({
                 model: selectedModel,

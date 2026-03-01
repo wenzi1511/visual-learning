@@ -1,0 +1,25 @@
+{
+  "name": "Java Collections Framework Hierarchy",
+  "difficulty": "Intermediate",
+  "chatResponse": "I will guide you through the core structure of the Java Collections Framework, explaining how interfaces and classes relate to one another.",
+  "steps": [
+    {
+      "title": "The Root: Iterable and Collection",
+      "content": "At the very top sits the `Iterable` interface, which allows collections to be the target of the 'for-each loop' statement. The `Collection` interface inherits from it and serves as the primary root for `List`, `Set`, and `Queue`. It defines basic operations like `add()`, `remove()`, and `size()`."
+    },
+    {
+      "title": "Ordered Sequences: The List Interface",
+      "content": "The `List` interface represents an ordered collection where duplicate elements are allowed. \n- **ArrayList**: Best for fast random access ($O(1)$) but slower for insertions/deletions in the middle.\n- **LinkedList**: Implements both `List` and `Deque`, making it efficient for frequent insertions and deletions ($O(1)$ at ends)."
+    },
+    {
+      "title": "Ensuring Uniqueness: The Set Interface",
+      "content": "A `Set` is a collection that contains no duplicate elements. \n- **HashSet**: Uses a hash table for storage; offers the best performance but no order guarantees.\n- **TreeSet**: Implements `SortedSet`, storing elements in a red-black tree to maintain natural or custom sorting."
+    },
+    {
+      "title": "Key-Value Mapping: The Map Interface",
+      "content": "Although part of the JCF, `Map` does **not** inherit from `Collection`. It maps unique keys to values.\n- **HashMap**: Fast, unordered key-value storage.\n- **TreeMap**: Keeps keys in a sorted order based on natural ordering or a `Comparator`."
+    }
+  ],
+  "visualType": "mermaid",
+  "visualCode": "graph TD\n    Iterable --> Collection\n    Collection --> List\n    Collection --> Set\n    Collection --> Queue\n    List --> ArrayList\n    List --> LinkedList\n    List --> Vector\n    Set --> HashSet\n    Set --> LinkedHashSet\n    Set --> SortedSet\n    SortedSet --> TreeSet\n    Queue --> Deque\n    Queue --> PriorityQueue\n    Deque --> LinkedList\n    Map[Map Interface] --> HashMap\n    Map --> LinkedHashMap\n    Map --> SortedMap\n    SortedMap --> TreeMap"
+}

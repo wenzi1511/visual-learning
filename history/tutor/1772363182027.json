@@ -1,0 +1,25 @@
+{
+  "name": "Java Collections Framework Hierarchy",
+  "difficulty": "Intermediate",
+  "chatResponse": "I will walk you through the structural hierarchy of the Java Collections Framework and explain how the different interfaces and classes relate to one another.",
+  "steps": [
+    {
+      "title": "The Framework Foundation",
+      "content": "The **Java Collections Framework (JCF)** is a set of classes and interfaces that implement commonly reusable collection data structures. It provides a unified architecture for storing and manipulating a group of objects. At the top level, it is divided into two distinct branches: the `Collection` hierarchy and the `Map` hierarchy."
+    },
+    {
+      "title": "The Collection Interface Branch",
+      "content": "The `Collection` interface is the root of most collection types. It has three main sub-interfaces:\n- **List**: An ordered collection that allows duplicate elements (e.g., `ArrayList`, `LinkedList`).\n- **Set**: A collection that cannot contain duplicate elements (e.g., `HashSet`, `TreeSet`).\n- **Queue**: Designed for holding elements prior to processing, typically in FIFO (First-In-First-Out) order."
+    },
+    {
+      "title": "The Map Interface Branch",
+      "content": "Unlike the others, the `Map` interface does *not* inherit from `Collection`. Instead, it maps unique keys to values. Common implementations include:\n- **HashMap**: Provides constant-time performance for basic operations but does not guarantee order.\n- **TreeMap**: Stores elements in a sorted order based on the keys' natural ordering or a custom comparator."
+    },
+    {
+      "title": "Concrete Implementations",
+      "content": "While interfaces define the behavior, **Concrete Classes** provide the actual logic. For example, `ArrayList` uses a dynamic array internally, whereas `LinkedList` uses a doubly-linked list. Choosing the right implementation depends on your performance requirements for adding, removing, and searching for elements."
+    }
+  ],
+  "visualType": "mermaid",
+  "visualCode": "graph TD\n  subgraph CollectionsBranch [Collection Hierarchy]\n    Collection[\"Collection (Interface)\"]\n    List[\"List (Interface)\"]\n    Set[\"Set (Interface)\"]\n    Queue[\"Queue (Interface)\"]\n    \n    Collection --> List\n    Collection --> Set\n    Collection --> Queue\n    \n    List --> ArrayList[ArrayList]\n    List --> LinkedList[LinkedList]\n    \n    Set --> HashSet[HashSet]\n    Set --> TreeSet[TreeSet]\n    \n    Queue --> PriorityQueue[PriorityQueue]\n    Queue --> Deque[\"Deque (Interface)\"]\n  end\n\n  subgraph MapBranch [Map Hierarchy]\n    Map[\"Map (Interface)\"]\n    Map --> HashMap[HashMap]\n    Map --> TreeMap[TreeMap]\n    Map --> LinkedHashMap[LinkedHashMap]\n  end"
+}

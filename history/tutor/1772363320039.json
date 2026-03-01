@@ -1,0 +1,21 @@
+{
+  "name": "Java HashMap Internals",
+  "difficulty": "Intermediate",
+  "chatResponse": "I'll visualize the internal lifecycle of a `put(K, V)` operation in a HashMap, illustrating how it handles hashing, collisions, and performance optimizations like treeification.",
+  "steps": [
+    {
+      "title": "Hashing and Index Calculation",
+      "content": "When you call `put(key, value)`, Java first computes the key's `hashCode()`. To prevent poor hash functions from causing collisions, the `HashMap` applies a supplementary hash function. It then calculates the specific bucket index using the formula: `index = (n - 1) & hash`, where `n` is the current capacity of the internal array (table)."
+    },
+    {
+      "title": "Bucket Assignment & Collision Handling",
+      "content": "If the calculated bucket is empty, a new node is created. If a collision occurs (the bucket is already occupied), the `HashMap` checks if the key already exists by comparing both the hash and the `.equals()` method. If the key is the same, the value is updated. If the keys are different, the entry is added to a linked structure within that bucket."
+    },
+    {
+      "title": "LinkedList vs. Red-Black Tree",
+      "content": "Since Java 8, if a single bucket becomes too crowded (threshold of 8 elements), the `HashMap` converts the internal LinkedList into a **Red-Black Tree** (TreeNodes). This improves the worst-case search time from $O(n)$ to $O(\\log n)$. If the bucket size decreases later (threshold of 6), it converts back to a simple list."
+    }
+  ],
+  "visualType": "mermaid",
+  "visualCode": "graph TD\n    Start([put key, value]) --> Hash[Calculate hash = hash\\(key\\)]\n    Hash --> Index[Index = hash & n-1]\n    Index --> Lookup{Bucket Empty?}\n    Lookup -- Yes --> Create[Create New Node]\n    Lookup -- No --> Compare{Key exists?}\n    Compare -- Yes / equals == true --> Update[Update Existing Value]\n    Compare -- No / equals == false --> CheckType{Bucket Type?}\n    CheckType -- LinkedList --> AppendLL[Append to Tail of List]\n    CheckType -- TreeNode --> InsertTree[Insert into Red-Black Tree]\n    AppendLL --> TreeCheck{Length >= 8?}\n    TreeCheck -- Yes --> Treeify[Convert List to TreeNode]\n    TreeCheck -- No --> End([Operation Complete])\n    Create --> End\n    Update --> End\n    Treeify --> End\n    InsertTree --> End"
+}

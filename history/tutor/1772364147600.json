@@ -1,0 +1,25 @@
+{
+  "name": "Hadoop 2.x (YARN) Architecture",
+  "difficulty": "Intermediate",
+  "chatResponse": "I will break down the Hadoop 2.x architecture, highlighting the decoupling of storage (HDFS) and resource management (YARN).",
+  "steps": [
+    {
+      "title": "The Shift to YARN",
+      "content": "Unlike Hadoop 1.x, which combined resource management and data processing in MapReduce, Hadoop 2.x introduced **YARN (Yet Another Resource Negotiator)**. This allows multiple data processing engines (MapReduce, Spark, Tez) to run on a single cluster by treating the cluster's resources as a global pool."
+    },
+    {
+      "title": "HDFS Layer (Storage)",
+      "content": "The storage layer remains **HDFS**. It consists of a **NameNode** (Master) that manages metadata and file system namespace, and multiple **DataNodes** (Slaves) that store the actual data blocks. Hadoop 2.x also introduced NameNode High Availability (HA) to eliminate the single point of failure."
+    },
+    {
+      "title": "YARN Layer (Resource Management)",
+      "content": "YARN functions via two main components:\n- **ResourceManager (RM):** The ultimate authority that arbitrates resources among all competing applications.\n- **NodeManager (NM):** The per-machine agent responsible for monitoring resource usage (CPU, memory) and reporting to the RM."
+    },
+    {
+      "title": "Application Execution Flow",
+      "content": "When a client submits an application:\n1. The **ResourceManager** allocates a container to start the **ApplicationMaster (AM)**.\n2. The **AM** negotiates resources from the RM and works with **NodeManagers** to execute and monitor tasks within distributed **Containers**."
+    }
+  ],
+  "visualType": "mermaid",
+  "visualCode": "graph TD\n    subgraph Client_Interface\n        C[Client Application]\n    end\n\n    subgraph YARN_Resource_Management\n        RM[ResourceManager]\n        S[Scheduler]\n        ASM[ApplicationsManager]\n        RM --- S\n        RM --- ASM\n    end\n\n    subgraph HDFS_Storage\n        NN[NameNode - Metadata]\n        SNN[Standby NameNode]\n        NN <--> SNN\n    end\n\n    subgraph Worker_Node_1\n        NM1[NodeManager]\n        DN1[DataNode]\n        AM[ApplicationMaster]\n        CON1[Container - Task]\n    end\n\n    subgraph Worker_Node_2\n        NM2[NodeManager]\n        DN2[DataNode]\n        CON2[Container - Task]\n    end\n\n    C -->|Submit Job| RM\n    C -->|Metadata Request| NN\n    RM -->|Allocate AM Container| NM1\n    NM1 --> AM\n    AM -->|Request Resources| RM\n    AM -->|Launch Tasks| NM2\n    NM2 --> CON2\n    DN1 --- DN2\n    NN -.->|Block Reports| DN1\n    NN -.->|Block Reports| DN2"
+}

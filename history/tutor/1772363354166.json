@@ -1,0 +1,21 @@
+{
+  "name": "HashMap put() Operation Flow",
+  "difficulty": "Intermediate",
+  "chatResponse": "I will provide a visual flowchart mapping out the internal logic of the HashMap `put` operation, including hashing, collision resolution, and the Java 8 treeification process.",
+  "steps": [
+    {
+      "title": "Hashing and Index Mapping",
+      "content": "When a key-value pair is inserted, the key's `hashCode()` is retrieved and passed through a supplemental hash function to ensure a uniform distribution. The final bucket index is determined using a bitwise AND: `index = (n - 1) & hash`, which is a high-performance alternative to the modulo operator."
+    },
+    {
+      "title": "Bucket Access and Key Comparison",
+      "content": "The JVM checks the calculated bucket index in the internal `Node[] table`. If the bucket is empty, a new node is created. If it is occupied, the system compares the existing key with the new key using both `==` (for identity) and `.equals()` (for content). If they match, the existing value is overwritten."
+    },
+    {
+      "title": "Collision Resolution Strategy",
+      "content": "If the keys differ but hash to the same bucket, a collision occurs. Historically, Java handled this with a **LinkedList**. However, in Java 8+, if the number of nodes in a single bucket exceeds a threshold (8), the list is transformed into a **Red-Black Tree** to keep search performance at $O(\\log n)$ rather than $O(n)$."
+    }
+  ],
+  "visualType": "mermaid",
+  "visualCode": "graph TD\n    Start([put key, value]) --> Hash[Compute hash = hash_func key.hashCode]\n    Hash --> Index[index = n-1 & hash]\n    Index --> Empty{Bucket Empty?}\n    \n    Empty -- Yes --> CreateNode[Create New Node at index]\n    Empty -- No --> CompareKeys{Key exists? hash == h && key.equals}\n    \n    CompareKeys -- Yes --> UpdateValue[Overwrite existing value]\n    CompareKeys -- No --> CheckTree{Is Bucket a TreeNode?}\n    \n    CheckTree -- Yes --> PutTree[Insert into Red-Black Tree]\n    CheckTree -- No --> PutList[Append to LinkedList]\n    \n    PutList --> Threshold{List Size > 8?}\n    Threshold -- Yes --> Treeify[Convert List to Red-Black Tree]\n    Threshold -- No --> End([Operation Complete])\n    \n    CreateNode --> End\n    UpdateValue --> End\n    PutTree --> End\n    Treeify --> End"
+}

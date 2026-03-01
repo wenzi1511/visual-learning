@@ -1,0 +1,21 @@
+{
+  "name": "Hadoop 2.x High-Level Architecture",
+  "difficulty": "Intermediate",
+  "chatResponse": "I will break down the Hadoop 2.x architecture, focusing on how HDFS handles storage and how YARN revolutionized resource management by decoupling it from the processing layer.",
+  "steps": [
+    {
+      "title": "HDFS: The Distributed Storage Layer",
+      "content": "The **Hadoop Distributed File System (HDFS)** follows a Master-Slave architecture. \n- **NameNode (Master):** Manages the file system namespace, tracks the directory tree, and monitors which blocks of data are stored on which DataNodes. \n- **DataNodes (Slaves):** These are the workhorses that store the actual data blocks and respond to read/write requests from clients based on the NameNode's instructions."
+    },
+    {
+      "title": "YARN: The Resource Management Layer",
+      "content": "Introduced in 2.x, **YARN (Yet Another Resource Negotiator)** acts as the cluster's operating system. \n- **ResourceManager (RM):** The ultimate authority that arbitrates resources among all competing applications. \n- **NodeManager (NM):** The per-machine agent responsible for monitoring resource usage (CPU, Memory) and reporting back to the RM."
+    },
+    {
+      "title": "Application Workflow (The AM)",
+      "content": "When a job is submitted, a specific **ApplicationMaster (AM)** is spawned. The AM is responsible for negotiating resources from the ResourceManager and working with the NodeManagers to execute and monitor individual tasks. This allows Hadoop 2.x to run multiple processing frameworks (MapReduce, Spark, Tez) on the same cluster."
+    }
+  ],
+  "visualType": "mermaid",
+  "visualCode": "graph TB\n    subgraph Client_Zone [Client Interface]\n        C[Client Application]\n    end\n\n    subgraph YARN_Layer [YARN - Resource Management]\n        RM[ResourceManager]\n        subgraph Node_1 [Worker Node 1]\n            NM1[NodeManager]\n            AM[ApplicationMaster]\n            T1[Container / Task]\n        end\n        subgraph Node_2 [Worker Node 2]\n            NM2[NodeManager]\n            T2[Container / Task]\n        end\n    end\n\n    subgraph HDFS_Layer [HDFS - Storage]\n        NN[NameNode - Metadata]\n        DN1[DataNode 1 - Blocks]\n        DN2[DataNode 2 - Blocks]\n    end\n\n    %% Connections\n    C --> RM\n    C --> NN\n    RM <--> AM\n    RM -- Allocation --> NM1\n    RM -- Allocation --> NM2\n    AM -- Manages --> T1\n    AM -- Manages --> T2\n    T1 -- Read/Write --> DN1\n    T2 -- Read/Write --> DN2\n    DN1 -- Heartbeat --> NN\n    DN2 -- Heartbeat --> NN"
+}
