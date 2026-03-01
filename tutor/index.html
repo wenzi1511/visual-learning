@@ -1262,6 +1262,7 @@
         let conversationHistory = [];
         let visualHistory = [];  // Stack of { type, code, name }
         let currentVisualIndex = -1;
+        let currentChatId = null;
 
         // ═══════════════════════════════════════════════
         // INITIALIZATION
@@ -1519,6 +1520,8 @@
                         apiKey, platform, model,
                         problemDescription: val,
                         conversationHistory: conversationHistory,
+                        visualHistory: visualHistory,
+                        chatId: currentChatId,
                         section: 'tutor'
                     })
                 });
@@ -1526,9 +1529,9 @@
                 const data = await response.json();
                 hideTypingIndicator();
 
-                if (data.success && data.historyPath) {
-                    const fileResponse = await fetch(`../${data.historyPath}`);
-                    const json = await fileResponse.json();
+                if (data.success && data.generatedResponse) {
+                    currentChatId = data.chatId;
+                    const json = data.generatedResponse;
 
                     renderAIResponse(json);
 
@@ -1546,7 +1549,7 @@
                     if (json.steps && json.steps.length > 0) {
                         assistantSummary += '\n' + json.steps.map(s => `${s.title}: ${s.content}`).join('\n');
                     }
-                    conversationHistory.push({ role: 'assistant', content: assistantSummary });
+                    conversationHistory.push({ role: 'assistant', content: assistantSummary, fullResponse: json });
 
                     // Refresh history dropdown
                     loadHistoryDropdown();
@@ -1776,6 +1779,7 @@
             conversationHistory = [];
             visualHistory = [];
             currentVisualIndex = -1;
+            currentChatId = null;
             updateVisualNav();
             document.getElementById('chat-history').innerHTML = `
                 <div class="chat-welcome" id="chat-welcome">
@@ -1843,16 +1847,51 @@
                 if (!response.ok) throw new Error('Failed to load ' + configFile);
                 const json = await response.json();
 
-                // Hide welcome
+                // Hide welcome and clear current state
                 const welcome = document.getElementById('chat-welcome');
                 if (welcome) welcome.remove();
+                document.getElementById('chat-history').innerHTML = '';
 
-                // Render the saved response
-                renderAIResponse(json);
+                conversationHistory = [];
+                visualHistory = [];
+                currentVisualIndex = -1;
+                currentChatId = json.chatId || null;
 
-                // Use pushVisual so it enters the history stack
-                if (json.visualType && json.visualCode) {
-                    pushVisual(json.visualType, json.visualCode, json.name || 'Visual');
+                // Replay conversation
+                if (json.conversationHistory && json.conversationHistory.length > 0) {
+                    json.conversationHistory.forEach(msg => {
+                        if (msg.role === 'user') {
+                            appendUserMsg(msg.content);
+                            conversationHistory.push(msg);
+                        } else if (msg.role === 'assistant') {
+                            if (msg.fullResponse) {
+                                renderAIResponse(msg.fullResponse);
+                            } else {
+                                // Fallback for assistant strings without rich payload during development
+                                appendSystemMsg(msg.content);
+                            }
+                            conversationHistory.push(msg);
+                        }
+                    });
+                } else {
+                    // Fallback for old single-turn history files
+                    if (json.chatResponse) renderAIResponse(json);
+                }
+
+                // Replay visuals
+                if (json.visualHistory && json.visualHistory.length > 0) {
+                    json.visualHistory.forEach(v => visualHistory.push(v));
+                    currentVisualIndex = visualHistory.length - 1;
+                    const activeVisual = visualHistory[currentVisualIndex];
+                    renderVisual(activeVisual.type, activeVisual.code);
+                    updateVisualNav();
+                } else {
+                    // Fallback for old single-turn history files
+                    if (json.visualType && json.visualCode) {
+                        pushVisual(json.visualType, json.visualCode, json.name || 'Visual');
+                    } else {
+                        updateVisualNav(); // Hide arrows if no visuals
+                    }
                 }
 
                 // Show export button

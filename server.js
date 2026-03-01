@@ -17,7 +17,7 @@ app.use(express.static(path.join(__dirname)));
 
 app.post('/api/generate', async (req, res) => {
     try {
-        const { apiKey, problemDescription, platform = 'gemini', section = 'playground', conversationHistory = [] } = req.body;
+        const { apiKey, problemDescription, platform = 'gemini', section = 'playground', conversationHistory = [], visualHistory = [], chatId } = req.body;
 
         if (!apiKey) {
             return res.status(400).json({ error: 'API key is required.' });
@@ -43,7 +43,9 @@ app.post('/api/generate', async (req, res) => {
             // Add conversation history (limit to last 20 messages to stay within context limits)
             const recentHistory = conversationHistory.slice(-20);
             for (const msg of recentHistory) {
-                messages.push({ role: msg.role, content: msg.content });
+                // If it's a fullResponse object disguised as string, just send the text representation
+                let contentStr = typeof msg.content === 'string' ? msg.content : JSON.stringify(msg.content);
+                messages.push({ role: msg.role, content: contentStr });
             }
 
             // Add the new user message
@@ -66,7 +68,8 @@ app.post('/api/generate', async (req, res) => {
                 combinedPrompt += '\n\n--- CONVERSATION HISTORY ---\n';
                 for (const msg of recentHistory) {
                     const role = msg.role === 'user' ? 'USER' : 'ASSISTANT';
-                    combinedPrompt += `${role}: ${msg.content}\n\n`;
+                    let contentStr = typeof msg.content === 'string' ? msg.content : JSON.stringify(msg.content);
+                    combinedPrompt += `${role}: ${contentStr}\n\n`;
                 }
                 combinedPrompt += '--- END CONVERSATION HISTORY ---\n';
             }
@@ -98,23 +101,43 @@ app.post('/api/generate', async (req, res) => {
             parsedJson = eval('(' + jsonStr + ')');
         }
 
-        // Save History
+        // Save History Thread
         const historyDir = path.join(__dirname, 'history', section);
         if (!fs.existsSync(historyDir)) {
             fs.mkdirSync(historyDir, { recursive: true });
         }
 
-        const timestamp = Date.now();
-        const historyFilename = `${timestamp}.json`;
-        const historyPath = path.join(historyDir, historyFilename);
+        const currentChatId = chatId || Date.now().toString();
+        const historyPath = path.join(historyDir, `${currentChatId}.json`);
 
-        fs.writeFileSync(historyPath, JSON.stringify(parsedJson, null, 2), 'utf-8');
+        // Append the new interaction to the history arrays before saving
+        const newConvoHistory = [...conversationHistory];
+        newConvoHistory.push({ role: 'user', content: problemDescription });
+        newConvoHistory.push({ role: 'assistant', fullResponse: parsedJson }); // Store rich JSON for the assistant
 
-        // Return the relative path to the new history file
+        const newVisualHistory = [...visualHistory];
+        if (parsedJson.visualType && parsedJson.visualCode) {
+            newVisualHistory.push({ type: parsedJson.visualType, code: parsedJson.visualCode, name: parsedJson.name || 'Visual' });
+        }
+
+        const threadState = {
+            chatId: currentChatId,
+            name: parsedJson.name || 'Untitled Generation',
+            difficulty: parsedJson.difficulty || 'Unknown',
+            timestamp: parseInt(currentChatId, 10) || Date.now(),
+            conversationHistory: newConvoHistory,
+            visualHistory: newVisualHistory
+        };
+
+        fs.writeFileSync(historyPath, JSON.stringify(threadState, null, 2), 'utf-8');
+
+        // Return the parsed JSON directly so the frontend doesn't have to fetch it
         res.json({
             success: true,
             message: 'Visual generated and saved to history successfully.',
-            historyPath: `history/${section}/${historyFilename}`
+            chatId: currentChatId,
+            generatedResponse: parsedJson,
+            historyPath: `history/${section}/${currentChatId}.json`
         });
     } catch (error) {
         console.error('Error generating AI content:', error);
