@@ -112,7 +112,10 @@ app.post('/api/generate', async (req, res) => {
 
         // Append the new interaction to the history arrays before saving
         const newConvoHistory = [...conversationHistory];
-        newConvoHistory.push({ role: 'user', content: problemDescription });
+
+        // The user message is already in conversationHistory (pushed by client before fetch).
+        // If not for some reason, we would append it, but we trust the client array here.
+        // We only need to append the ASSISTANT's response to the history payload.
         newConvoHistory.push({ role: 'assistant', fullResponse: parsedJson }); // Store rich JSON for the assistant
 
         const newVisualHistory = [...visualHistory];
