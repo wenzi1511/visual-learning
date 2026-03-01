@@ -1,0 +1,43 @@
+{
+  "chatId": "1772368705114",
+  "name": "Binary Search Visualization",
+  "difficulty": "Beginner",
+  "timestamp": 1772368705114,
+  "conversationHistory": [
+    {
+      "role": "user",
+      "content": "Visualize Binary Search"
+    },
+    {
+      "role": "assistant",
+      "fullResponse": {
+        "name": "Binary Search Visualization",
+        "difficulty": "Beginner",
+        "chatResponse": "I will show you how Binary Search efficiently finds a value in a sorted array by repeatedly halving the search space.",
+        "steps": [
+          {
+            "title": "Search Space Initialization",
+            "content": "Binary Search requires a **sorted array**. We initialize two pointers: `low` (index 0) and `high` (the last index). The algorithm only considers elements within this inclusive range."
+          },
+          {
+            "title": "Finding the Midpoint",
+            "content": "In each step, we calculate the middle index: `mid = low + floor((high - low) / 2)`. We then compare `array[mid]` with our `target` value."
+          },
+          {
+            "title": "Eliminating Half",
+            "content": "If the `target` is smaller than the middle element, it must be in the left half, so we update `high = mid - 1`. If it's larger, it must be in the right half, so we update `low = mid + 1`. This gives Binary Search its $O(\\log n)$ time complexity."
+          }
+        ],
+        "visualType": "dsa",
+        "visualCode": "{\"slots\":[{\"id\":\"arr\",\"type\":\"array\",\"label\":\"Sorted Array\"}],\"inputs\":[{\"label\":\"Target\",\"default\":\"7\"}],\"code\":\"class Playground {\\n  async run(inputs) {\\n    const data = [1, 3, 5, 8, 12, 15, 18, 21, 25, 30];\\n    const target = parseInt(inputs.Target);\\n    await this.arr.init(data);\\n\\n    let low = 0;\\n    let high = data.length - 1;\\n\\n    while (low <= high) {\\n      // Reset previous highlights\\n      await this.arr.highlightRange(0, data.length - 1, null);\\n      // Highlight the current search window in Cyan\\n      await this.arr.highlightRange(low, high, 'cyan');\\n      \\n      let mid = Math.floor(low + (high - low) / 2);\\n      // Highlight the pivot/mid in Pink\\n      await this.arr.highlight(mid, 'pink');\\n      \\n      this.log(`Searching range [${low}, ${high}]. Midpoint index ${mid} has value ${data[mid]}`);\\n      await this.await();\\n\\n      if (data[mid] === target) {\\n        await this.arr.highlight(mid, 'emerald');\\n        this.log(`Success! Target ${target} found at index ${mid}.`);\\n        return;\\n      }\\n\\n      if (data[mid] < target) {\\n        this.log(`${data[mid]} < ${target}. Discarding left half.`);\\n        low = mid + 1;\\n      } else {\\n        this.log(`${data[mid]} > ${target}. Discarding right half.`);\\n        high = mid - 1;\\n      }\\n      await this.await();\\n    }\\n\\n    this.log(`Target ${target} not found in the array.`);\\n  }\\n}\"}"
+      }
+    }
+  ],
+  "visualHistory": [
+    {
+      "type": "dsa",
+      "code": "{\"slots\":[{\"id\":\"arr\",\"type\":\"array\",\"label\":\"Sorted Array\"}],\"inputs\":[{\"label\":\"Target\",\"default\":\"7\"}],\"code\":\"class Playground {\\n  async run(inputs) {\\n    const data = [1, 3, 5, 8, 12, 15, 18, 21, 25, 30];\\n    const target = parseInt(inputs.Target);\\n    await this.arr.init(data);\\n\\n    let low = 0;\\n    let high = data.length - 1;\\n\\n    while (low <= high) {\\n      // Reset previous highlights\\n      await this.arr.highlightRange(0, data.length - 1, null);\\n      // Highlight the current search window in Cyan\\n      await this.arr.highlightRange(low, high, 'cyan');\\n      \\n      let mid = Math.floor(low + (high - low) / 2);\\n      // Highlight the pivot/mid in Pink\\n      await this.arr.highlight(mid, 'pink');\\n      \\n      this.log(`Searching range [${low}, ${high}]. Midpoint index ${mid} has value ${data[mid]}`);\\n      await this.await();\\n\\n      if (data[mid] === target) {\\n        await this.arr.highlight(mid, 'emerald');\\n        this.log(`Success! Target ${target} found at index ${mid}.`);\\n        return;\\n      }\\n\\n      if (data[mid] < target) {\\n        this.log(`${data[mid]} < ${target}. Discarding left half.`);\\n        low = mid + 1;\\n      } else {\\n        this.log(`${data[mid]} > ${target}. Discarding right half.`);\\n        high = mid - 1;\\n      }\\n      await this.await();\\n    }\\n\\n    this.log(`Target ${target} not found in the array.`);\\n  }\\n}\"}",
+      "name": "Binary Search Visualization"
+    }
+  ]
+}

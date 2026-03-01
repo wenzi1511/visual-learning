@@ -1,0 +1,47 @@
+{
+  "chatId": "1772368064910",
+  "name": "Binary Search Algorithm",
+  "difficulty": "Beginner",
+  "timestamp": 1772368064910,
+  "conversationHistory": [
+    {
+      "role": "user",
+      "content": "Visualize Binary Search"
+    },
+    {
+      "role": "assistant",
+      "fullResponse": {
+        "name": "Binary Search Algorithm",
+        "difficulty": "Beginner",
+        "chatResponse": "I'll visualize how Binary Search efficiently narrows down a target value within a sorted array by repeatedly splitting the search interval in half.",
+        "steps": [
+          {
+            "title": "Prerequisite: The Sorted Array",
+            "content": "Binary search relies on the data being **sorted**. This allows the algorithm to make a logical deduction: if the target is greater than the middle element, it *must* be in the right half, and if it's smaller, it *must* be in the left half."
+          },
+          {
+            "title": "Defining Search Pointers",
+            "content": "We initialize two pointers: `low` at index 0 and `high` at the last index. These represent the current 'window' of search. In each step, we calculate the `mid` index:\n\n`mid = low + Math.floor((high - low) / 2)`"
+          },
+          {
+            "title": "The Comparison Logic",
+            "content": "We compare `arr[mid]` to our `target`:\n1. **Match**: If `arr[mid] == target`, we're done!\n2. **Target is Higher**: If `arr[mid] < target`, the target is in the upper half. We set `low = mid + 1`.\n3. **Target is Lower**: If `arr[mid] > target`, the target is in the lower half. We set `high = mid - 1`."
+          },
+          {
+            "title": "Logarithmic Efficiency",
+            "content": "Because we discard half of the remaining elements at every step, the time complexity is **O(log n)**. This makes it incredibly fast even for massive datasets (e.g., searching 1 billion items takes only ~30 comparisons)."
+          }
+        ],
+        "visualType": "dsa",
+        "visualCode": "{\"slots\": [{\"id\": \"arr\", \"type\": \"array\", \"label\": \"Sorted Array\"}], \"inputs\": [{\"label\": \"Target\", \"default\": \"23\"}], \"code\": \"class Playground {\\n    async run(inputs) {\\n        const target = parseInt(inputs.Target);\\n        const data = [2, 5, 8, 12, 16, 23, 38, 56, 72, 91];\\n        await this.arr.init(data);\\n        \\n        let low = 0;\\n        let high = data.length - 1;\\n\\n        while (low <= high) {\\n            const mid = Math.floor((low + high) / 2);\\n            this.log(`Checking range [${low}, ${high}], middle index: ${mid}`);\\n            \\n            // Clear previous and highlight search range and mid\\n            this.arr.highlightRange(0, data.length - 1, null);\\n            this.arr.highlightRange(low, high, 'rgba(34, 211, 238, 0.2)');\\n            this.arr.highlight(mid, '#f59e0b'); // Amber for checking\\n            await this.await();\\n\\n            if (data[mid] === target) {\\n                this.arr.highlight(mid, '#10b981'); // Emerald for success\\n                this.log(`Target ${target} found at index ${mid}!`);\\n                return;\\n            }\\n\\n            if (data[mid] < target) {\\n                this.log(`${data[mid]} < ${target}. Discarding left half.`);\\n                low = mid + 1;\\n            } else {\\n                this.log(`${data[mid]} > ${target}. Discarding right half.`);\\n                high = mid - 1;\\n            }\\n            await this.await();\\n        }\\n\\n        this.log(`Target ${target} was not found in the array.`);\\n    }\\n}\"}"
+      }
+    }
+  ],
+  "visualHistory": [
+    {
+      "type": "dsa",
+      "code": "{\"slots\": [{\"id\": \"arr\", \"type\": \"array\", \"label\": \"Sorted Array\"}], \"inputs\": [{\"label\": \"Target\", \"default\": \"23\"}], \"code\": \"class Playground {\\n    async run(inputs) {\\n        const target = parseInt(inputs.Target);\\n        const data = [2, 5, 8, 12, 16, 23, 38, 56, 72, 91];\\n        await this.arr.init(data);\\n        \\n        let low = 0;\\n        let high = data.length - 1;\\n\\n        while (low <= high) {\\n            const mid = Math.floor((low + high) / 2);\\n            this.log(`Checking range [${low}, ${high}], middle index: ${mid}`);\\n            \\n            // Clear previous and highlight search range and mid\\n            this.arr.highlightRange(0, data.length - 1, null);\\n            this.arr.highlightRange(low, high, 'rgba(34, 211, 238, 0.2)');\\n            this.arr.highlight(mid, '#f59e0b'); // Amber for checking\\n            await this.await();\\n\\n            if (data[mid] === target) {\\n                this.arr.highlight(mid, '#10b981'); // Emerald for success\\n                this.log(`Target ${target} found at index ${mid}!`);\\n                return;\\n            }\\n\\n            if (data[mid] < target) {\\n                this.log(`${data[mid]} < ${target}. Discarding left half.`);\\n                low = mid + 1;\\n            } else {\\n                this.log(`${data[mid]} > ${target}. Discarding right half.`);\\n                high = mid - 1;\\n            }\\n            await this.await();\\n        }\\n\\n        this.log(`Target ${target} was not found in the array.`);\\n    }\\n}\"}",
+      "name": "Binary Search Algorithm"
+    }
+  ]
+}

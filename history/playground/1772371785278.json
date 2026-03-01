@@ -1,0 +1,54 @@
+{
+  "chatId": "1772371785278",
+  "name": "Binary Tree Zigzag Level Order Traversal",
+  "difficulty": "Medium",
+  "timestamp": 1772371785278,
+  "conversationHistory": [
+    {
+      "role": "assistant",
+      "fullResponse": {
+        "id": "binary-tree-zigzag-traversal",
+        "name": "Binary Tree Zigzag Level Order Traversal",
+        "difficulty": "Medium",
+        "description": "Given the <code>root</code> of a binary tree, return the <em>zigzag level order traversal</em> of its nodes' values. (i.e., from left to right, then right to left for the next level and alternate between).<br/><br/><ul><li>The first level is traversed Left-to-Right.</li><li>The second level is traversed Right-to-Left.</li><li>The third level is traversed Left-to-Right, and so on.</li></ul>",
+        "tags": [
+          "Tree",
+          "Breadth-First Search",
+          "Binary Tree",
+          "Queue"
+        ],
+        "slots": [
+          {
+            "id": "tree",
+            "type": "binary-tree",
+            "label": "Binary Tree"
+          },
+          {
+            "id": "queue",
+            "type": "queue",
+            "label": "BFS Queue (Frontier)"
+          },
+          {
+            "id": "currentLevel",
+            "type": "array",
+            "label": "Current Level Nodes"
+          },
+          {
+            "id": "vars",
+            "type": "hashmap",
+            "label": "State Variables"
+          }
+        ],
+        "inputs": [
+          {
+            "label": "Tree Array (LeetCode format)",
+            "default": "[3,9,20,null,null,15,7]",
+            "placeholder": "[3,9,20,null,null,15,7]"
+          }
+        ],
+        "code": "class Playground {\n    async run(inputs) {\n        const vals = JSON.parse(inputs[0]);\n        \n        // 1. Initialization\n        this.tree.init(vals);\n        this.queue.init([]);\n        this.currentLevel.init([]);\n        this.vars.init([[\"level\", 0], [\"leftToRight\", true]]);\n\n        const root = this.tree.getRoot();\n        if (!root) {\n            this.log(\"Tree is empty.\");\n            return [];\n        }\n\n        const finalResult = [];\n        let leftToRight = true;\n        let levelCount = 0;\n\n        this.queue.enqueue(root);\n        this.log(\"Starting BFS traversal from root.\");\n        await this.await();\n\n        while (!this.queue.isEmpty()) {\n            const levelSize = this.queue.size();\n            const currentLevelVals = [];\n            this.currentLevel.init([]);\n            \n            this.vars.put(\"level\", levelCount);\n            this.vars.put(\"leftToRight\", leftToRight);\n            this.log(`Processing Level ${levelCount}. Zigzag direction: ${leftToRight ? 'L -> R' : 'R -> L'}`);\n            await this.await();\n\n            for (let i = 0; i < levelSize; i++) {\n                const node = this.queue.dequeue();\n                \n                // Visual feedback: highlight node being processed\n                this.tree.highlight(node.id, \"#00e0ff\");\n                this.log(`Popped node ${node.val} from queue.`);\n                \n                currentLevelVals.push(node.val);\n                this.currentLevel.push(node.val);\n                await this.await();\n\n                // Add children to queue for next level\n                if (node.left) {\n                    this.queue.enqueue(node.left);\n                    this.log(`Queued left child: ${node.left.val}`);\n                    await this.await();\n                }\n                if (node.right) {\n                    this.queue.enqueue(node.right);\n                    this.log(`Queued right child: ${node.right.val}`);\n                    await this.await();\n                }\n\n                // Mark node as finished\n                this.tree.highlight(node.id, \"#00f5a0\");\n            }\n\n            // Zigzag logic: if direction is right-to-left, reverse the collected array\n            let processedLevel = [...currentLevelVals];\n            if (!leftToRight) {\n                this.log(`Direction is Right-to-Left: Reversing current level values [${processedLevel}]`);\n                processedLevel.reverse();\n                this.currentLevel.init(processedLevel);\n                await this.await();\n            }\n\n            finalResult.push(processedLevel);\n            this.log(`Level ${levelCount} completed. Adding [${processedLevel}] to result.`);\n            \n            // Flip direction and increment level\n            leftToRight = !leftToRight;\n            levelCount++;\n            await this.await();\n        }\n\n        this.log(\"Traversal complete.\");\n        return finalResult;\n    }\n}"
+      }
+    }
+  ],
+  "visualHistory": []
+}

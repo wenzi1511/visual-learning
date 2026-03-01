@@ -1,0 +1,59 @@
+{
+  "chatId": "1772371607832",
+  "name": "Number of Islands",
+  "difficulty": "Medium",
+  "timestamp": 1772371607832,
+  "conversationHistory": [
+    {
+      "role": "assistant",
+      "fullResponse": {
+        "id": "number-of-islands",
+        "name": "Number of Islands",
+        "difficulty": "Medium",
+        "description": "<p>Given an <code>m x n</code> 2D binary grid <code>grid</code> which represents a map of <code>'1'</code>s (land) and <code>'0'</code>s (water), return the <em>number of islands</em>.</p><p>An <strong>island</strong> is surrounded by water and is formed by connecting adjacent lands horizontally or vertically. You may assume all four edges of the grid are all surrounded by water.</p><ul><li><code>'1'</code>: Land</li><li><code>'0'</code>: Water</li></ul>",
+        "tags": [
+          "Grid",
+          "DFS",
+          "Recursion",
+          "Matrix"
+        ],
+        "slots": [
+          {
+            "id": "grid",
+            "type": "grid",
+            "label": "Island Map"
+          },
+          {
+            "id": "visited",
+            "type": "grid",
+            "label": "Visited Cells"
+          },
+          {
+            "id": "vars",
+            "type": "hashmap",
+            "label": "Global State"
+          },
+          {
+            "id": "callstack",
+            "type": "callstack",
+            "label": "Call Stack"
+          },
+          {
+            "id": "recursionTree",
+            "type": "recursion-tree",
+            "label": "Recursion Tree"
+          }
+        ],
+        "inputs": [
+          {
+            "label": "Grid (JSON)",
+            "default": "[[\"1\",\"1\",\"0\",\"0\",\"0\"],[\"1\",\"1\",\"0\",\"0\",\"0\"],[\"0\",\"0\",\"1\",\"0\",\"0\"],[\"0\",\"0\",\"0\",\"1\",\"1\"]]",
+            "placeholder": "[[\"1\",\"0\"],[\"0\",\"1\"]]"
+          }
+        ],
+        "code": "class Playground {\n    async run(inputs) {\n        let matrix;\n        try {\n            matrix = JSON.parse(inputs[0]);\n        } catch (e) {\n            this.log(\"Invalid JSON input\");\n            return 0;\n        }\n\n        const rows = matrix.length;\n        const cols = rows > 0 ? matrix[0].length : 0;\n\n        // 1. Initialize Slots\n        this.grid.init(matrix);\n        const visitedMatrix = Array.from({ length: rows }, () => Array(cols).fill(0));\n        this.visited.init(visitedMatrix);\n        this.vars.init([[\"Island Count\", 0]]);\n        this.callstack.init();\n        this.recursionTree.init();\n\n        this.rows = rows;\n        this.cols = cols;\n        let islandCount = 0;\n\n        this.log(\"Starting scan of the grid...\");\n        await this.await();\n\n        // 2. Iterate through grid\n        for (let r = 0; r < rows; r++) {\n            for (let c = 0; c < cols; c++) {\n                this.grid.highlight(r, c, \"#ffb703\"); // Highlight current scanner position\n                \n                const cellValue = this.grid.getCell(r, c);\n                const isVisited = this.visited.getCell(r, c);\n\n                if (cellValue === \"1\" && isVisited === 0) {\n                    islandCount++;\n                    this.vars.put(\"Island Count\", islandCount);\n                    this.log(`New island found at (${r}, ${c})! Total islands: ${islandCount}`);\n                    await this.await();\n                    \n                    // Start DFS to mark entire island\n                    await this.dfs(r, c);\n                }\n                \n                this.grid.highlight(r, c, null); // Remove scanner highlight\n            }\n        }\n\n        this.log(`Algorithm complete. Final count: ${islandCount}`);\n        return islandCount;\n    }\n\n    async dfs(r, c) {\n        const nodeId = `${r}-${c}`;\n        \n        // Strict Recursion Rules\n        this.callstack.pushFrame(\"dfs\", { r, c });\n        this.recursionTree.enterNode(nodeId, `(${r},${c})`);\n\n        // Mark as visited\n        this.visited.setCell(r, c, 1);\n        this.visited.highlight(r, c, \"#00f5a0\"); // Visited color\n        this.grid.highlight(r, c, \"#00e0ff\");    // Current node color\n\n        this.log(`DFS: Visiting land at (${r}, ${c})`);\n        await this.await();\n\n        const directions = [\n            [0, 1],  // Right\n            [1, 0],  // Down\n            [0, -1], // Left\n            [-1, 0]  // Up\n        ];\n\n        for (const [dr, dc] of directions) {\n            const nr = r + dr;\n            const nc = c + dc;\n\n            // Check boundaries\n            if (nr >= 0 && nr < this.rows && nc >= 0 && nc < this.cols) {\n                const neighborVal = this.grid.getCell(nr, nc);\n                const neighborVisited = this.visited.getCell(nr, nc);\n\n                if (neighborVal === \"1\" && neighborVisited === 0) {\n                    this.log(`Moving to neighbor (${nr}, ${nc})`);\n                    await this.dfs(nr, nc);\n                }\n            }\n        }\n\n        // Backtracking / Finishing cell\n        this.grid.highlight(r, c, \"#00f5a0\"); // Keep finished land highlighted as visited\n        this.callstack.popFrame();\n        this.recursionTree.exitNode();\n    }\n}"
+      }
+    }
+  ],
+  "visualHistory": []
+}

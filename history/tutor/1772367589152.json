@@ -1,0 +1,43 @@
+{
+  "chatId": "1772367589152",
+  "name": "Visualizing Binary Search",
+  "difficulty": "Beginner",
+  "timestamp": 1772367589152,
+  "conversationHistory": [
+    {
+      "role": "user",
+      "content": "Visualize Binary Search"
+    },
+    {
+      "role": "assistant",
+      "fullResponse": {
+        "name": "Visualizing Binary Search",
+        "difficulty": "Beginner",
+        "chatResponse": "I'll guide you through how Binary Search efficiently finds a target value in a sorted array by repeatedly halving the search space. We'll track the 'low', 'high', and 'mid' pointers to see the elimination process in action.",
+        "steps": [
+          {
+            "title": "Prerequisite: Sorted Data",
+            "content": "Binary Search **requires** the input array to be sorted. This allows us to make a logical assumption: if our target is greater than the middle element, it *must* be in the right half, and vice versa. We initialize two pointers: `low` at index 0 and `high` at the last index."
+          },
+          {
+            "title": "The Midpoint Logic",
+            "content": "In each step, we calculate the middle index: `mid = floor((low + high) / 2)`. By checking this single element, we can effectively discard half of the remaining search space, leading to an efficient logarithmic time complexity of $O(\\log n)$."
+          },
+          {
+            "title": "Comparison & Narrowing",
+            "content": "1. If `arr[mid] == target`, we've found it!\n2. If `arr[mid] < target`, the target must be to the right, so we set `low = mid + 1`.\n3. If `arr[mid] > target`, the target must be to the left, so we set `high = mid - 1`."
+          }
+        ],
+        "visualType": "dsa",
+        "visualCode": "{\n  \"slots\": [\n    { \"id\": \"arr\", \"type\": \"array\", \"label\": \"Sorted Array\" }\n  ],\n  \"inputs\": [\n    { \"label\": \"Target\", \"default\": \"72\" }\n  ],\n  \"code\": \"class Playground {\\n    async run(inputs) {\\n        const target = parseInt(inputs.Target);\\n        const data = [2, 5, 8, 12, 16, 23, 38, 56, 72, 91];\\n        await this.arr.init(data);\\n        \\n        let low = 0;\\n        let high = data.length - 1;\\n\\n        while (low <= high) {\\n            // Reset colors and highlight current active range\\n            this.arr.highlightRange(0, data.length - 1, '#1e293b'); // Dark blue-gray for inactive\\n            this.arr.highlightRange(low, high, '#3b82f6'); // Vibrant blue for active\\n            this.log(`Searching in range [${low}, ${high}]`);\\n            await this.await();\\n\\n            let mid = Math.floor((low + high) / 2);\\n            this.arr.highlight(mid, '#f59e0b'); // Yellow for midpoint\\n            this.log(`Checking midpoint index ${mid} (Value: ${data[mid]})`);\\n            await this.await();\\n\\n            if (data[mid] === target) {\\n                this.arr.highlight(mid, '#10b981'); // Green for success\\n                this.log(`MATCH! Target ${target} found at index ${mid}.`);\\n                return;\\n            } else if (data[mid] < target) {\\n                this.log(`${data[mid]} < ${target}. Discarding left half.`);\\n                low = mid + 1;\\n            } else {\\n                this.log(`${data[mid]} > ${target}. Discarding right half.`);\\n                high = mid - 1;\\n            }\\n            await this.await();\\n        }\\n\\n        this.log('Target not found in the array.');\\n    }\\n}\"\n}"
+      }
+    }
+  ],
+  "visualHistory": [
+    {
+      "type": "dsa",
+      "code": "{\n  \"slots\": [\n    { \"id\": \"arr\", \"type\": \"array\", \"label\": \"Sorted Array\" }\n  ],\n  \"inputs\": [\n    { \"label\": \"Target\", \"default\": \"72\" }\n  ],\n  \"code\": \"class Playground {\\n    async run(inputs) {\\n        const target = parseInt(inputs.Target);\\n        const data = [2, 5, 8, 12, 16, 23, 38, 56, 72, 91];\\n        await this.arr.init(data);\\n        \\n        let low = 0;\\n        let high = data.length - 1;\\n\\n        while (low <= high) {\\n            // Reset colors and highlight current active range\\n            this.arr.highlightRange(0, data.length - 1, '#1e293b'); // Dark blue-gray for inactive\\n            this.arr.highlightRange(low, high, '#3b82f6'); // Vibrant blue for active\\n            this.log(`Searching in range [${low}, ${high}]`);\\n            await this.await();\\n\\n            let mid = Math.floor((low + high) / 2);\\n            this.arr.highlight(mid, '#f59e0b'); // Yellow for midpoint\\n            this.log(`Checking midpoint index ${mid} (Value: ${data[mid]})`);\\n            await this.await();\\n\\n            if (data[mid] === target) {\\n                this.arr.highlight(mid, '#10b981'); // Green for success\\n                this.log(`MATCH! Target ${target} found at index ${mid}.`);\\n                return;\\n            } else if (data[mid] < target) {\\n                this.log(`${data[mid]} < ${target}. Discarding left half.`);\\n                low = mid + 1;\\n            } else {\\n                this.log(`${data[mid]} > ${target}. Discarding right half.`);\\n                high = mid - 1;\\n            }\\n            await this.await();\\n        }\\n\\n        this.log('Target not found in the array.');\\n    }\\n}\"\n}",
+      "name": "Visualizing Binary Search"
+    }
+  ]
+}

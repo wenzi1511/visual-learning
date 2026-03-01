@@ -110,29 +110,34 @@ app.post('/api/generate', async (req, res) => {
         const currentChatId = chatId || Date.now().toString();
         const historyPath = path.join(historyDir, `${currentChatId}.json`);
 
-        // Append the new interaction to the history arrays before saving
-        const newConvoHistory = [...conversationHistory];
+        let contentToSave;
+        if (section === 'playground') {
+            contentToSave = parsedJson;
+        } else {
+            // Append the new interaction to the history arrays before saving
+            const newConvoHistory = [...conversationHistory];
 
-        // The user message is already in conversationHistory (pushed by client before fetch).
-        // If not for some reason, we would append it, but we trust the client array here.
-        // We only need to append the ASSISTANT's response to the history payload.
-        newConvoHistory.push({ role: 'assistant', fullResponse: parsedJson }); // Store rich JSON for the assistant
+            // The user message is already in conversationHistory (pushed by client before fetch).
+            // If not for some reason, we would append it, but we trust the client array here.
+            // We only need to append the ASSISTANT's response to the history payload.
+            newConvoHistory.push({ role: 'assistant', fullResponse: parsedJson }); // Store rich JSON for the assistant
 
-        const newVisualHistory = [...visualHistory];
-        if (parsedJson.visualType && parsedJson.visualCode) {
-            newVisualHistory.push({ type: parsedJson.visualType, code: parsedJson.visualCode, name: parsedJson.name || 'Visual' });
+            const newVisualHistory = [...visualHistory];
+            if (parsedJson.visualType && parsedJson.visualCode) {
+                newVisualHistory.push({ type: parsedJson.visualType, code: parsedJson.visualCode, name: parsedJson.name || 'Visual' });
+            }
+
+            contentToSave = {
+                chatId: currentChatId,
+                name: parsedJson.name || 'Untitled Generation',
+                difficulty: parsedJson.difficulty || 'Unknown',
+                timestamp: parseInt(currentChatId, 10) || Date.now(),
+                conversationHistory: newConvoHistory,
+                visualHistory: newVisualHistory
+            };
         }
 
-        const threadState = {
-            chatId: currentChatId,
-            name: parsedJson.name || 'Untitled Generation',
-            difficulty: parsedJson.difficulty || 'Unknown',
-            timestamp: parseInt(currentChatId, 10) || Date.now(),
-            conversationHistory: newConvoHistory,
-            visualHistory: newVisualHistory
-        };
-
-        fs.writeFileSync(historyPath, JSON.stringify(threadState, null, 2), 'utf-8');
+        fs.writeFileSync(historyPath, JSON.stringify(contentToSave, null, 2), 'utf-8');
 
         // Return the parsed JSON directly so the frontend doesn't have to fetch it
         res.json({

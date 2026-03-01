@@ -1,0 +1,152 @@
+{
+  "chatId": "1772370316887",
+  "name": "Root-to-Leaf Path Discovery",
+  "difficulty": "Intermediate",
+  "timestamp": 1772370316887,
+  "conversationHistory": [
+    {
+      "role": "user",
+      "content": "Visualize Binary Search"
+    },
+    {
+      "role": "assistant",
+      "content": "I will demonstrate how Binary Search works by repeatedly dividing the search space in half to find a target value in a sorted array.\nInitialization & Range Setup: Binary search begins with a **sorted array**. We initialize two pointers: `low` at the start (index 0) and `high` at the end of the array. This defines our initial search window.\nFinding the Midpoint: In each step, we calculate the middle index `mid = floor((low + high) / 2)`. We then compare the value at `arr[mid]` with our `target` value.\nHalving the Search Space: If `arr[mid]` is smaller than the target, we know the target must be in the right half, so we move `low` to `mid + 1`. If it's larger, we move `high` to `mid - 1`. If they are equal, we've found our target!\nComplexity & Efficiency: Because we discard half of the remaining elements in every step, the algorithm runs in **O(log N)** time, making it incredibly efficient for large datasets compared to a linear search.",
+      "fullResponse": {
+        "name": "Binary Search Algorithm",
+        "difficulty": "Beginner",
+        "chatResponse": "I will demonstrate how Binary Search works by repeatedly dividing the search space in half to find a target value in a sorted array.",
+        "steps": [
+          {
+            "title": "Initialization & Range Setup",
+            "content": "Binary search begins with a **sorted array**. We initialize two pointers: `low` at the start (index 0) and `high` at the end of the array. This defines our initial search window."
+          },
+          {
+            "title": "Finding the Midpoint",
+            "content": "In each step, we calculate the middle index `mid = floor((low + high) / 2)`. We then compare the value at `arr[mid]` with our `target` value."
+          },
+          {
+            "title": "Halving the Search Space",
+            "content": "If `arr[mid]` is smaller than the target, we know the target must be in the right half, so we move `low` to `mid + 1`. If it's larger, we move `high` to `mid - 1`. If they are equal, we've found our target!"
+          },
+          {
+            "title": "Complexity & Efficiency",
+            "content": "Because we discard half of the remaining elements in every step, the algorithm runs in **O(log N)** time, making it incredibly efficient for large datasets compared to a linear search."
+          }
+        ],
+        "visualType": "dsa",
+        "visualCode": "{\"slots\": [{\"id\": \"array\", \"type\": \"array\", \"label\": \"Sorted Array\"}, {\"id\": \"vars\", \"type\": \"hashmap\", \"label\": \"Variables\"}], \"inputs\": [{\"label\": \"Array (comma-separated)\", \"default\": \"2,5,8,12,16,23,38,56,72,91\"}, {\"label\": \"Target\", \"default\": \"23\"}], \"code\": \"class Playground {\\n    async run(inputs) {\\n        const arr = inputs[0].split(',').map(num => parseInt(num.trim()));\\n        const target = parseInt(inputs[1]);\\n        \\n        await this.array.init(arr);\\n        await this.vars.init([['low', 0], ['high', arr.length - 1], ['mid', 'n/a']]);\\n        \\n        let low = 0;\\n        let high = arr.length - 1;\\n        \\n        while (low <= high) {\\n            this.vars.put('low', low);\\n            this.vars.put('high', high);\\n            this.array.highlightRange(low, high, '#3b82f6');\\n            this.log(`Searching in range [${low}, ${high}]`);\\n            await this.await();\\n            \\n            let mid = Math.floor((low + high) / 2);\\n            this.vars.put('mid', mid);\\n            this.array.highlight(mid, '#f59e0b');\\n            this.log(`Midpoint calculated at index ${mid} (Value: ${arr[mid]})`);\\n            await this.await();\\n            \\n            if (arr[mid] === target) {\\n                this.array.highlight(mid, '#10b981');\\n                this.log(`Found target ${target} at index ${mid}!`);\\n                await this.await();\\n                return mid;\\n            }\\n            \\n            if (arr[mid] < target) {\\n                this.log(`${arr[mid]} is less than ${target}. Target must be in the right half.`);\\n                low = mid + 1;\\n            } else {\\n                this.log(`${arr[mid]} is greater than ${target}. Target must be in the left half.`);\\n                high = mid - 1;\\n            }\\n            \\n            // Clear previous highlights for next iteration\\n            for (let i = 0; i < arr.length; i++) this.array.highlight(i, null);\\n            await this.await();\\n        }\\n        \\n        this.log('Target not found in the array.');\\n        return -1;\\n    }\\n}\"}"
+      }
+    },
+    {
+      "role": "user",
+      "content": "Container with the most water problem"
+    },
+    {
+      "role": "assistant",
+      "fullResponse": {
+        "name": "Container With Most Water",
+        "difficulty": "Intermediate",
+        "chatResponse": "I'll demonstrate the Two-Pointer technique to solve the Container With Most Water problem efficiently in linear time.",
+        "steps": [
+          {
+            "title": "Problem Logic",
+            "content": "The goal is to find two vertical lines that, together with the x-axis, form a container that holds the most water. The area is defined by the distance between the lines (width) multiplied by the height of the shorter line: `Area = width * min(height[left], height[right])`."
+          },
+          {
+            "title": "Two-Pointer Strategy",
+            "content": "We start with two pointers at the extreme ends of the array. To maximize the area, we need to find a balance between a large width and tall heights. Since moving either pointer inward **always** decreases the width, we only move the pointer that points to the **shorter** line, hoping to find a taller line that compensates for the lost width."
+          },
+          {
+            "title": "Optimization Insight",
+            "content": "By always moving the shorter pointer, we prune search spaces that definitely cannot yield a larger area than our current maximum. This reduces the search from $O(N^2)$ (checking every pair) to $O(N)$ (a single pass)."
+          }
+        ],
+        "visualType": "dsa",
+        "visualCode": "{\n  \"slots\": [\n    { \"id\": \"heights\", \"type\": \"array\", \"label\": \"Heights (Bar Chart)\", \"display\": \"bar\" },\n    { \"id\": \"vars\", \"type\": \"hashmap\", \"label\": \"State Variables\" }\n  ],\n  \"inputs\": [\n    { \"label\": \"Heights (comma separated)\", \"default\": \"1,8,6,2,5,4,8,3,7\" }\n  ],\n  \"code\": \"class Playground {\\n  async run(inputs) {\\n    const h = inputs[0].split(',').map(Number);\\n    await this.heights.init(h);\\n    await this.vars.init([\\n      [\\\"left\\\", 0],\\n      [\\\"right\\\", h.length - 1],\\n      [\\\"maxArea\\\", 0],\\n      [\\\"currentArea\\\", 0]\\n    ]);\\n\\n    let left = 0;\\n    let right = h.length - 1;\\n    let maxArea = 0;\\n\\n    while (left < right) {\\n      // Highlight the two bars being considered\\n      this.heights.highlight(left, \\\"#00e0ff\\\");\\n      this.heights.highlight(right, \\\"#ffb703\\\");\\n\\n      const hL = h[left];\\n      const hR = h[right];\\n      const width = right - left;\\n      const currentArea = Math.min(hL, hR) * width;\\n\\n      if (currentArea > maxArea) {\\n        maxArea = currentArea;\\n      }\\n\\n      this.vars.put(\\\"left\\\", left);\\n      this.vars.put(\\\"right\\\", right);\\n      this.vars.put(\\\"currentArea\\\", currentArea);\\n      this.vars.put(\\\"maxArea\\\", maxArea);\\n\\n      this.log(`Left height: ${hL}, Right height: ${hR}. Width: ${width}. Area: ${currentArea}`);\\n      await this.await();\\n\\n      this.heights.highlight(left, null);\\n      this.heights.highlight(right, null);\\n\\n      // Greedy step: Move the shorter pointer\\n      if (hL < hR) {\\n        this.log(`Left wall (${hL}) is shorter than Right wall (${hR}). Moving Left pointer right.`);\\n        left++;\\n      } else {\\n        this.log(`Right wall (${hR}) is shorter than or equal to Left wall (${hL}). Moving Right pointer left.`);\\n        right--;\\n      }\\n    }\\n\\n    this.log(`Search complete. Maximum area found: ${maxArea}`);\\n    return maxArea;\\n  }\\n}\"\n}"
+      }
+    },
+    {
+      "role": "user",
+      "content": "Reverse a Singly Linked List"
+    },
+    {
+      "role": "assistant",
+      "content": "I'll demonstrate how to reverse a singly linked list in-place by redirecting each node's next pointer using a three-pointer iterative approach.\nInitialization of Pointers: To reverse the list without losing data, we need three pointers: `prev` (initially `null`), `curr` (initially `head`), and a temporary `next` pointer. `prev` tracks the node that will become the new 'next' for our current node.\nChanging Direction: At each node, we first save the `curr.next` reference so we don't lose the rest of the list. Then, we perform the core reversal step: `curr.next = prev`. This flips the arrow to point backwards.\nIterative Progression: After reversing the current link, we move the entire window forward: `prev` becomes the current node, and `curr` moves to the saved `next` node. We repeat this until `curr` is `null`.\nCompleting the Reversal: Once the loop finishes, the `prev` pointer will be resting on the last node of the original list, which is now the new head of our reversed list. The original head's next pointer now correctly points to `null`.",
+      "fullResponse": {
+        "name": "Reversing a Singly Linked List",
+        "difficulty": "Intermediate",
+        "chatResponse": "I'll demonstrate how to reverse a singly linked list in-place by redirecting each node's next pointer using a three-pointer iterative approach.",
+        "steps": [
+          {
+            "title": "Initialization of Pointers",
+            "content": "To reverse the list without losing data, we need three pointers: `prev` (initially `null`), `curr` (initially `head`), and a temporary `next` pointer. `prev` tracks the node that will become the new 'next' for our current node."
+          },
+          {
+            "title": "Changing Direction",
+            "content": "At each node, we first save the `curr.next` reference so we don't lose the rest of the list. Then, we perform the core reversal step: `curr.next = prev`. This flips the arrow to point backwards."
+          },
+          {
+            "title": "Iterative Progression",
+            "content": "After reversing the current link, we move the entire window forward: `prev` becomes the current node, and `curr` moves to the saved `next` node. We repeat this until `curr` is `null`."
+          },
+          {
+            "title": "Completing the Reversal",
+            "content": "Once the loop finishes, the `prev` pointer will be resting on the last node of the original list, which is now the new head of our reversed list. The original head's next pointer now correctly points to `null`."
+          }
+        ],
+        "visualType": "dsa",
+        "visualCode": "{\n  \"slots\": [\n    { \"id\": \"list\", \"type\": \"sll\", \"label\": \"Singly Linked List\" },\n    { \"id\": \"vars\", \"type\": \"hashmap\", \"label\": \"Pointers & State\" }\n  ],\n  \"inputs\": [\n    { \"label\": \"List Values\", \"default\": \"1,2,3,4,5\" }\n  ],\n  \"code\": \"class Playground {\\n  async run(inputs) {\\n    const vals = inputs[0].split(',').map(v => v.trim());\\n    await this.list.init(vals);\\n    await this.vars.init([]);\\n\\n    let prevId = null;\\n    let currId = this.list.getHeadId();\\n\\n    this.list.createPointer('curr', currId, '#00e0ff');\\n    this.vars.put('prev', 'null');\\n    this.log('Starting reversal. prev is null, curr is at head.');\\n    await this.await();\\n\\n    while (currId !== null) {\\n      // 1. Save next\\n      let nextId = this.list.getNextId(currId);\\n      this.vars.put('next', nextId || 'null');\\n      this.log('Step 1: Save the next node reference.');\\n      await this.await();\\n\\n      // 2. Reverse the link\\n      this.log('Step 2: Reverse the pointer (curr.next = prev).');\\n      this.list.unlink(currId, 'next');\\n      if (prevId !== null) {\\n        this.list.link(currId, prevId, 'next');\\n      }\\n      this.list.highlightNode(currId, '#00f5a0');\\n      await this.await();\\n\\n      // 3. Move pointers forward\\n      this.log('Step 3: Move prev and curr forward.');\\n      prevId = currId;\\n      currId = nextId;\\n\\n      this.vars.put('prev', prevId);\\n      if (currId) {\\n        this.list.movePointer('curr', currId);\\n      } else {\\n        this.list.removePointer('curr');\\n      }\\n      await this.await();\\n    }\\n\\n    this.log('Reversal complete! The list is now fully reversed.');\\n    return 'New Head ID: ' + prevId;\\n  }\\n}\"\n}"
+      }
+    },
+    {
+      "role": "user",
+      "content": "Binary Tree all root to leaf node paths"
+    },
+    {
+      "role": "assistant",
+      "fullResponse": {
+        "name": "Root-to-Leaf Path Discovery",
+        "difficulty": "Intermediate",
+        "chatResponse": "I'll demonstrate how to find all paths from the root to the leaf nodes using a Depth-First Search (DFS) traversal combined with a backtracking strategy.",
+        "steps": [
+          {
+            "title": "Depth-First Exploration",
+            "content": "We use **DFS** to explore the tree. Starting from the root, we travel as deep as possible along each branch before backtracking. This ensures we visit every possible path from the top to the bottom."
+          },
+          {
+            "title": "Path Tracking & Backtracking",
+            "content": "As we descend, we add the current node's value to a `path` list. Once we reach a **leaf node** (a node with no children), we record the completed path. When we move back up to a parent node, we **pop** the last element from our list to explore other branches."
+          },
+          {
+            "title": "Identifying Leaf Nodes",
+            "content": "A path is only complete when we hit a leaf. In the visualization, you'll see nodes turn green when a leaf is identified and the path is added to our final results array."
+          }
+        ],
+        "visualType": "dsa",
+        "visualCode": "{\n  \"slots\": [\n    { \"id\": \"tree\", \"type\": \"binary_tree\", \"label\": \"Binary Tree\" },\n    { \"id\": \"path\", \"type\": \"array\", \"label\": \"Current Path\" },\n    { \"id\": \"results\", \"type\": \"array\", \"label\": \"All Found Paths\" },\n    { \"id\": \"callstack\", \"type\": \"callstack\", \"label\": \"DFS Call Stack\" },\n    { \"id\": \"recursionTree\", \"type\": \"recursion_tree\", \"label\": \"Recursion Visualization\" }\n  ],\n  \"inputs\": [\n    { \"label\": \"Tree Array (LeetCode format)\", \"default\": \"[1, 2, 3, null, 5, 6]\" }\n  ],\n  \"code\": \"class Playground {\\n  async run(inputs) {\\n    const vals = JSON.parse(inputs[0] || '[1, 2, 3, null, 5, 6]');\\n    this.tree.init(vals);\\n    this.path.init([]);\\n    this.results.init([]);\\n    this.callstack.init();\\n    this.recursionTree.init();\\n\\n    const root = this.tree.getRoot();\\n    if (!root) return [];\\n\\n    await this.dfs(root);\\n    return this.results.getValues();\\n  }\\n\\n  async dfs(node) {\\n    if (!node) return;\\n\\n    const nodeId = node.id;\\n    const nodeVal = node.val;\\n\\n    this.callstack.pushFrame('dfs', { node: nodeVal });\\n    this.recursionTree.enterNode(nodeId, `Node ${nodeVal}`);\\n    this.tree.highlight(nodeId, '#00e0ff');\\n    this.path.push(nodeVal);\\n    \\n    this.log(`Visiting node ${nodeVal}. Current path: ${this.path.getValues().join(' -> ')}`);\\n    await this.await();\\n\\n    const isLeaf = !node.left && !node.right;\\n\\n    if (isLeaf) {\\n      const fullPath = this.path.getValues().join('->');\\n      this.results.push(fullPath);\\n      this.log(`Leaf reached! Recorded path: ${fullPath}`);\\n      this.tree.highlight(nodeId, '#00f5a0');\\n      await this.await();\\n    } else {\\n      if (node.left) {\\n        await this.dfs(node.left);\\n      }\\n      if (node.right) {\\n        await this.dfs(node.right);\\n      }\\n    }\\n\\n    this.path.pop();\\n    this.tree.highlight(nodeId, null);\\n    this.log(`Backtracking from node ${nodeVal}`);\\n    this.recursionTree.exitNode();\\n    this.callstack.popFrame();\\n    await this.await();\\n  }\\n}\"\n}"
+      }
+    }
+  ],
+  "visualHistory": [
+    {
+      "type": "dsa",
+      "code": "{\"slots\": [{\"id\": \"array\", \"type\": \"array\", \"label\": \"Sorted Array\"}, {\"id\": \"vars\", \"type\": \"hashmap\", \"label\": \"Variables\"}], \"inputs\": [{\"label\": \"Array (comma-separated)\", \"default\": \"2,5,8,12,16,23,38,56,72,91\"}, {\"label\": \"Target\", \"default\": \"23\"}], \"code\": \"class Playground {\\n    async run(inputs) {\\n        const arr = inputs[0].split(',').map(num => parseInt(num.trim()));\\n        const target = parseInt(inputs[1]);\\n        \\n        await this.array.init(arr);\\n        await this.vars.init([['low', 0], ['high', arr.length - 1], ['mid', 'n/a']]);\\n        \\n        let low = 0;\\n        let high = arr.length - 1;\\n        \\n        while (low <= high) {\\n            this.vars.put('low', low);\\n            this.vars.put('high', high);\\n            this.array.highlightRange(low, high, '#3b82f6');\\n            this.log(`Searching in range [${low}, ${high}]`);\\n            await this.await();\\n            \\n            let mid = Math.floor((low + high) / 2);\\n            this.vars.put('mid', mid);\\n            this.array.highlight(mid, '#f59e0b');\\n            this.log(`Midpoint calculated at index ${mid} (Value: ${arr[mid]})`);\\n            await this.await();\\n            \\n            if (arr[mid] === target) {\\n                this.array.highlight(mid, '#10b981');\\n                this.log(`Found target ${target} at index ${mid}!`);\\n                await this.await();\\n                return mid;\\n            }\\n            \\n            if (arr[mid] < target) {\\n                this.log(`${arr[mid]} is less than ${target}. Target must be in the right half.`);\\n                low = mid + 1;\\n            } else {\\n                this.log(`${arr[mid]} is greater than ${target}. Target must be in the left half.`);\\n                high = mid - 1;\\n            }\\n            \\n            // Clear previous highlights for next iteration\\n            for (let i = 0; i < arr.length; i++) this.array.highlight(i, null);\\n            await this.await();\\n        }\\n        \\n        this.log('Target not found in the array.');\\n        return -1;\\n    }\\n}\"}",
+      "name": "Binary Search Algorithm"
+    },
+    {
+      "type": "dsa",
+      "code": "{\n  \"slots\": [\n    { \"id\": \"heights\", \"type\": \"array\", \"label\": \"Heights (Bar Chart)\", \"display\": \"bar\" },\n    { \"id\": \"vars\", \"type\": \"hashmap\", \"label\": \"State Variables\" }\n  ],\n  \"inputs\": [\n    { \"label\": \"Heights (comma separated)\", \"default\": \"1,8,6,2,5,4,8,3,7\" }\n  ],\n  \"code\": \"class Playground {\\n  async run(inputs) {\\n    const h = inputs[0].split(',').map(Number);\\n    await this.heights.init(h);\\n    await this.vars.init([\\n      [\\\"left\\\", 0],\\n      [\\\"right\\\", h.length - 1],\\n      [\\\"maxArea\\\", 0],\\n      [\\\"currentArea\\\", 0]\\n    ]);\\n\\n    let left = 0;\\n    let right = h.length - 1;\\n    let maxArea = 0;\\n\\n    while (left < right) {\\n      // Highlight the two bars being considered\\n      this.heights.highlight(left, \\\"#00e0ff\\\");\\n      this.heights.highlight(right, \\\"#ffb703\\\");\\n\\n      const hL = h[left];\\n      const hR = h[right];\\n      const width = right - left;\\n      const currentArea = Math.min(hL, hR) * width;\\n\\n      if (currentArea > maxArea) {\\n        maxArea = currentArea;\\n      }\\n\\n      this.vars.put(\\\"left\\\", left);\\n      this.vars.put(\\\"right\\\", right);\\n      this.vars.put(\\\"currentArea\\\", currentArea);\\n      this.vars.put(\\\"maxArea\\\", maxArea);\\n\\n      this.log(`Left height: ${hL}, Right height: ${hR}. Width: ${width}. Area: ${currentArea}`);\\n      await this.await();\\n\\n      this.heights.highlight(left, null);\\n      this.heights.highlight(right, null);\\n\\n      // Greedy step: Move the shorter pointer\\n      if (hL < hR) {\\n        this.log(`Left wall (${hL}) is shorter than Right wall (${hR}). Moving Left pointer right.`);\\n        left++;\\n      } else {\\n        this.log(`Right wall (${hR}) is shorter than or equal to Left wall (${hL}). Moving Right pointer left.`);\\n        right--;\\n      }\\n    }\\n\\n    this.log(`Search complete. Maximum area found: ${maxArea}`);\\n    return maxArea;\\n  }\\n}\"\n}",
+      "name": "Container With Most Water"
+    },
+    {
+      "type": "dsa",
+      "code": "{\n  \"slots\": [\n    { \"id\": \"list\", \"type\": \"sll\", \"label\": \"Singly Linked List\" },\n    { \"id\": \"vars\", \"type\": \"hashmap\", \"label\": \"Pointers & State\" }\n  ],\n  \"inputs\": [\n    { \"label\": \"List Values\", \"default\": \"1,2,3,4,5\" }\n  ],\n  \"code\": \"class Playground {\\n  async run(inputs) {\\n    const vals = inputs[0].split(',').map(v => v.trim());\\n    await this.list.init(vals);\\n    await this.vars.init([]);\\n\\n    let prevId = null;\\n    let currId = this.list.getHeadId();\\n\\n    this.list.createPointer('curr', currId, '#00e0ff');\\n    this.vars.put('prev', 'null');\\n    this.log('Starting reversal. prev is null, curr is at head.');\\n    await this.await();\\n\\n    while (currId !== null) {\\n      // 1. Save next\\n      let nextId = this.list.getNextId(currId);\\n      this.vars.put('next', nextId || 'null');\\n      this.log('Step 1: Save the next node reference.');\\n      await this.await();\\n\\n      // 2. Reverse the link\\n      this.log('Step 2: Reverse the pointer (curr.next = prev).');\\n      this.list.unlink(currId, 'next');\\n      if (prevId !== null) {\\n        this.list.link(currId, prevId, 'next');\\n      }\\n      this.list.highlightNode(currId, '#00f5a0');\\n      await this.await();\\n\\n      // 3. Move pointers forward\\n      this.log('Step 3: Move prev and curr forward.');\\n      prevId = currId;\\n      currId = nextId;\\n\\n      this.vars.put('prev', prevId);\\n      if (currId) {\\n        this.list.movePointer('curr', currId);\\n      } else {\\n        this.list.removePointer('curr');\\n      }\\n      await this.await();\\n    }\\n\\n    this.log('Reversal complete! The list is now fully reversed.');\\n    return 'New Head ID: ' + prevId;\\n  }\\n}\"\n}",
+      "name": "Reversing a Singly Linked List"
+    },
+    {
+      "type": "dsa",
+      "code": "{\n  \"slots\": [\n    { \"id\": \"tree\", \"type\": \"binary_tree\", \"label\": \"Binary Tree\" },\n    { \"id\": \"path\", \"type\": \"array\", \"label\": \"Current Path\" },\n    { \"id\": \"results\", \"type\": \"array\", \"label\": \"All Found Paths\" },\n    { \"id\": \"callstack\", \"type\": \"callstack\", \"label\": \"DFS Call Stack\" },\n    { \"id\": \"recursionTree\", \"type\": \"recursion_tree\", \"label\": \"Recursion Visualization\" }\n  ],\n  \"inputs\": [\n    { \"label\": \"Tree Array (LeetCode format)\", \"default\": \"[1, 2, 3, null, 5, 6]\" }\n  ],\n  \"code\": \"class Playground {\\n  async run(inputs) {\\n    const vals = JSON.parse(inputs[0] || '[1, 2, 3, null, 5, 6]');\\n    this.tree.init(vals);\\n    this.path.init([]);\\n    this.results.init([]);\\n    this.callstack.init();\\n    this.recursionTree.init();\\n\\n    const root = this.tree.getRoot();\\n    if (!root) return [];\\n\\n    await this.dfs(root);\\n    return this.results.getValues();\\n  }\\n\\n  async dfs(node) {\\n    if (!node) return;\\n\\n    const nodeId = node.id;\\n    const nodeVal = node.val;\\n\\n    this.callstack.pushFrame('dfs', { node: nodeVal });\\n    this.recursionTree.enterNode(nodeId, `Node ${nodeVal}`);\\n    this.tree.highlight(nodeId, '#00e0ff');\\n    this.path.push(nodeVal);\\n    \\n    this.log(`Visiting node ${nodeVal}. Current path: ${this.path.getValues().join(' -> ')}`);\\n    await this.await();\\n\\n    const isLeaf = !node.left && !node.right;\\n\\n    if (isLeaf) {\\n      const fullPath = this.path.getValues().join('->');\\n      this.results.push(fullPath);\\n      this.log(`Leaf reached! Recorded path: ${fullPath}`);\\n      this.tree.highlight(nodeId, '#00f5a0');\\n      await this.await();\\n    } else {\\n      if (node.left) {\\n        await this.dfs(node.left);\\n      }\\n      if (node.right) {\\n        await this.dfs(node.right);\\n      }\\n    }\\n\\n    this.path.pop();\\n    this.tree.highlight(nodeId, null);\\n    this.log(`Backtracking from node ${nodeVal}`);\\n    this.recursionTree.exitNode();\\n    this.callstack.popFrame();\\n    await this.await();\\n  }\\n}\"\n}",
+      "name": "Root-to-Leaf Path Discovery"
+    }
+  ]
+}
