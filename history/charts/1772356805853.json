@@ -1,0 +1,69 @@
+{
+  "id": "dsa-platform-comparison-2024",
+  "name": "DSA Platform Difficulty Analysis",
+  "difficulty": "Data Analytics",
+  "description": "This interactive bar chart provides a comparative analysis of major coding platforms used for <b>Data Structures and Algorithms (DSA)</b> practice. The difficulty rating (scaled 1-10) is derived from community consensus regarding problem complexity, mathematical requirements, and time constraints. <br><br><b>Key Insights:</b><ul><li><b>Codeforces & AtCoder:</b> Dominate the high-difficulty spectrum, focusing heavily on competitive programming and advanced mathematical logic.</li><li><b>LeetCode:</b> Positioned as the industry standard for interview preparation, balancing algorithmic rigor with practical application.</li><li><b>HackerRank:</b> Serves as an excellent entry point for beginners, focusing on foundational syntax and basic logic.</li></ul>",
+  "tags": [
+    "DSA",
+    "Programming",
+    "Education",
+    "Comparative Analysis"
+  ],
+  "dataGenerationCode": "const platforms = ['HackerRank', 'GeeksforGeeks', 'LeetCode', 'CodeChef', 'AtCoder', 'Codeforces'];\nconst difficulty = [4.8, 5.9, 7.6, 8.4, 9.1, 9.7];\nconst colors = [\n  '#10b981', // Emerald\n  '#3b82f6', // Blue\n  '#f59e0b', // Amber\n  '#ef4444', // Red\n  '#8b5cf6', // Violet\n  '#ec4899'  // Pink\n];\n\nreturn [{\n  x: platforms,\n  y: difficulty,\n  type: 'bar',\n  marker: {\n    color: colors,\n    line: {\n      width: 2,\n      color: '#1e293b'\n    }\n  },\n  text: difficulty.map(v => v + ' / 10'),\n  textposition: 'outside',\n  cliponaxis: false,\n  hovertemplate: '<b>%{x}</b><br>Difficulty: %{y}/10<extra></extra>'\n}];",
+  "plotLayout": {
+    "title": "DSA Platform Difficulty Index",
+    "autosize": true,
+    "paper_bgcolor": "rgba(0,0,0,0)",
+    "plot_bgcolor": "rgba(0,0,0,0)",
+    "font": {
+      "color": "#cbd5e1",
+      "family": "Inter, sans-serif"
+    },
+    "xaxis": {
+      "title": "Practice Platform",
+      "gridcolor": "#334155",
+      "zerolinecolor": "#475569",
+      "showgrid": false,
+      "zeroline": true,
+      "showticklabels": true
+    },
+    "yaxis": {
+      "title": "Complexity Score (1-10)",
+      "gridcolor": "#1e293b",
+      "zerolinecolor": "#475569",
+      "showgrid": true,
+      "zeroline": true,
+      "range": [
+        0,
+        11
+      ],
+      "dtick": 2
+    },
+    "shapes": [
+      {
+        "type": "line",
+        "x0": -0.5,
+        "y0": 7.5,
+        "x1": 5.5,
+        "y1": 7.5,
+        "line": {
+          "color": "rgba(255, 255, 255, 0.3)",
+          "width": 2,
+          "dash": "dash"
+        }
+      }
+    ],
+    "annotations": [
+      {
+        "x": 0.5,
+        "y": 8,
+        "text": "FAANG Interview Threshold",
+        "showarrow": false,
+        "font": {
+          "size": 11,
+          "color": "#94a3b8"
+        }
+      }
+    ]
+  }
+}

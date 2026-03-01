@@ -1,0 +1,14 @@
+{
+  "id": "rcnn-detailed-architecture",
+  "name": "R-CNN: Region-based Convolutional Neural Networks",
+  "difficulty": "Advanced",
+  "description": "<h3>Architecture Overview</h3><p>R-CNN (Regions with CNN features) revolutionized object detection by combining region proposals with deep convolutional neural networks. The process involves four main stages: <strong>Region Proposal</strong> (generating candidate boxes), <strong>Feature Extraction</strong> (extracting attributes via CNN), <strong>Classification</strong> (identifying objects via SVM), and <strong>Bounding Box Regression</strong> (refining object location).</p><h4>Key Components:</h4><ul><li><strong>Selective Search:</strong> A grouping algorithm that finds likely object locations.</li><li><strong>Warping:</strong> Resizes variable-sized regions into a fixed input size (224x224) for the CNN.</li><li><strong>CNN:</strong> Acts as a feature extractor, producing a high-dimensional vector.</li><li><strong>Linear SVMs:</strong> One per category to classify the extracted features.</li><li><strong>Bbox Regressor:</strong> A linear model that learns to shift and scale the proposal to fit the ground truth better.</li></ul>",
+  "tags": [
+    "Computer Vision",
+    "Deep Learning",
+    "Object Detection",
+    "CNN",
+    "R-CNN"
+  ],
+  "code": "graph TD\n  Start[Input Image] --> SS[Selective Search Algorithm]\n  SS --> |~2000 Proposals| ROI[Region Proposals / ROIs]\n  ROI --> Warp[Warping & Resizing - 224x224]\n  Warp --> CNN[Deep CNN - Feature Extractor]\n  CNN --> Features[Feature Vector - 4096-d]\n\n  subgraph DetectionHead [Classification & Refinement Stage]\n    Features --> SVM[Linear SVMs - Class Specific]\n    Features --> BBR[Bounding Box Regressors]\n  end\n\n  SVM --> Out1[Class Labels]\n  BBR --> Out2[Refined Bounding Boxes]\n  \n  Out1 --> Final[Non-Maximum Suppression]\n  Out2 --> Final\n  Final --> End[Final Detected Objects]\n\n  style DetectionHead fill:none,stroke:#64748b,stroke-width:2px,stroke-dasharray: 5 5\n  classDef default fill:#ffffff,stroke:#334155,stroke-width:2px,color:#000000\n  classDef highlight fill:#e2e8f0,stroke:#1e293b,stroke-width:2px,color:#000000\n  class Start,End highlight"
+}

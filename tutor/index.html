@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Tutor - Unified Visual Learning</title>
     <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Fira+Code:wght@400;500&display=swap"
         rel="stylesheet">
 
     <!-- Unified Imports: Architecture, Science, Charts, Math -->
@@ -20,19 +20,39 @@
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
 
     <style>
+        /* ═══════════════════════════════════════════════
+           DESIGN TOKENS
+           ═══════════════════════════════════════════════ */
         :root {
-            --bg-body: #0f172a;
-            --bg-panel: #1e293b;
+            --bg-body: #0a0e1a;
+            --bg-panel: #111827;
+            --bg-surface: #1a2236;
+            --bg-elevated: #1f2b3f;
             --text-main: #f1f5f9;
-            --text-sub: #94a3b8;
-            --border: rgba(100, 116, 139, 0.3);
-            --border-hover: rgba(148, 163, 184, 0.4);
+            --text-sub: #8b9dc3;
+            --text-muted: #5a6a8a;
+            --border: rgba(100, 116, 139, 0.15);
+            --border-hover: rgba(148, 163, 184, 0.3);
 
-            /* Gradient Accents */
-            --accent-gradient: linear-gradient(135deg, #3b82f6, #8b5cf6);
-            --accent-subtle: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1));
+            /* Accents */
+            --accent-primary: #6366f1;
+            --accent-secondary: #a855f7;
+            --accent-gradient: linear-gradient(135deg, #6366f1, #a855f7);
+            --accent-glow: rgba(99, 102, 241, 0.15);
+            --user-gradient: linear-gradient(135deg, #3b82f6, #6366f1);
+            --user-glow: rgba(59, 130, 246, 0.12);
+
+            /* Sizing */
+            --chat-width: 480px;
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
         }
 
+        /* ═══════════════════════════════════════════════
+           RESET & BASE
+           ═══════════════════════════════════════════════ */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -44,203 +64,612 @@
             background-color: var(--bg-body);
             color: var(--text-main);
             min-height: 100vh;
-            padding: 20px 24px;
-            overflow-x: hidden;
-            background-image: radial-gradient(var(--border) 1px, transparent 1px);
-            background-size: 24px 24px;
+            overflow: hidden;
             display: flex;
             flex-direction: column;
         }
 
-        .header-flex {
-            display: grid;
-            grid-template-columns: auto 1fr auto;
-            align-items: center;
-            margin-bottom: 24px;
-            max-width: 1800px;
-            margin: 0 auto 24px auto;
-            width: 100%;
+        /* Subtle animated background grain */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                radial-gradient(ellipse at 20% 50%, rgba(99, 102, 241, 0.04) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, rgba(168, 85, 247, 0.03) 0%, transparent 50%),
+                radial-gradient(rgba(100, 116, 139, 0.06) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 100%, 20px 20px;
+            pointer-events: none;
+            z-index: 0;
         }
 
-        .home-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 36px;
-            height: 36px;
-            border-radius: 10px;
-            background: var(--bg-panel);
-            border: 1px solid var(--border);
-            color: var(--text-sub);
-            transition: all 0.25s ease;
-            text-decoration: none;
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 5px;
         }
 
-        .home-btn:hover {
-            color: #f8fafc;
-            border-color: #64748b;
-        }
-
-        h1 {
-            text-align: center;
-            font-size: 1.8rem;
-            font-weight: 900;
-            background: linear-gradient(135deg, #f8fafc, #94a3b8);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-            letter-spacing: -1px;
-        }
-
-        .tutor-layout {
-            display: grid;
-            grid-template-columns: 450px 1fr;
-            gap: 24px;
-            flex: 1;
-            max-width: 1800px;
-            margin: 0 auto;
-            width: 100%;
-            height: calc(100vh - 100px);
-        }
-
-        /* LEFT: CHAT PANEL */
-        .chat-column {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-            height: 100%;
-        }
-
-        .prompt-container {
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            background: rgba(30, 41, 59, 0.4);
-            border-radius: 12px;
-            padding: 16px 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-            position: relative;
-        }
-
-        .prompt-input {
-            width: 100%;
+        ::-webkit-scrollbar-track {
             background: transparent;
-            border: none;
-            color: #f8fafc;
-            font-family: 'Inter', sans-serif;
-            font-size: 1rem;
-            resize: none;
-            outline: none;
-            line-height: 1.5;
-            padding-bottom: 24px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         }
 
-        .prompt-input::placeholder {
-            color: #64748b;
-            font-weight: 500;
+        ::-webkit-scrollbar-thumb {
+            background: rgba(99, 102, 241, 0.25);
+            border-radius: 10px;
         }
 
-        .btn-send {
-            padding: 8px 16px;
-            background: linear-gradient(135deg, #6366f1, #a855f7);
-            color: #fff;
-            border: none;
-            border-radius: 8px;
-            font-weight: 500;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(99, 102, 241, 0.45);
+        }
+
+        /* ═══════════════════════════════════════════════
+           HEADER
+           ═══════════════════════════════════════════════ */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 24px;
+            background: rgba(17, 24, 39, 0.8);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border);
+            position: relative;
+            z-index: 10;
+        }
+
+        .header-left,
+        .header-right {
             display: flex;
             align-items: center;
             gap: 8px;
         }
 
-        .btn-send:hover {
-            filter: brightness(1.1);
+        .header-title {
+            font-size: 1.15rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #f8fafc 10%, #94a3b8 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
         }
 
-        .chat-history {
+        .header-badge {
+            font-size: 0.65rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 3px 8px;
+            border-radius: 6px;
+            background: var(--accent-gradient);
+            color: #fff;
+            margin-left: 10px;
+        }
+
+        .icon-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius-sm);
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-sub);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+
+        .icon-btn:hover {
+            background: var(--bg-surface);
+            color: #f8fafc;
+            border-color: var(--border-hover);
+        }
+
+        /* ═══════════════════════════════════════════════
+           MAIN LAYOUT
+           ═══════════════════════════════════════════════ */
+        .tutor-layout {
+            display: grid;
+            grid-template-columns: var(--chat-width) 1fr;
             flex: 1;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            /* Softer outer border */
-            background: rgba(15, 23, 42, 0.4);
-            /* Deeper background */
-            border-radius: 12px;
-            padding: 24px;
-            overflow-y: auto;
+            overflow: hidden;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ═══════════════════════════════════════════════
+           CHAT COLUMN
+           ═══════════════════════════════════════════════ */
+        .chat-column {
             display: flex;
             flex-direction: column;
-            gap: 24px;
+            height: 100%;
+            border-right: 1px solid var(--border);
+            background: rgba(17, 24, 39, 0.5);
         }
 
-        .chat-bubble {
-            border-radius: 12px;
-            padding: 18px 22px;
-            color: #e2e8f0;
-            /* Softer text color */
-            font-size: 0.95rem;
-            line-height: 1.7;
+        /* ── Settings Toggle Bar ── */
+        .settings-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 20px;
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            transition: background 0.2s ease;
+            user-select: none;
         }
 
-        .chat-bubble.ai-response {
-            background: rgba(30, 41, 59, 0.6);
-            /* Muted slate background */
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-left: 3px solid #a855f7;
-            /* Very subtle thin purple strip */
-            align-self: flex-start;
-            max-width: 90%;
+        .settings-bar:hover {
+            background: rgba(99, 102, 241, 0.04);
         }
 
-        .chat-bubble.user-msg {
-            background: rgba(59, 130, 246, 0.15);
-            /* Very muted blue tint */
-            border: 1px solid rgba(59, 130, 246, 0.3);
-            /* Subtle blue border */
-            align-self: flex-end;
+        .settings-bar-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-sub);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .settings-bar-label svg {
+            opacity: 0.5;
+        }
+
+        .settings-chevron {
+            transition: transform 0.3s ease;
+            color: var(--text-muted);
+        }
+
+        .settings-chevron.open {
+            transform: rotate(180deg);
+        }
+
+        /* ── Settings Panel (Collapsible) ── */
+        .settings-panel {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1), padding 0.35s ease;
+            padding: 0 20px;
+            border-bottom: 1px solid transparent;
+            background: rgba(10, 14, 26, 0.4);
+        }
+
+        .settings-panel.open {
+            max-height: 200px;
+            padding: 16px 20px;
+            border-bottom-color: var(--border);
+        }
+
+        .settings-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .settings-field {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .settings-field.full {
+            grid-column: 1 / -1;
+        }
+
+        .settings-label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .settings-input {
+            background: var(--bg-surface);
+            color: var(--text-main);
+            border: 1px solid var(--border);
+            padding: 8px 12px;
+            border-radius: var(--radius-sm);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.82rem;
+            outline: none;
+            transition: border-color 0.2s ease;
+            width: 100%;
+        }
+
+        .settings-input:focus {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 2px var(--accent-glow);
+        }
+
+        .settings-input option {
+            background-color: var(--bg-panel);
+            color: var(--text-main);
+        }
+
+        /* ── Chat Messages Area ── */
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            scroll-behavior: smooth;
+        }
+
+        /* Welcome / Empty State */
+        .chat-welcome {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 40px 24px;
+            gap: 20px;
+            flex: 1;
+        }
+
+        .welcome-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 20px;
+            background: var(--accent-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            box-shadow: 0 8px 32px rgba(99, 102, 241, 0.25);
+        }
+
+        .welcome-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .welcome-subtitle {
+            font-size: 0.88rem;
+            color: var(--text-sub);
+            line-height: 1.6;
+            max-width: 340px;
+        }
+
+        .suggestion-chips {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .suggestion-chip {
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            background: rgba(99, 102, 241, 0.06);
+            color: var(--text-sub);
+            font-size: 0.78rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .suggestion-chip:hover {
+            background: rgba(99, 102, 241, 0.15);
+            border-color: rgba(99, 102, 241, 0.4);
+            color: var(--text-main);
+            transform: translateY(-1px);
+        }
+
+        /* ── Message Bubbles ── */
+        .message-group {
+            display: flex;
+            gap: 10px;
+            animation: msgSlideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .message-group.user {
+            flex-direction: row-reverse;
+        }
+
+        @keyframes msgSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .msg-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            font-weight: 700;
+            flex-shrink: 0;
+            margin-top: 4px;
+        }
+
+        .msg-avatar.ai {
+            background: var(--accent-gradient);
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+        }
+
+        .msg-avatar.user {
+            background: var(--user-gradient);
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+        }
+
+        .msg-content {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
             max-width: 85%;
+            min-width: 0;
         }
 
+        .msg-meta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0 4px;
+        }
+
+        .msg-sender {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-sub);
+        }
+
+        .msg-time {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+        }
+
+        .msg-bubble {
+            padding: 12px 16px;
+            border-radius: var(--radius-md);
+            font-size: 0.9rem;
+            line-height: 1.65;
+            color: #dce4f0;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .msg-bubble.ai {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-top-left-radius: 4px;
+        }
+
+        .msg-bubble.user {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.18), rgba(99, 102, 241, 0.18));
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            border-top-right-radius: 4px;
+            color: #e8ecf6;
+        }
+
+        /* Step blocks inside AI messages */
         .step-block {
-            margin-top: 16px;
-            margin-bottom: 8px;
-            padding: 16px;
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 8px;
-            border: 1px solid rgba(255, 255, 255, 0.03);
-            border-left: 2px solid rgba(255, 255, 255, 0.1);
-            /* Replace bright purple with subtle light-grey line */
+            margin-top: 12px;
+            margin-bottom: 6px;
+            padding: 14px 16px;
+            background: rgba(0, 0, 0, 0.25);
+            border-radius: var(--radius-sm);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-left: 3px solid rgba(99, 102, 241, 0.4);
         }
 
         .step-block h4 {
-            color: #f8fafc;
-            margin-bottom: 10px;
-            font-size: 1rem;
+            color: #c7d2fe;
+            margin-bottom: 8px;
+            font-size: 0.88rem;
             font-weight: 600;
         }
 
         .step-block pre {
-            background: rgba(15, 23, 42, 0.9);
+            background: rgba(10, 14, 26, 0.8);
             padding: 12px;
             border-radius: 6px;
             overflow-x: auto;
             font-family: 'Fira Code', monospace;
-            font-size: 0.85rem;
-            color: #94a3b8;
-            /* Neutral color instead of bright purple */
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 0.8rem;
+            color: var(--text-sub);
+            border: 1px solid rgba(255, 255, 255, 0.04);
         }
 
-        /* RIGHT: VISUAL PANEL */
+        /* Markdown inside bubbles */
+        .msg-bubble p {
+            margin-bottom: 0.8em;
+        }
+
+        .msg-bubble p:last-child {
+            margin-bottom: 0;
+        }
+
+        .msg-bubble code {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.82em;
+        }
+
+        .msg-bubble pre {
+            background: rgba(0, 0, 0, 0.35);
+            padding: 12px 14px;
+            border-radius: var(--radius-sm);
+            overflow-x: auto;
+            margin: 8px 0;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.8rem;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .msg-bubble ul,
+        .msg-bubble ol {
+            padding-left: 1.4em;
+            margin-bottom: 0.8em;
+        }
+
+        .msg-bubble li {
+            margin-bottom: 0.3em;
+        }
+
+        /* ── Typing Indicator ── */
+        .typing-indicator {
+            display: flex;
+            gap: 10px;
+            padding: 0 0 8px 0;
+            animation: msgSlideIn 0.3s ease;
+        }
+
+        .typing-dots {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 14px 18px;
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            border-top-left-radius: 4px;
+        }
+
+        .typing-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--accent-primary);
+            animation: typingBounce 1.4s infinite ease-in-out;
+        }
+
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.16s;
+        }
+
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.32s;
+        }
+
+        @keyframes typingBounce {
+
+            0%,
+            60%,
+            100% {
+                transform: translateY(0);
+                opacity: 0.35;
+            }
+
+            30% {
+                transform: translateY(-6px);
+                opacity: 1;
+            }
+        }
+
+        /* ── Chat Input (Bottom) ── */
+        .chat-input-area {
+            padding: 16px 20px;
+            border-top: 1px solid var(--border);
+            background: rgba(17, 24, 39, 0.7);
+            backdrop-filter: blur(8px);
+        }
+
+        .chat-input-wrapper {
+            display: flex;
+            align-items: flex-end;
+            gap: 10px;
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 6px 6px 6px 18px;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .chat-input-wrapper:focus-within {
+            border-color: rgba(99, 102, 241, 0.5);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        .chat-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            resize: none;
+            outline: none;
+            line-height: 1.5;
+            max-height: 120px;
+            padding: 8px 0;
+        }
+
+        .chat-input::placeholder {
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        .btn-send {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: var(--accent-gradient);
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .btn-send:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 16px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-send:active {
+            transform: scale(0.95);
+        }
+
+        .btn-send:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-send svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        /* ═══════════════════════════════════════════════
+           VISUAL COLUMN
+           ═══════════════════════════════════════════════ */
         .visual-column {
             display: flex;
             flex-direction: column;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            background: rgba(8, 11, 18, 0.9);
-            border-radius: 12px;
             overflow: hidden;
             position: relative;
+            background: var(--bg-body);
         }
 
         .visual-container {
@@ -248,12 +677,10 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #94a3b8;
-            font-size: 1.1rem;
-            padding: 20px;
+            color: var(--text-sub);
+            font-size: 1rem;
+            padding: 24px;
             position: relative;
-
-            /* Crucial fix for the charts expanding to infinite heights */
             min-height: 0;
             max-height: 100%;
             overflow: hidden;
@@ -270,7 +697,6 @@
             justify-content: center;
             align-items: center;
             overflow: hidden;
-            /* Critical for charts and diagrams */
         }
 
         #tutor-chart-container canvas {
@@ -287,100 +713,42 @@
             height: auto !important;
         }
 
-        .visual-overlay-text {
-            text-align: center;
-            max-width: 60%;
+        .visual-placeholder {
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 16px;
+            text-align: center;
+            max-width: 380px;
         }
 
-        /* Controls / Options inside Chat Panel */
-        .tutor-controls {
-            display: grid;
-            grid-template-columns: 140px minmax(0, 1fr);
-            gap: 12px;
-            margin-top: -10px;
-            /* pull up due to border-bottom padding of input */
-            width: 100%;
+        .visual-placeholder-icon {
+            width: 72px;
+            height: 72px;
+            border-radius: 20px;
+            background: rgba(99, 102, 241, 0.08);
+            border: 1px solid rgba(99, 102, 241, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
         }
 
-        .tutor-select {
-            background: rgba(15, 23, 42, 0.9);
-            /* Darker native background to fix bright dropdowns on some OS */
-            color: #e2e8f0;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-family: 'Inter', sans-serif;
-            font-size: 0.85rem;
-            outline: none;
-            cursor: pointer;
-            width: 100%;
-            max-width: 100%;
-
-            /* Prevent overflow */
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
+        .visual-placeholder-title {
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: var(--text-sub);
         }
 
-        #tutor-provider {
-            flex: 0 0 140px;
-            /* Fixed width for provider */
+        .visual-placeholder-desc {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            line-height: 1.6;
         }
 
-        #tutor-model {
-            flex: 1;
-            /* Take remaining space */
-            min-width: 0;
-            /* Critical for flex child truncation */
-        }
-
-        /* Target the <option> elements to ensure they are readable on dark mode */
-        .tutor-select option {
-            background-color: #0f172a;
-            color: #e2e8f0;
-            /* In standard select elements, options can't easily be truncated via CSS,
-               so we rely on the parent container's width bounds. */
-        }
-
-        .tutor-select:hover {
-            border-color: var(--border-hover);
-        }
-
-        .tutor-select:focus {
-            border-color: #a855f7;
-        }
-
-        /* Markdown styling inside chat */
-        .chat-bubble p {
-            margin-bottom: 1em;
-        }
-
-        .chat-bubble p:last-child {
-            margin-bottom: 0;
-        }
-
-        .chat-bubble code {
-            background: rgba(0, 0, 0, 0.3);
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-family: 'Fira Code', monospace;
-        }
-
-        .chat-bubble pre {
-            background: rgba(0, 0, 0, 0.4);
-            padding: 12px;
-            border-radius: 6px;
-            overflow-x: auto;
-            margin-bottom: 1em;
-            font-family: 'Fira Code', monospace;
-            font-size: 0.85rem;
-        }
-
-        /* Keyframes */
+        /* ═══════════════════════════════════════════════
+           ANIMATIONS
+           ═══════════════════════════════════════════════ */
         @keyframes pulse {
             0% {
                 transform: scale(1);
@@ -392,95 +760,158 @@
                 opacity: 1;
             }
         }
+
+        @keyframes shimmer {
+            0% {
+                background-position: -200% 0;
+            }
+
+            100% {
+                background-position: 200% 0;
+            }
+        }
+
+        /* ═══════════════════════════════════════════════
+           RESPONSIVE
+           ═══════════════════════════════════════════════ */
+        @media (max-width: 900px) {
+            .tutor-layout {
+                grid-template-columns: 1fr;
+                grid-template-rows: 1fr 300px;
+            }
+
+            .chat-column {
+                border-right: none;
+                border-bottom: 1px solid var(--border);
+            }
+        }
     </style>
 </head>
 
 <body>
-    <div class="header-flex">
-        <div style="justify-self: start;">
-            <a href="../index.html" class="home-btn" title="Back to Modules">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+    <!-- ═══ HEADER ═══ -->
+    <div class="header">
+        <div class="header-left">
+            <a href="../index.html" class="icon-btn" title="Back to Modules">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
                     stroke-linecap="round" stroke-linejoin="round">
                     <polyline points="15 18 9 12 15 6"></polyline>
                 </svg>
             </a>
+            <span class="header-title">Visual Tutor</span>
+            <span class="header-badge">AI</span>
         </div>
-        <h1 style="margin-bottom: 0; justify-self: center;">Unified Visual Tutor</h1>
-        <div style="justify-self: end; display: flex; gap: 8px;">
-            <button class="home-btn" onclick="clearHistory()" title="Clear Chat">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <div class="header-right">
+            <button class="icon-btn" onclick="clearHistory()" title="Clear Chat">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
                     <polyline points="3 6 5 6 21 6"></polyline>
-                    <path d="M19 6V20a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    <path d="M19 6V20a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
+                    </path>
                 </svg>
             </button>
         </div>
     </div>
 
     <div class="tutor-layout">
-        <!-- Chat Interaction Panel -->
+        <!-- ═══ CHAT COLUMN ═══ -->
         <div class="chat-column">
 
-            <div class="prompt-container">
-                <textarea id="tutor-prompt" class="prompt-input" rows="2"
-                    placeholder="Explain me a Simplex problem..."></textarea>
-
-                <div class="tutor-controls">
-                    <select id="tutor-provider" class="tutor-select" onchange="updateModelOptions()">
-                        <option value="gemini" selected>Google Gemini</option>
-                        <option value="groq">Groq (Llama 3)</option>
-                    </select>
-                    <select id="tutor-model" class="tutor-select"
-                        onchange="localStorage.setItem('aiModelTutor', this.value)">
-                        <option value="">Loading models...</option>
-                    </select>
+            <!-- Collapsible Settings -->
+            <div class="settings-bar" onclick="toggleSettings()">
+                <div class="settings-bar-label">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path
+                            d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z">
+                        </path>
+                    </svg>
+                    Model Settings
                 </div>
+                <svg class="settings-chevron" id="settings-chevron" width="16" height="16" viewBox="0 0 24 24"
+                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+            </div>
 
-                <div style="display: flex; gap: 12px; align-items: center; justify-content: space-between;">
-                    <input type="password" id="tutor-api-key" placeholder="API Key..." class="tutor-select"
-                        style="min-width: 150px;" onblur="updateModelOptions()">
-                    <button class="btn-send" onclick="sendPrompt()">Send Request</button>
+            <div class="settings-panel" id="settings-panel">
+                <div class="settings-grid">
+                    <div class="settings-field">
+                        <label class="settings-label">Provider</label>
+                        <select id="tutor-provider" class="settings-input" onchange="updateModelOptions()">
+                            <option value="gemini" selected>Google Gemini</option>
+                            <option value="groq">Groq (Llama 3)</option>
+                        </select>
+                    </div>
+                    <div class="settings-field">
+                        <label class="settings-label">Model</label>
+                        <select id="tutor-model" class="settings-input"
+                            onchange="localStorage.setItem('aiModelTutor', this.value)">
+                            <option value="">Loading models...</option>
+                        </select>
+                    </div>
+                    <div class="settings-field full">
+                        <label class="settings-label">API Key</label>
+                        <input type="password" id="tutor-api-key" placeholder="Enter your API key..."
+                            class="settings-input" onblur="updateModelOptions()">
+                    </div>
                 </div>
             </div>
 
-            <div class="chat-history" id="chat-history">
-                <!-- Mockup starting state -->
-                <div class="chat-bubble ai-response">
-                    <p><strong>AI Tutor</strong></p>
-                    <p>I am your Unified Visual Tutor. I can help visualize any topic spanning Science, Math,
-                        Architecture, system flows, and interactive charts! Describe a problem, and I will generate a
-                        step-by-step textual explanation followed by a dynamic visual solution.</p>
-                </div>
-
-                <!-- Mockup example of a targeted response -->
-                <div class="chat-bubble user-msg" style="display: none;" id="mockup-user">
-                    Explain me a Simplex problem
-                </div>
-
-                <div class="chat-bubble ai-response" style="display: none;" id="mockup-ai">
-                    <p>Sure, Here is your problem step by step explanation followed by the visual solution:</p>
-                    <div class="step-block">
-                        <h4>&lt;Step 1&gt;:</h4>
-                        <pre>Table: | x1 | x2 | S1 ...</pre>
+            <!-- Chat Messages -->
+            <div class="chat-messages" id="chat-history">
+                <div class="chat-welcome" id="chat-welcome">
+                    <div class="welcome-icon">🎓</div>
+                    <div class="welcome-title">Visual Tutor</div>
+                    <div class="welcome-subtitle">
+                        I can help visualize any topic — Science, Math, Architecture, system flows, and more.
+                        Describe a problem and I'll generate a step-by-step explanation with an interactive visual.
+                    </div>
+                    <div class="suggestion-chips">
+                        <button class="suggestion-chip" onclick="useSuggestion(this)">Explain a Simplex problem</button>
+                        <button class="suggestion-chip" onclick="useSuggestion(this)">Visualize Binary Search</button>
+                        <button class="suggestion-chip" onclick="useSuggestion(this)">Newton's Laws diagram</button>
+                        <button class="suggestion-chip" onclick="useSuggestion(this)">Graph a sine wave</button>
                     </div>
                 </div>
+            </div>
 
+            <!-- Chat Input (Bottom) -->
+            <div class="chat-input-area">
+                <div class="chat-input-wrapper">
+                    <textarea id="tutor-prompt" class="chat-input" rows="1"
+                        placeholder="Ask me anything to visualize..."></textarea>
+                    <button class="btn-send" id="btn-send" onclick="sendPrompt()" title="Send">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="22" y1="2" x2="11" y2="13"></line>
+                            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                        </svg>
+                    </button>
+                </div>
             </div>
         </div>
 
-        <!-- Unified Visual Panel -->
+        <!-- ═══ VISUAL PANEL ═══ -->
         <div class="visual-column">
             <div class="visual-container" id="visual-render-target">
-                <div class="visual-overlay-text" id="visual-placeholder-text">
-                    The visual graph or something like that will render here based on the chat context.
+                <div class="visual-placeholder" id="visual-placeholder-text">
+                    <div class="visual-placeholder-icon">📊</div>
+                    <div class="visual-placeholder-title">Visual Output</div>
+                    <div class="visual-placeholder-desc">
+                        Charts, diagrams, graphs, and simulations will appear here based on your conversation.
+                    </div>
                 </div>
-                <!-- Dynamic canvases, SVGs, or divs will be injected here during generation -->
             </div>
         </div>
     </div>
 
     <script>
+        // ═══════════════════════════════════════════════
+        // INITIALIZATION
+        // ═══════════════════════════════════════════════
         document.addEventListener('DOMContentLoaded', () => {
-            // Setup keys and auto-fetch logic similar to science/architecture
             const savedGemini = localStorage.getItem('gemini_api_key') || localStorage.getItem('geminiApiKey');
             if (savedGemini) {
                 document.getElementById('tutor-api-key').value = savedGemini;
@@ -488,8 +919,10 @@
                 updateModelOptions();
             }
 
-            // Demo logic to show mockup
-            document.getElementById('tutor-prompt').addEventListener('keydown', (e) => {
+            // Auto-resize textarea
+            const input = document.getElementById('tutor-prompt');
+            input.addEventListener('input', autoResize);
+            input.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
                     sendPrompt();
@@ -497,23 +930,51 @@
             });
         });
 
+        function autoResize() {
+            const el = document.getElementById('tutor-prompt');
+            el.style.height = 'auto';
+            el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+        }
+
+        // ═══════════════════════════════════════════════
+        // SETTINGS TOGGLE
+        // ═══════════════════════════════════════════════
+        function toggleSettings() {
+            const panel = document.getElementById('settings-panel');
+            const chevron = document.getElementById('settings-chevron');
+            panel.classList.toggle('open');
+            chevron.classList.toggle('open');
+        }
+
+        // ═══════════════════════════════════════════════
+        // SUGGESTION CHIPS
+        // ═══════════════════════════════════════════════
+        function useSuggestion(btn) {
+            document.getElementById('tutor-prompt').value = btn.textContent;
+            autoResize();
+            sendPrompt();
+        }
+
+        // ═══════════════════════════════════════════════
+        // MODEL OPTIONS
+        // ═══════════════════════════════════════════════
         function updateModelOptions() {
             const apiKey = document.getElementById('tutor-api-key').value.trim();
             const platform = document.getElementById('tutor-provider').value;
             const modelSelect = document.getElementById('tutor-model');
 
             if (!apiKey) {
-                modelSelect.innerHTML = '<option value="">Enter API Key to load models...</option>';
+                modelSelect.innerHTML = '<option value="">Enter API Key first</option>';
                 return;
             }
 
-            modelSelect.innerHTML = '<option value="">Loading models...</option>';
+            modelSelect.innerHTML = '<option value="">Loading...</option>';
             modelSelect.disabled = true;
 
             fetch('/api/models', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ apiKey: apiKey, platform: platform })
+                body: JSON.stringify({ apiKey, platform })
             })
                 .then(res => res.json())
                 .then(data => {
@@ -548,7 +1009,7 @@
                         }
                         modelSelect.disabled = false;
                     } else {
-                        modelSelect.innerHTML = '<option value="">No generating models found</option>';
+                        modelSelect.innerHTML = '<option value="">No models found</option>';
                         modelSelect.disabled = false;
                     }
                 })
@@ -558,7 +1019,7 @@
                     modelSelect.disabled = false;
                 });
 
-            // Save the valid key that was just used to fetch models
+            // Save API key
             if (apiKey) {
                 if (platform === 'gemini') {
                     localStorage.setItem('gemini_api_key', apiKey);
@@ -566,7 +1027,6 @@
                     localStorage.setItem('groq_api_key', apiKey);
                 }
             } else {
-                // Only restore if input is blank
                 if (platform === 'gemini') {
                     document.getElementById('tutor-api-key').value = localStorage.getItem('gemini_api_key') || '';
                 } else {
@@ -575,6 +1035,16 @@
             }
         }
 
+        // ═══════════════════════════════════════════════
+        // TIME HELPER
+        // ═══════════════════════════════════════════════
+        function getTimeString() {
+            return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+
+        // ═══════════════════════════════════════════════
+        // SEND PROMPT
+        // ═══════════════════════════════════════════════
         async function sendPrompt() {
             const input = document.getElementById('tutor-prompt');
             const val = input.value.trim();
@@ -585,27 +1055,34 @@
             const model = document.getElementById('tutor-model').value;
 
             if (!apiKey) {
-                alert("Please enter your API key first.");
+                // Auto-open settings if no key
+                const panel = document.getElementById('settings-panel');
+                if (!panel.classList.contains('open')) toggleSettings();
+                document.getElementById('tutor-api-key').focus();
                 return;
             }
 
-            // Append User msg
+            // Hide welcome
+            const welcome = document.getElementById('chat-welcome');
+            if (welcome) welcome.remove();
+
+            // Add user message
             appendUserMsg(val);
             input.value = '';
+            input.style.height = 'auto';
 
-            // Add Loading Bubble
-            const history = document.getElementById('chat-history');
-            const loadDiv = document.createElement('div');
-            loadDiv.className = 'chat-bubble ai-response';
-            loadDiv.id = 'loading-bubble';
-            loadDiv.innerHTML = `<p><strong>AI Tutor</strong></p><p>Generating dynamic visualization...</p>`;
-            history.appendChild(loadDiv);
-            scrollToBottom();
+            // Disable send
+            document.getElementById('btn-send').disabled = true;
 
+            // Show typing indicator
+            showTypingIndicator();
+
+            // Set visual to loading
             document.getElementById('visual-render-target').innerHTML = `
-                <div class="visual-overlay-text" id="visual-placeholder-text">
-                    <div style="font-size:2rem; animation: pulse 1s infinite alternate;">⚙️</div>
-                    <div>Processing Unified Output...</div>
+                <div class="visual-placeholder">
+                    <div class="visual-placeholder-icon" style="animation: pulse 1.2s infinite alternate;">⚙️</div>
+                    <div class="visual-placeholder-title">Generating Visualization...</div>
+                    <div class="visual-placeholder-desc">Processing your request with AI</div>
                 </div>
             `;
 
@@ -614,16 +1091,14 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        apiKey: apiKey,
-                        platform: platform,
-                        model: model,
+                        apiKey, platform, model,
                         problemDescription: val,
                         section: 'tutor'
                     })
                 });
 
                 const data = await response.json();
-                document.getElementById('loading-bubble').remove();
+                hideTypingIndicator();
 
                 if (data.success && data.historyPath) {
                     const fileResponse = await fetch(`../${data.historyPath}`);
@@ -632,70 +1107,150 @@
                     renderAIResponse(json);
                     renderVisual(json.visualType, json.visualCode);
                 } else {
-                    appendSystemMsg("Error generating response: " + (data.error || "Unknown error"));
+                    appendSystemMsg("Error: " + (data.error || "Unknown error"));
                 }
             } catch (err) {
-                if (document.getElementById('loading-bubble')) document.getElementById('loading-bubble').remove();
+                hideTypingIndicator();
                 appendSystemMsg("Network error connecting to AI backend.");
             }
+
+            document.getElementById('btn-send').disabled = false;
+        }
+
+        // ═══════════════════════════════════════════════
+        // TYPING INDICATOR
+        // ═══════════════════════════════════════════════
+        function showTypingIndicator() {
+            const history = document.getElementById('chat-history');
+            const indicator = document.createElement('div');
+            indicator.className = 'typing-indicator';
+            indicator.id = 'typing-indicator';
+            indicator.innerHTML = `
+                <div class="msg-avatar ai">🎓</div>
+                <div class="typing-dots">
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                </div>
+            `;
+            history.appendChild(indicator);
+            scrollToBottom();
+        }
+
+        function hideTypingIndicator() {
+            const indicator = document.getElementById('typing-indicator');
+            if (indicator) indicator.remove();
+        }
+
+        // ═══════════════════════════════════════════════
+        // MESSAGE RENDERING
+        // ═══════════════════════════════════════════════
+        function appendUserMsg(text) {
+            const history = document.getElementById('chat-history');
+            const group = document.createElement('div');
+            group.className = 'message-group user';
+            group.innerHTML = `
+                <div class="msg-avatar user">U</div>
+                <div class="msg-content">
+                    <div class="msg-meta" style="justify-content: flex-end;">
+                        <span class="msg-time">${getTimeString()}</span>
+                        <span class="msg-sender">You</span>
+                    </div>
+                    <div class="msg-bubble user">${escapeHtml(text)}</div>
+                </div>
+            `;
+            history.appendChild(group);
+            scrollToBottom();
         }
 
         function renderAIResponse(json) {
             const history = document.getElementById('chat-history');
-            const div = document.createElement('div');
-            div.className = 'chat-bubble ai-response';
+            const group = document.createElement('div');
+            group.className = 'message-group';
 
-            let html = `<p><strong>AI Tutor</strong></p>`;
-            html += `<p>${marked.parseInline(json.chatResponse || "Here is your explanation:")}</p>`;
+            let bubbleHtml = `<div>${marked.parseInline(json.chatResponse || "Here is your explanation:")}</div>`;
 
             if (json.steps && json.steps.length > 0) {
                 json.steps.forEach(step => {
-                    html += `
+                    bubbleHtml += `
                     <div class="step-block">
                         <h4>${step.title}</h4>
-                        <div style="font-size:0.9rem; color:#cbd5e1;">${DOMPurify.sanitize(marked.parse(step.content))}</div>
+                        <div style="font-size:0.88rem; color:#bcc8de;">${DOMPurify.sanitize(marked.parse(step.content))}</div>
                     </div>`;
                 });
             }
 
-            div.innerHTML = html;
-            history.appendChild(div);
+            group.innerHTML = `
+                <div class="msg-avatar ai">🎓</div>
+                <div class="msg-content">
+                    <div class="msg-meta">
+                        <span class="msg-sender">AI Tutor</span>
+                        <span class="msg-time">${getTimeString()}</span>
+                    </div>
+                    <div class="msg-bubble ai">${bubbleHtml}</div>
+                </div>
+            `;
+            history.appendChild(group);
 
-            // Re-render math in chat if applicable
+            // Re-render math
             try {
-                renderMathInElement(div, { delimiters: [{ left: "$$", right: "$$", display: true }, { left: "$", right: "$", display: false }] });
+                renderMathInElement(group, {
+                    delimiters: [
+                        { left: "$$", right: "$$", display: true },
+                        { left: "$", right: "$", display: false }
+                    ]
+                });
             } catch (e) { }
 
             scrollToBottom();
         }
 
+        function appendSystemMsg(text) {
+            const history = document.getElementById('chat-history');
+            const group = document.createElement('div');
+            group.className = 'message-group';
+            group.innerHTML = `
+                <div class="msg-avatar ai">🎓</div>
+                <div class="msg-content">
+                    <div class="msg-meta">
+                        <span class="msg-sender">AI Tutor</span>
+                        <span class="msg-time">${getTimeString()}</span>
+                    </div>
+                    <div class="msg-bubble ai"><div>${text}</div></div>
+                </div>
+            `;
+            history.appendChild(group);
+            scrollToBottom();
+        }
+
+        // ═══════════════════════════════════════════════
+        // VISUAL RENDERING
+        // ═══════════════════════════════════════════════
         function renderVisual(type, code) {
             const target = document.getElementById('visual-render-target');
-            target.innerHTML = ''; // Clear
+            target.innerHTML = '';
 
             try {
                 if (!type || !code) {
-                    target.innerHTML = `<div class="visual-overlay-text">No visual data returned.</div>`;
+                    target.innerHTML = `<div class="visual-placeholder">
+                        <div class="visual-placeholder-icon">📊</div>
+                        <div class="visual-placeholder-title">No Visual Data</div>
+                        <div class="visual-placeholder-desc">The AI didn't return any visual data for this query.</div>
+                    </div>`;
                     return;
                 }
 
                 if (type === 'mermaid') {
-                    // Mermaid Render
                     target.innerHTML = `<div class="mermaid" id="mermaid-target"></div>`;
-
                     mermaid.render('mermaid-svg', code).then(({ svg }) => {
                         document.getElementById('mermaid-target').innerHTML = svg;
                     }).catch(err => {
                         console.error("Mermaid Render Error:", err);
-                        target.innerHTML = `<div class="visual-overlay-text" style="color:#ef4444;">Mermaid Error: ${err.message}</div>`;
+                        target.innerHTML = `<div class="visual-placeholder" style="color:#ef4444;">Mermaid Error: ${err.message}</div>`;
                     });
                 } else if (type === 'html') {
-                    // Raw HTML Render (Tables, Grids)
                     target.innerHTML = `<div style="width:100%; height:100%; overflow:auto;">${DOMPurify.sanitize(code, { ALLOWED_TAGS: ['table', 'tr', 'td', 'th', 'tbody', 'thead', 'div', 'span', 'b', 'i', 'u', 'strong', 'br', 'hr'], ALLOWED_ATTR: ['style', 'class', 'id'] })}</div>`;
                 } else if (type === 'chartjs') {
-                    // ChartJS JSON instantiation 
-                    // CRITICAL FIX: To maintain aspect ratio and prevent height explosion in flex layouts,
-                    // Chart.js requires a relatively positioned bounded div wrapper.
                     target.innerHTML = `
                         <div id="tutor-chart-container">
                             <canvas id="tutor-chart"></canvas>
@@ -703,59 +1258,68 @@
                     `;
                     const ctx = document.getElementById('tutor-chart').getContext('2d');
                     const config = JSON.parse(code);
-
-                    // Force text to be legible on dark bg and ensure it maintains aspect ratio correctly
                     Chart.defaults.color = '#e2e8f0';
                     config.options = config.options || {};
-                    config.options.maintainAspectRatio = false; // Key for fitting inside the visual-container dynamically
+                    config.options.maintainAspectRatio = false;
                     new Chart(ctx, config);
                 } else if (type === 'latex') {
-                    // Raw LaTeX block
                     target.innerHTML = `<div id="latex-target" style="font-size:2rem; padding: 40px;"></div>`;
                     katex.render(code, document.getElementById('latex-target'), {
                         displayMode: true,
                         throwOnError: false
                     });
                 } else {
-                    target.innerHTML = `<div class="visual-overlay-text">Unsupported visualType: ${type}</div>`;
+                    target.innerHTML = `<div class="visual-placeholder">
+                        <div class="visual-placeholder-icon">❓</div>
+                        <div class="visual-placeholder-title">Unsupported Visual Type</div>
+                        <div class="visual-placeholder-desc">Type: ${type}</div>
+                    </div>`;
                 }
             } catch (err) {
                 console.error("Visual Render Error:", err, "Code:", code);
-                target.innerHTML = `<div class="visual-overlay-text" style="color:#ef4444;">Error rendering visual code: ${err.message}</div>`;
+                target.innerHTML = `<div class="visual-placeholder" style="color:#ef4444;">Error: ${err.message}</div>`;
             }
         }
 
-        function appendUserMsg(text) {
-            const history = document.getElementById('chat-history');
+        // ═══════════════════════════════════════════════
+        // UTILITIES
+        // ═══════════════════════════════════════════════
+        function escapeHtml(text) {
             const div = document.createElement('div');
-            div.className = 'chat-bubble user-msg';
             div.textContent = text;
-            history.appendChild(div);
-        }
-
-        function appendSystemMsg(text) {
-            const history = document.getElementById('chat-history');
-            const div = document.createElement('div');
-            div.className = 'chat-bubble ai-response';
-            div.innerHTML = `<p><strong>AI Tutor</strong></p><p>${text}</p>`;
-            history.appendChild(div);
+            return div.innerHTML;
         }
 
         function scrollToBottom() {
             const history = document.getElementById('chat-history');
-            history.scrollTop = history.scrollHeight;
+            requestAnimationFrame(() => {
+                history.scrollTop = history.scrollHeight;
+            });
         }
 
         function clearHistory() {
             document.getElementById('chat-history').innerHTML = `
-                <div class="chat-bubble ai-response">
-                    <p><strong>AI Tutor</strong></p>
-                    <p>Chat history cleared. What would you like to explore next?</p>
+                <div class="chat-welcome" id="chat-welcome">
+                    <div class="welcome-icon">🎓</div>
+                    <div class="welcome-title">Visual Tutor</div>
+                    <div class="welcome-subtitle">
+                        Chat history cleared. What would you like to explore next?
+                    </div>
+                    <div class="suggestion-chips">
+                        <button class="suggestion-chip" onclick="useSuggestion(this)">Explain a Simplex problem</button>
+                        <button class="suggestion-chip" onclick="useSuggestion(this)">Visualize Binary Search</button>
+                        <button class="suggestion-chip" onclick="useSuggestion(this)">Newton's Laws diagram</button>
+                        <button class="suggestion-chip" onclick="useSuggestion(this)">Graph a sine wave</button>
+                    </div>
                 </div>
             `;
             document.getElementById('visual-render-target').innerHTML = `
-                <div class="visual-overlay-text" id="visual-placeholder-text">
-                    The visual graph or something like that will render here based on the chat context.
+                <div class="visual-placeholder" id="visual-placeholder-text">
+                    <div class="visual-placeholder-icon">📊</div>
+                    <div class="visual-placeholder-title">Visual Output</div>
+                    <div class="visual-placeholder-desc">
+                        Charts, diagrams, graphs, and simulations will appear here based on your conversation.
+                    </div>
                 </div>
             `;
         }

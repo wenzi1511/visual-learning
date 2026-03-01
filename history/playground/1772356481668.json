@@ -1,0 +1,36 @@
+{
+  "id": "binary-search",
+  "name": "Binary Search",
+  "difficulty": "Easy",
+  "description": "<p>Binary Search is an efficient algorithm for finding an item from a <strong>sorted</strong> list of items. It works by repeatedly dividing in half the portion of the list that could contain the item, until you've narrowed down the possible locations to just one.</p><ul><li><strong>Time Complexity:</strong> O(log N)</li><li><strong>Space Complexity:</strong> O(1)</li><li><strong>Pre-requisite:</strong> The input array must be sorted.</li></ul><p>In this visualization, the <span style='color: #ffb703;'>orange</span> range represents the current search space, and the <span style='color: #00e0ff;'>cyan</span> highlight indicates the middle element being compared.</p>",
+  "tags": [
+    "Array",
+    "Binary Search",
+    "Searching"
+  ],
+  "slots": [
+    {
+      "id": "array_slot",
+      "type": "array",
+      "label": "Sorted Array"
+    },
+    {
+      "id": "vars_slot",
+      "type": "hashmap",
+      "label": "State Variables"
+    }
+  ],
+  "inputs": [
+    {
+      "label": "Sorted Array",
+      "default": "2, 5, 8, 12, 16, 23, 38, 56, 72, 91",
+      "placeholder": "e.g. 1, 2, 3, 4, 5"
+    },
+    {
+      "label": "Target Value",
+      "default": "23",
+      "placeholder": "Value to find"
+    }
+  ],
+  "code": "class Playground {\n    async run(inputs) {\n        // Parse inputs\n        const rawArr = inputs[0].split(',').map(x => parseInt(x.trim())).filter(x => !isNaN(x));\n        // Ensure the array is sorted for Binary Search\n        const arr = rawArr.sort((a, b) => a - b);\n        const target = parseInt(inputs[1]);\n\n        // Initialize slots\n        await this.array_slot.init(arr);\n        await this.vars_slot.init([\n            [\"low\", 0],\n            [\"high\", arr.length - 1],\n            [\"target\", target]\n        ]);\n\n        let low = 0;\n        let high = arr.length - 1;\n\n        this.log(`Starting Binary Search for target: ${target}`);\n        await this.await();\n\n        while (low <= high) {\n            const mid = Math.floor(low + (high - low) / 2);\n            const midVal = this.array_slot.get(mid);\n\n            // Update state visualization\n            this.vars_slot.put(\"low\", low);\n            this.vars_slot.put(\"high\", high);\n            this.vars_slot.put(\"mid\", mid);\n            this.vars_slot.put(\"midValue\", midVal);\n\n            // Highlight the search range and the middle element\n            // Reset highlights by highlighting full range with a neutral color first if needed,\n            // but here we use specific colors for the active window.\n            this.array_slot.highlightRange(0, arr.length - 1, \"#2d2d2d\"); // Dim others\n            this.array_slot.highlightRange(low, high, \"#ffb703\"); // Current search space\n            this.array_slot.highlight(mid, \"#00e0ff\"); // Current mid pivot\n\n            this.log(`Checking middle index ${mid} (Value: ${midVal})`);\n            await this.await();\n\n            if (midVal === target) {\n                this.log(`Success! Target ${target} found at index ${mid}.`);\n                this.array_slot.highlight(mid, \"#00f5a0\"); // Success color\n                await this.await();\n                return mid;\n            }\n\n            if (midVal < target) {\n                this.log(`${midVal} is less than ${target}. Narrowing search to the right half.`);\n                low = mid + 1;\n            } else {\n                this.log(`${midVal} is greater than ${target}. Narrowing search to the left half.`);\n                high = mid - 1;\n            }\n            \n            this.vars_slot.put(\"low\", low);\n            this.vars_slot.put(\"high\", high);\n            await this.await();\n        }\n\n        this.log(`Target ${target} not found in the array.`);\n        this.array_slot.highlightRange(0, arr.length - 1, \"#ff4d4d\"); // Error/Not found indicator\n        return -1;\n    }\n}"
+}

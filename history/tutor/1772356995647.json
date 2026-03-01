@@ -1,0 +1,25 @@
+{
+  "name": "Mastering Binary Search",
+  "difficulty": "Beginner",
+  "chatResponse": "I'll help you visualize Binary Search, an efficient O(log n) algorithm that finds an element in a sorted list by repeatedly halving the search space.",
+  "steps": [
+    {
+      "title": "Prerequisites and Setup",
+      "content": "Binary Search only works on **sorted arrays**. We initialize two pointers: `low` at the start (index 0) and `high` at the end (index $n-1$). The search continues as long as `low <= high`."
+    },
+    {
+      "title": "Finding the Midpoint",
+      "content": "In each step, we calculate the middle index:  \n`mid = low + floor((high - low) / 2)`  \nUsing this formula instead of `(low + high) / 2` prevents potential integer overflow in some programming languages."
+    },
+    {
+      "title": "Evaluating the Target",
+      "content": "We compare the middle element `arr[mid]` to our `target`:\n1. If `arr[mid] == target`, search ends successfully.\n2. If `arr[mid] < target`, the target must be in the right half: set `low = mid + 1`.\n3. If `arr[mid] > target`, the target must be in the left half: set `high = mid - 1`."
+    },
+    {
+      "title": "Logarithmic Efficiency",
+      "content": "Because we discard half the remaining elements in every step, the time complexity is **O(log N)**. For an array of 1,000,000 elements, it takes at most 20 comparisons to find the target."
+    }
+  ],
+  "visualType": "html",
+  "visualCode": "<div style='background:#0f172a; padding: 40px 20px; border-radius: 12px; font-family: monospace; display: flex; flex-direction: column; align-items: center;'>\n  <div style='color: #94a3b8; margin-bottom: 20px; font-size: 14px;'>SEARCHING FOR TARGET: <span style='color: #ec4899; font-weight: bold;'>70</span></div>\n  <div style='display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;'>\n    <div style='width: 45px; height: 45px; border: 2px solid #334155; display: flex; align-items: center; justify-content: center; color: #475569;'>10</div>\n    <div style='width: 45px; height: 45px; border: 2px solid #334155; display: flex; align-items: center; justify-content: center; color: #475569;'>20</div>\n    <div style='width: 45px; height: 45px; border: 2px solid #334155; display: flex; align-items: center; justify-content: center; color: #475569;'>30</div>\n    <div style='width: 45px; height: 45px; border: 2px solid #334155; display: flex; align-items: center; justify-content: center; color: #475569;'>40</div>\n    <div style='width: 45px; height: 45px; border: 2px solid #10b981; background: rgba(16, 185, 129, 0.1); display: flex; align-items: center; justify-content: center; color: #10b981; position: relative; font-weight: bold;'>\n      50\n      <div style='position: absolute; top: -25px; font-size: 10px; color: #10b981;'>MID</div>\n    </div>\n    <div style='width: 45px; height: 45px; border: 2px solid #22d3ee; display: flex; align-items: center; justify-content: center; color: #22d3ee;'>60</div>\n    <div style='width: 45px; height: 45px; border: 2px solid #ec4899; background: rgba(236, 72, 153, 0.1); display: flex; align-items: center; justify-content: center; color: #ec4899; font-weight: bold; position: relative;'>\n      70\n      <div style='position: absolute; bottom: -25px; font-size: 10px; color: #ec4899;'>TARGET</div>\n    </div>\n    <div style='width: 45px; height: 45px; border: 2px solid #22d3ee; display: flex; align-items: center; justify-content: center; color: #22d3ee;'>80</div>\n    <div style='width: 45px; height: 45px; border: 2px solid #22d3ee; display: flex; align-items: center; justify-content: center; color: #22d3ee;'>90</div>\n  </div>\n  <div style='margin-top: 50px; border-top: 1px solid #334155; padding-top: 20px; text-align: center;'>\n    <div style='color: #22d3ee; font-size: 13px;'>Current Logic: 70 > 50</div>\n    <div style='color: #94a3b8; font-size: 11px; margin-top: 5px;'>Discarding indices 0-4. Moving LOW to index 5.</div>\n  </div>\n</div>"
+}

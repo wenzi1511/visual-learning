@@ -1,0 +1,25 @@
+{
+  "name": "Hadoop 2.x Architectural Evolution",
+  "difficulty": "Intermediate",
+  "chatResponse": "I will provide a detailed breakdown of Hadoop 2.x, focusing on how YARN revolutionized the ecosystem by decoupling resource management from data processing.",
+  "steps": [
+    {
+      "title": "The Shift to YARN Architecture",
+      "content": "In Hadoop 1.x, the **JobTracker** handled both resource management and job scheduling/monitoring, creating a massive bottleneck. Hadoop 2.x introduced **YARN (Yet Another Resource Negotiator)**, which separates these functions. \n\n- **ResourceManager (RM):** The global authority that arbitrates resources among all competing applications.\n- **NodeManager (NM):** The per-machine agent responsible for managing containers and reporting usage to the RM."
+    },
+    {
+      "title": "Application Master and Containers",
+      "content": "Unlike the fixed 'slots' in Hadoop 1.x, Hadoop 2.x uses **Containers**, which are dynamic fractions of a node's resources (CPU, Memory). Each running application has its own **Application Master (AM)**, a framework-specific library that negotiates resources from the RM and works with the NM to execute and monitor tasks."
+    },
+    {
+      "title": "HDFS 2.0 Enhancements",
+      "content": "Hadoop 2.x brought critical reliability to the storage layer:\n\n1. **High Availability (HA):** Introduced an Active/Standby NameNode configuration with shared storage (Quorum Journal Manager) to eliminate the Single Point of Failure.\n2. **HDFS Federation:** Allows multiple NameNodes to manage different namespaces (e.g., /data vs /user), scaling the cluster horizontally by separating the namespace from the block management layer."
+    },
+    {
+      "title": "Multi-Tenancy and Data Processing",
+      "content": "Because YARN is a generic resource management layer, Hadoop is no longer limited to **MapReduce**. You can run multiple processing engines simultaneously on the same physical data:\n- **Interactive:** Apache Hive (via Tez or LLAP)\n- **Streaming:** Apache Storm or Spark Streaming\n- **Graph Processing:** Apache Giraph\n- **Batch:** MapReduce"
+    }
+  ],
+  "visualType": "mermaid",
+  "visualCode": "graph TD\n  subgraph Processing_Engines\n    MR[MapReduce]\n    SPARK[Apache Spark]\n    HIVE[Hive/Tez]\n  end\n\n  subgraph YARN_Resource_Layer\n    RM[Resource Manager - Scheduler/AppsManager]\n    AM1[Application Master 1]\n    AM2[Application Master 2]\n    NM[Node Manager]\n    C1[Container]\n    C2[Container]\n  end\n\n  subgraph HDFS_Storage_Layer\n    NN_A[NameNode - Active]\n    NN_S[NameNode - Standby]\n    DN[DataNodes]\n  end\n\n  Processing_Engines --> RM\n  RM --> AM1\n  RM --> AM2\n  AM1 --> C1\n  AM2 --> C2\n  NM --> C1\n  NM --> C2\n  C1 -.-> DN\n  C2 -.-> DN\n  NN_A <--> NN_S\n  NN_A --> DN\n\n  style RM fill:#1e293b,stroke:#06b6d4,color:#fff\n  style NN_A fill:#1e293b,stroke:#ec4899,color:#fff\n  style Processing_Engines fill:#0f172a,stroke:#64748b,color:#fff\n  style Default fill:none,stroke:#64748b,stroke-width:2px,stroke-dasharray: 5 5"
+}

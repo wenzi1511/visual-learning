@@ -1,0 +1,51 @@
+{
+  "id": "cnn-visualizer",
+  "name": "How CNN Works: Convolution Mechanics",
+  "difficulty": "Medium",
+  "description": "Convolutional Neural Networks (CNNs) process images using **Kernels** (filters) that slide across an input to extract features. This simulation visualizes the mathematical operation of a 2D convolution.\n\n### Key Concepts:\n- **Kernel (Filter)**: A small matrix of weights (e.g., 3x3) that detects patterns like edges or textures.\n- **Stride**: The number of pixels the filter moves at each step.\n- **Padding**: Adding zeros around the border to control the output size.\n- **Feature Map**: The resulting grid showing where the filter detected its specific pattern.\n\n### The Math:\nFor a window $X$ and kernel $W$, the output value $y$ is the dot product:\n$$y = \\sum_{i=1}^{k} \\sum_{j=1}^{k} X_{i,j} \\cdot W_{i,j}$$\n\nThe output dimensions are calculated as:\n$$O = \\lfloor \\frac{W - K + 2P}{S} \\rfloor + 1$$",
+  "tags": [
+    "machine learning",
+    "neural networks",
+    "computer science",
+    "mathematics"
+  ],
+  "inputs": [
+    {
+      "id": "kernelSize",
+      "label": "Kernel Size",
+      "type": "range",
+      "min": 3,
+      "max": 5,
+      "step": 2,
+      "value": 3
+    },
+    {
+      "id": "stride",
+      "label": "Stride",
+      "type": "range",
+      "min": 1,
+      "max": 3,
+      "step": 1,
+      "value": 1
+    },
+    {
+      "id": "padding",
+      "label": "Padding",
+      "type": "range",
+      "min": 0,
+      "max": 2,
+      "step": 1,
+      "value": 0
+    },
+    {
+      "id": "speed",
+      "label": "Scan Speed",
+      "type": "range",
+      "min": 1,
+      "max": 10,
+      "step": 1,
+      "value": 5
+    }
+  ],
+  "renderingCode": "class ScienceSimulation {\n    constructor(container, initialInputs) {\n        this.container = container;\n        this.canvas = document.createElement('canvas');\n        this.ctx = this.canvas.getContext('2d');\n        this.container.style.display = 'flex';\n        this.container.style.alignItems = 'center';\n        this.container.style.justifyContent = 'center';\n        this.container.style.background = '#f8fafc';\n        this.container.appendChild(this.canvas);\n        \n        this.inputGridSize = 7;\n        this.inputData = this.generateInputData(this.inputGridSize);\n        this.kernelData = [\n            [-1, 0, 1],\n            [-2, 0, 2],\n            [-1, 0, 1]\n        ];\n        \n        this.t = 0;\n        this.update(initialInputs);\n    }\n\n    generateInputData(size) {\n        const data = [];\n        for (let y = 0; y < size; y++) {\n            const row = [];\n            for (let x = 0; x < size; x++) {\n                // Create a simple vertical edge pattern\n                row.push(x < size / 2 ? 0.2 : 0.8);\n            }\n            data.push(row);\n        }\n        return data;\n    }\n\n    update(inputs) {\n        const { kernelSize, stride, padding, speed } = inputs;\n        const dpr = window.devicePixelRatio || 1;\n        const rect = this.container.getBoundingClientRect();\n        this.canvas.width = rect.width * dpr;\n        this.canvas.height = rect.height * dpr;\n        this.canvas.style.width = rect.width + 'px';\n        this.canvas.style.height = rect.height + 'px';\n        this.ctx.scale(dpr, dpr);\n\n        this.t += speed * 0.02;\n        \n        const cellSize = 35;\n        const gap = 100;\n        const startX = 50;\n        const startY = 100;\n\n        // Calculate output size\n        const outSize = Math.floor((this.inputGridSize - kernelSize + 2 * padding) / stride) + 1;\n        \n        // Determine current scan position\n        const totalSteps = outSize * outSize;\n        const currentStep = Math.floor(this.t) % totalSteps;\n        const outX = currentStep % outSize;\n        const outY = Math.floor(currentStep / outSize);\n        const inX = outX * stride - padding;\n        const inY = outY * stride - padding;\n\n        this.ctx.clearRect(0, 0, rect.width, rect.height);\n\n        // Draw Labels\n        this.ctx.font = 'bold 16px Inter, system-ui';\n        this.ctx.fillStyle = '#1e293b';\n        this.ctx.fillText('Input Image (7x7)', startX, startY - 40);\n        this.ctx.fillText('Feature Map (' + outSize + 'x' + outSize + ')', startX + (this.inputGridSize * cellSize) + gap, startY - 40);\n\n        // Draw Input Grid\n        for (let y = 0; y < this.inputGridSize; y++) {\n            for (let x = 0; x < this.inputGridSize; x++) {\n                const val = this.inputData[y][x];\n                this.drawCell(startX + x * cellSize, startY + y * cellSize, cellSize, val, '#cbd5e1');\n            }\n        }\n\n        // Draw Padding\n        if (padding > 0) {\n            this.ctx.strokeStyle = '#94a3b8';\n            this.ctx.setLineDash([4, 4]);\n            this.ctx.strokeRect(startX - padding * cellSize, startY - padding * cellSize, (this.inputGridSize + 2 * padding) * cellSize, (this.inputGridSize + 2 * padding) * cellSize);\n            this.ctx.setLineDash([]);\n        }\n\n        // Draw Kernel Highlight\n        this.ctx.fillStyle = 'rgba(59, 130, 246, 0.3)';\n        this.ctx.strokeStyle = '#3b82f6';\n        this.ctx.lineWidth = 2;\n        this.ctx.strokeRect(startX + inX * cellSize, startY + inY * cellSize, kernelSize * cellSize, kernelSize * cellSize);\n        this.ctx.fillRect(startX + inX * cellSize, startY + inY * cellSize, kernelSize * cellSize, kernelSize * cellSize);\n\n        // Draw Output Grid\n        const outStartX = startX + (this.inputGridSize * cellSize) + gap;\n        for (let y = 0; y < outSize; y++) {\n            for (let x = 0; x < outSize; x++) {\n                const isActive = x === outX && y === outY;\n                const opacity = (y * outSize + x <= currentStep) ? 1 : 0.2;\n                this.drawCell(outStartX + x * cellSize, startY + y * cellSize, cellSize, 0.6, isActive ? '#3b82f6' : '#64748b', opacity);\n            }\n        }\n\n        // Draw Connecting Lines\n        this.ctx.beginPath();\n        this.ctx.moveTo(startX + inX * cellSize + kernelSize * cellSize, startY + inY * cellSize);\n        this.ctx.lineTo(outStartX + outX * cellSize, startY + outY * cellSize);\n        this.ctx.moveTo(startX + inX * cellSize + kernelSize * cellSize, startY + inY * cellSize + kernelSize * cellSize);\n        this.ctx.lineTo(outStartX + outX * cellSize, startY + (outY + 1) * cellSize);\n        this.ctx.strokeStyle = 'rgba(59, 130, 246, 0.4)';\n        this.ctx.stroke();\n\n        // Draw Legend / Info\n        this.ctx.fillStyle = '#64748b';\n        this.ctx.font = '12px Inter';\n        this.ctx.fillText('Current Window: [' + inX + ', ' + inY + ']', startX, startY + (this.inputGridSize * cellSize) + 30);\n        this.ctx.fillText('Stride: ' + stride + ' | Kernel: ' + kernelSize + 'x' + kernelSize, startX, startY + (this.inputGridSize * cellSize) + 50);\n    }\n\n    drawCell(x, y, size, val, color, opacity = 1) {\n        this.ctx.globalAlpha = opacity;\n        this.ctx.fillStyle = color;\n        if (typeof color === 'string' && color.startsWith('#')) {\n            // If it's the base grid, use the value to shade it\n            if (color === '#cbd5e1') {\n                const v = Math.floor(val * 255);\n                this.ctx.fillStyle = `rgb(${v},${v},${v})`;\n            }\n        }\n        this.ctx.fillRect(x + 1, y + 1, size - 2, size - 2);\n        this.ctx.strokeStyle = 'rgba(0,0,0,0.05)';\n        this.ctx.strokeRect(x, y, size, size);\n        this.ctx.globalAlpha = 1.0;\n    }\n}"
+}
