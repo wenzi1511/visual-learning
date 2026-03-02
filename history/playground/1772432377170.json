@@ -1,0 +1,31 @@
+{
+  "id": "palindrome-checker",
+  "name": "Palindrome Checker",
+  "difficulty": "Easy",
+  "description": "<p>A <strong>palindrome</strong> is a word, phrase, number, or other sequence of characters which reads the same backward as forward. Typically, non-alphanumeric characters are ignored and case is disregarded.</p><p>This visualizer uses the <strong>Two-Pointer Technique</strong>:</p><ul><li>Place one pointer at the <code>start</code> of the string.</li><li>Place another pointer at the <code>end</code> of the string.</li><li>Compare the characters at each pointer. If they match, move both pointers toward the middle.</li><li>If they don't match, the string is not a palindrome.</li></ul>",
+  "tags": [
+    "Two Pointers",
+    "String",
+    "Array"
+  ],
+  "slots": [
+    {
+      "id": "string_array",
+      "type": "array",
+      "label": "String Characters"
+    },
+    {
+      "id": "variables",
+      "type": "hashmap",
+      "label": "State Variables"
+    }
+  ],
+  "inputs": [
+    {
+      "label": "Input String",
+      "default": "RaceCar",
+      "placeholder": "Enter a string to check..."
+    }
+  ],
+  "code": "class Playground {\n    async run(inputs) {\n        const rawInput = inputs[0] || \"racecar\";\n        \n        // Step 1: Clean the string (lowercase and remove non-alphanumeric)\n        this.log(\"Cleaning string: removing non-alphanumeric characters and converting to lowercase.\");\n        const cleanedString = rawInput.toLowerCase().replace(/[^a-z0-9]/g, \"\");\n        const chars = cleanedString.split(\"\");\n\n        // Step 2: Initialize Visuals\n        await this.string_array.init(chars);\n        await this.variables.init([]);\n        \n        if (chars.length === 0) {\n            this.log(\"Empty string is technically a palindrome.\");\n            return true;\n        }\n\n        let left = 0;\n        let right = chars.length - 1;\n\n        // Step 3: Two-Pointer Iteration\n        while (left <= right) {\n            // Update Visual State\n            this.variables.put(\"left_idx\", left);\n            this.variables.put(\"right_idx\", right);\n            this.variables.put(\"left_char\", chars[left]);\n            this.variables.put(\"right_char\", chars[right]);\n\n            // Highlight pointers in blue\n            this.string_array.highlight(left, \"#00e0ff\");\n            this.string_array.highlight(right, \"#00e0ff\");\n            \n            this.log(`Comparing characters at indices ${left} and ${right}`);\n            await this.await();\n\n            if (chars[left] !== chars[right]) {\n                // Highlight mismatch in red\n                this.string_array.highlight(left, \"#ff4d4d\");\n                this.string_array.highlight(right, \"#ff4d4d\");\n                this.log(`Mismatch found: '${chars[left]}' !== '${chars[right]}'. Not a palindrome.`);\n                await this.await();\n                return false;\n            }\n\n            // Highlight match in green\n            this.string_array.highlight(left, \"#00f5a0\");\n            this.string_array.highlight(right, \"#00f5a0\");\n            this.log(`Characters match: '${chars[left]}'. Moving pointers.`);\n            await this.await();\n\n            left++;\n            right--;\n        }\n\n        this.log(\"All pointers met or crossed with successful matches. This is a palindrome!\");\n        return true;\n    }\n}"
+}

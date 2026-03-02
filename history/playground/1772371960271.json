@@ -1,0 +1,49 @@
+{
+  "chatId": "1772371960271",
+  "name": "Binary Tree Level Order Traversal",
+  "difficulty": "Medium",
+  "timestamp": 1772371960271,
+  "conversationHistory": [
+    {
+      "role": "assistant",
+      "fullResponse": {
+        "id": "binary-tree-level-order-traversal",
+        "name": "Binary Tree Level Order Traversal",
+        "difficulty": "Medium",
+        "description": "<p>Given the <code>root</code> of a binary tree, return the <b>level order traversal</b> of its nodes' values. (i.e., from left to right, level by level).</p><p>We use a <b>Queue</b> to keep track of nodes at the current level and explore their children for the next level.</p><ul><li><b>Breadth-First Search (BFS)</b> is the primary algorithm used here.</li><li>We process all nodes at height <i>h</i> before moving to height <i>h + 1</i>.</li></ul>",
+        "tags": [
+          "Tree",
+          "Breadth-First Search",
+          "Queue",
+          "Binary Tree"
+        ],
+        "slots": [
+          {
+            "id": "tree",
+            "type": "binary-tree",
+            "label": "Binary Tree"
+          },
+          {
+            "id": "traversal_queue",
+            "type": "queue",
+            "label": "BFS Queue (Frontier)"
+          },
+          {
+            "id": "vars",
+            "type": "hashmap",
+            "label": "Variables"
+          }
+        ],
+        "inputs": [
+          {
+            "label": "Root Array (LeetCode format)",
+            "default": "[3, 9, 20, null, null, 15, 7]",
+            "placeholder": "e.g. [1, 2, 3, null, 4]"
+          }
+        ],
+        "code": "class Playground {\n    async run(inputs) {\n        // 1. Initialize data structures\n        let rootData;\n        try {\n            rootData = JSON.parse(inputs[0]);\n        } catch (e) {\n            this.log(\"Invalid input format. Please use [1, 2, 3]\");\n            return [];\n        }\n\n        this.tree.init(rootData);\n        this.traversal_queue.init([]);\n        this.vars.init([]);\n\n        const root = this.tree.getRoot();\n        if (!root) {\n            this.log(\"Tree is empty.\");\n            return [];\n        }\n\n        const result = [];\n        // Internal queue to hold node objects, slot queue for visualization\n        const internalQueue = [root];\n        this.traversal_queue.enqueue(root.val);\n\n        let levelIndex = 0;\n        this.vars.put(\"Current Level\", levelIndex);\n        this.log(\"Starting Level Order Traversal at root\");\n        await this.await();\n\n        while (internalQueue.length > 0) {\n            const levelSize = internalQueue.length;\n            const currentLevelValues = [];\n            this.vars.put(\"Nodes in current level\", levelSize);\n            this.log(`Processing Level ${levelIndex} with ${levelSize} nodes`);\n            await this.await();\n\n            for (let i = 0; i < levelSize; i++) {\n                // Dequeue from both internal and visual queue\n                const currentNode = internalQueue.shift();\n                this.traversal_queue.dequeue();\n\n                // Highlight the node being processed\n                this.tree.highlight(currentNode.id, \"#00e0ff\");\n                this.log(`Visiting node: ${currentNode.val}`);\n                currentLevelValues.push(currentNode.val);\n                await this.await();\n\n                // Check Left Child\n                if (currentNode.left) {\n                    this.log(`Adding left child ${currentNode.left.val} to queue`);\n                    internalQueue.push(currentNode.left);\n                    this.traversal_queue.enqueue(currentNode.left.val);\n                    this.tree.highlight(currentNode.left.id, \"#ffb703\");\n                    await this.await();\n                    // Reset color after adding to queue\n                    this.tree.highlight(currentNode.left.id, null);\n                }\n\n                // Check Right Child\n                if (currentNode.right) {\n                    this.log(`Adding right child ${currentNode.right.val} to queue`);\n                    internalQueue.push(currentNode.right);\n                    this.traversal_queue.enqueue(currentNode.right.val);\n                    this.tree.highlight(currentNode.right.id, \"#ffb703\");\n                    await this.await();\n                    // Reset color after adding to queue\n                    this.tree.highlight(currentNode.right.id, null);\n                }\n\n                // Mark processed node as 'visited'\n                this.tree.highlight(currentNode.id, \"#00f5a0\");\n            }\n\n            result.push(currentLevelValues);\n            levelIndex++;\n            this.vars.put(\"Current Level\", levelIndex);\n            this.log(`Finished level ${levelIndex - 1}. Current Result: ${JSON.stringify(result)}`);\n            await this.await();\n        }\n\n        this.log(\"Traversal complete.\");\n        return result;\n    }\n}"
+      }
+    }
+  ],
+  "visualHistory": []
+}

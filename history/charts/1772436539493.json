@@ -1,0 +1,75 @@
+{
+  "id": "big-o-time-complexity-analysis",
+  "name": "Big O Notation: Comparative Time Complexities",
+  "difficulty": "Algorithms",
+  "description": "<p>Big O notation is a mathematical notation used to describe the limiting behavior of a function when the argument tends towards a particular value or infinity. In computer science, it is used to classify algorithms according to how their run time or space requirements grow as the input size (<i>n</i>) grows.</p><ul><li><b>O(1) - Constant:</b> Execution time remains the same regardless of input size.</li><li><b>O(log n) - Logarithmic:</b> Execution time grows slowly, common in binary search.</li><li><b>O(n) - Linear:</b> Growth is proportional to the input size.</li><li><b>O(n log n) - Linearithmic:</b> Common in efficient sorting algorithms like Merge Sort.</li><li><b>O(n²) - Quadratic:</b> Performance is proportional to the square of the input, typical of nested loops.</li><li><b>O(2ⁿ) - Exponential:</b> Growth doubles with each addition to the input set, often seen in recursive solutions for the traveling salesman problem.</li></ul>",
+  "tags": [
+    "Algorithms",
+    "Complexity",
+    "Performance",
+    "Computer Science"
+  ],
+  "dataGenerationCode": "const n = []; for(let i=1; i<=20; i+=0.5) { n.push(i); } const o1 = n.map(() => 1); const oLogN = n.map(v => Math.log2(v)); const oN = n.map(v => v); const oNLogN = n.map(v => v * Math.log2(v)); const oN2 = n.map(v => Math.pow(v, 2)); const o2N = n.map(v => Math.pow(2, v)); return [ { x: n, y: o1, type: 'scatter', mode: 'lines', name: 'O(1)', line: { color: '#94a3b8', width: 3 } }, { x: n, y: oLogN, type: 'scatter', mode: 'lines', name: 'O(log n)', line: { color: '#10b981', width: 3 } }, { x: n, y: oN, type: 'scatter', mode: 'lines', name: 'O(n)', line: { color: '#3b82f6', width: 3 } }, { x: n, y: oNLogN, type: 'scatter', mode: 'lines', name: 'O(n log n)', line: { color: '#f59e0b', width: 3 } }, { x: n, y: oN2, type: 'scatter', mode: 'lines', name: 'O(n²)', line: { color: '#ef4444', width: 3 } }, { x: n, y: o2N, type: 'scatter', mode: 'lines', name: 'O(2ⁿ)', line: { color: '#8b5cf6', width: 3, dash: 'dot' } } ];",
+  "plotLayout": {
+    "title": "Complexity Growth Comparison",
+    "autosize": true,
+    "paper_bgcolor": "rgba(0,0,0,0)",
+    "plot_bgcolor": "rgba(0,0,0,0)",
+    "font": {
+      "color": "#cbd5e1",
+      "family": "Inter, system-ui, sans-serif"
+    },
+    "xaxis": {
+      "title": "Elements (n)",
+      "gridcolor": "#334155",
+      "zerolinecolor": "#475569",
+      "showgrid": true,
+      "range": [
+        1,
+        20
+      ]
+    },
+    "yaxis": {
+      "title": "Operations / Time",
+      "gridcolor": "#334155",
+      "zerolinecolor": "#475569",
+      "showgrid": true,
+      "range": [
+        0,
+        100
+      ]
+    },
+    "legend": {
+      "font": {
+        "size": 12
+      },
+      "bgcolor": "rgba(15, 23, 42, 0.8)"
+    },
+    "annotations": [
+      {
+        "x": 18,
+        "y": 95,
+        "text": "Horrible Growth",
+        "showarrow": true,
+        "arrowhead": 2,
+        "ax": -40,
+        "ay": -20,
+        "font": {
+          "color": "#ef4444"
+        }
+      },
+      {
+        "x": 18,
+        "y": 5,
+        "text": "Excellent Growth",
+        "showarrow": true,
+        "arrowhead": 2,
+        "ax": -40,
+        "ay": 20,
+        "font": {
+          "color": "#10b981"
+        }
+      }
+    ]
+  }
+}

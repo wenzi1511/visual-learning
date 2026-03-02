@@ -1,0 +1,42 @@
+{
+  "id": "optics-refraction-sim",
+  "name": "Refraction and Snell's Law",
+  "difficulty": "Medium",
+  "description": "This simulation visualizes the behavior of light as it passes from one medium to another. \n\n### Snell's Law\nWhen light travels from a medium with refractive index $n_1$ to another with $n_2$, it changes speed and direction. This is described by the equation:\n\n$$n_1 \\sin(\\theta_1) = n_2 \\sin(\\theta_2)$$\n\n### Key Concepts\n- **Refraction**: The bending of light as it enters a different medium.\n- **Total Internal Reflection (TIR)**: When light travels from a higher index medium to a lower one ($n_1 > n_2$), there is a 'Critical Angle' beyond which all light is reflected back into the first medium.\n- **Refractive Index ($n$)**: A dimensionless number that describes how fast light travels through the material (e.g., Vacuum = 1.0, Water $\\approx$ 1.33, Glass $\\approx$ 1.5).",
+  "tags": [
+    "physics",
+    "optics",
+    "waves",
+    "light"
+  ],
+  "inputs": [
+    {
+      "id": "n1",
+      "label": "Index n₁ (Top)",
+      "type": "range",
+      "min": 1,
+      "max": 2.5,
+      "step": 0.01,
+      "value": 1
+    },
+    {
+      "id": "n2",
+      "label": "Index n₂ (Bottom)",
+      "type": "range",
+      "min": 1,
+      "max": 2.5,
+      "step": 0.01,
+      "value": 1.5
+    },
+    {
+      "id": "angle",
+      "label": "Incident Angle (°)",
+      "type": "range",
+      "min": 0,
+      "max": 89,
+      "step": 1,
+      "value": 45
+    }
+  ],
+  "renderingCode": "class ScienceSimulation {\n    constructor(container, initialInputs) {\n        this.container = container;\n        this.canvas = document.createElement('canvas');\n        this.ctx = this.canvas.getContext('2d');\n        this.container.appendChild(this.canvas);\n        this.resize();\n        window.addEventListener('resize', () => this.resize());\n        this.update(initialInputs);\n    }\n\n    resize() {\n        this.canvas.width = this.container.clientWidth;\n        this.canvas.height = this.container.clientHeight;\n    }\n\n    drawArc(x, y, radius, startAngle, endAngle, color, label) {\n        this.ctx.beginPath();\n        this.ctx.strokeStyle = color;\n        this.ctx.lineWidth = 1.5;\n        this.ctx.arc(x, y, radius, startAngle, endAngle);\n        this.ctx.stroke();\n        if (label) {\n            const midAngle = (startAngle + endAngle) / 2;\n            const lx = x + (radius + 15) * Math.cos(midAngle);\n            const ly = y + (radius + 15) * Math.sin(midAngle);\n            this.ctx.fillStyle = color;\n            this.ctx.font = '12px Inter, sans-serif';\n            this.ctx.textAlign = 'center';\n            this.ctx.fillText(label, lx, ly);\n        }\n    }\n\n    update(inputs) {\n        const { canvas, ctx } = this;\n        const w = canvas.width;\n        const h = canvas.height;\n        const n1 = parseFloat(inputs.n1);\n        const n2 = parseFloat(inputs.n2);\n        const thetaI = (parseFloat(inputs.angle) * Math.PI) / 180;\n\n        ctx.clearRect(0, 0, w, h);\n\n        const centerX = w / 2;\n        const centerY = h / 2;\n        const rayLength = Math.min(w, h) * 0.4;\n\n        // Draw Backgrounds\n        ctx.fillStyle = '#f8fafc'; // Air-like\n        ctx.fillRect(0, 0, w, centerY);\n        ctx.fillStyle = '#dbeafe'; // Water/Glass-like\n        ctx.fillRect(0, centerY, w, h);\n\n        // Interface line\n        ctx.strokeStyle = '#475569';\n        ctx.lineWidth = 3;\n        ctx.beginPath();\n        ctx.moveTo(0, centerY);\n        ctx.lineTo(w, centerY);\n        ctx.stroke();\n\n        // Normal line\n        ctx.setLineDash([8, 8]);\n        ctx.strokeStyle = '#94a3b8';\n        ctx.lineWidth = 1;\n        ctx.beginPath();\n        ctx.moveTo(centerX, 20);\n        ctx.lineTo(centerX, h - 20);\n        ctx.stroke();\n        ctx.setLineDash([]);\n\n        // Physics Calculation\n        const sinThetaR = (n1 / n2) * Math.sin(thetaI);\n        const isTIR = sinThetaR > 1.0;\n        let thetaR = isTIR ? null : Math.asin(sinThetaR);\n\n        // Incident Ray\n        const incidentX = centerX - rayLength * Math.sin(thetaI);\n        const incidentY = centerY - rayLength * Math.cos(thetaI);\n        ctx.strokeStyle = '#f59e0b';\n        ctx.lineWidth = 4;\n        ctx.lineCap = 'round';\n        ctx.beginPath();\n        ctx.moveTo(incidentX, incidentY);\n        ctx.lineTo(centerX, centerY);\n        ctx.stroke();\n\n        // Reflected Ray (always present, but brighter during TIR)\n        const reflectX = centerX + rayLength * Math.sin(thetaI);\n        const reflectY = centerY - rayLength * Math.cos(thetaI);\n        ctx.strokeStyle = isTIR ? '#f59e0b' : 'rgba(245, 158, 11, 0.3)';\n        ctx.beginPath();\n        ctx.moveTo(centerX, centerY);\n        ctx.lineTo(reflectX, reflectY);\n        ctx.stroke();\n\n        if (!isTIR) {\n            // Refracted Ray\n            const refractX = centerX + rayLength * Math.sin(thetaR);\n            const refractY = centerY + rayLength * Math.cos(thetaR);\n            ctx.strokeStyle = '#3b82f6';\n            ctx.beginPath();\n            ctx.moveTo(centerX, centerY);\n            ctx.lineTo(refractX, refractY);\n            ctx.stroke();\n\n            // Refraction angle arc\n            this.drawArc(centerX, centerY, 50, Math.PI / 2 - thetaR, Math.PI / 2, '#3b82f6', (thetaR * 180 / Math.PI).toFixed(1) + '°');\n        } else {\n            // Critical Angle Text\n            const criticalAngle = Math.asin(n2 / n1) * 180 / Math.PI;\n            ctx.fillStyle = '#ef4444';\n            ctx.font = 'bold 16px Inter, sans-serif';\n            ctx.textAlign = 'left';\n            ctx.fillText('Total Internal Reflection!', 20, h - 40);\n            ctx.font = '14px Inter, sans-serif';\n            ctx.fillText('Critical Angle: ' + criticalAngle.toFixed(1) + '°', 20, h - 20);\n        }\n\n        // Incident angle arc\n        this.drawArc(centerX, centerY, 60, -Math.PI / 2, -Math.PI / 2 + thetaI, '#f59e0b', inputs.angle + '°');\n\n        // Labels\n        ctx.fillStyle = '#334155';\n        ctx.font = 'bold 14px Inter, sans-serif';\n        ctx.textAlign = 'left';\n        ctx.fillText('Medium 1 (n₁ = ' + n1.toFixed(2) + ')', 20, centerY - 20);\n        ctx.fillText('Medium 2 (n₂ = ' + n2.toFixed(2) + ')', 20, centerY + 30);\n\n        // Arrow heads for rays\n        const drawArrow = (x1, y1, x2, y2, color) => {\n            const angle = Math.atan2(y2 - y1, x2 - x1);\n            ctx.fillStyle = color;\n            ctx.save();\n            ctx.translate(x2, y2);\n            ctx.rotate(angle);\n            ctx.beginPath();\n            ctx.moveTo(0, 0);\n            ctx.lineTo(-10, -5);\n            ctx.lineTo(-10, 5);\n            ctx.fill();\n            ctx.restore();\n        };\n\n        drawArrow(incidentX, incidentY, (incidentX + centerX) / 2, (incidentY + centerY) / 2, '#f59e0b');\n        if (!isTIR) {\n            const refractX = centerX + rayLength * Math.sin(thetaR);\n            const refractY = centerY + rayLength * Math.cos(thetaR);\n            drawArrow(centerX, centerY, (centerX + refractX) / 2, (centerY + refractY) / 2, '#3b82f6');\n        }\n    }\n}"
+}

@@ -1,0 +1,42 @@
+{
+  "id": "binary-tree-dfs-traversal",
+  "name": "Binary Tree DFS (Pre-order)",
+  "difficulty": "Easy",
+  "description": "<p>Depth First Search (DFS) is a fundamental graph/tree traversal algorithm. In a <strong>Pre-order traversal</strong>, we visit the nodes in the following order:</p><ul><li>1. Visit the <b>Root</b></li><li>2. Traverse the <b>Left</b> subtree</li><li>3. Traverse the <b>Right</b> subtree</li></ul><p>This visualization tracks the <code>Call Stack</code>, the <code>Recursion Tree</code>, and the resulting <code>Traversal Order</code> array simultaneously.</p>",
+  "tags": [
+    "Tree",
+    "DFS",
+    "Recursion",
+    "Binary Tree"
+  ],
+  "slots": [
+    {
+      "id": "tree",
+      "type": "binary-tree",
+      "label": "Binary Tree"
+    },
+    {
+      "id": "callstack",
+      "type": "callstack",
+      "label": "Call Stack"
+    },
+    {
+      "id": "recursionTree",
+      "type": "recursion-tree",
+      "label": "Recursion Tree"
+    },
+    {
+      "id": "traversalOrder",
+      "type": "array",
+      "label": "Pre-order Result"
+    }
+  ],
+  "inputs": [
+    {
+      "label": "Tree Values (Level Order)",
+      "default": "[1, 2, 3, 4, 5, null, 6]",
+      "placeholder": "e.g. [1, 2, 3]"
+    }
+  ],
+  "code": "class Playground {\n    async run(inputs) {\n        let treeData;\n        try {\n            treeData = JSON.parse(inputs[0]);\n        } catch (e) {\n            this.log(\"Invalid input format. Please provide a JSON array.\");\n            return null;\n        }\n\n        // 1. Initialize data structures\n        this.tree.init(treeData);\n        this.callstack.init();\n        this.recursionTree.init();\n        this.traversalOrder.init([]);\n\n        const root = this.tree.getRoot();\n        \n        if (!root) {\n            this.log(\"Tree is empty.\");\n            return [];\n        }\n\n        const result = [];\n\n        // 2. Define Recursive DFS function\n        const dfs = async (node) => {\n            if (!node) return;\n\n            // --- ENTERING NODE ---\n            const nodeId = node.id;\n            const nodeVal = node.val;\n\n            // Push frame to call stack and enter recursion tree\n            this.callstack.pushFrame(\"dfs\", { val: nodeVal });\n            this.recursionTree.enterNode(nodeId, nodeVal.toString());\n            \n            // Highlight the current node in the binary tree\n            this.tree.highlight(nodeId, \"#00e0ff\"); // Current node color\n            this.log(`Visiting Node: ${nodeVal}`);\n            \n            // Process current node (Pre-order: Root first)\n            result.push(nodeVal);\n            this.traversalOrder.push(nodeVal);\n            this.traversalOrder.highlight(result.length - 1, \"#00f5a0\");\n            \n            await this.await();\n\n            // --- RECURSE LEFT ---\n            if (node.left) {\n                this.log(`Moving Left from ${nodeVal}`);\n                await dfs(node.left);\n            } else {\n                this.log(`No left child for ${nodeVal}`);\n                // Optional: visualize null child check\n                this.callstack.pushFrame(\"dfs\", { val: \"null\" });\n                await this.await();\n                this.callstack.popFrame();\n            }\n\n            // --- RECURSE RIGHT ---\n            if (node.right) {\n                this.log(`Moving Right from ${nodeVal}`);\n                await dfs(node.right);\n            } else {\n                this.log(`No right child for ${nodeVal}`);\n                this.callstack.pushFrame(\"dfs\", { val: \"null\" });\n                await this.await();\n                this.callstack.popFrame();\n            }\n\n            // --- EXITING NODE ---\n            this.log(`Finished processing node ${nodeVal}, returning...`);\n            this.tree.highlight(nodeId, \"#00f5a0\"); // Mark as completed/visited\n            \n            this.callstack.popFrame(nodeVal);\n            this.recursionTree.exitNode();\n            await this.await();\n        };\n\n        // 3. Start traversal\n        await dfs(root);\n\n        this.log(\"DFS Traversal Complete!\");\n        return result;\n    }\n}"
+}

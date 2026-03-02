@@ -1,0 +1,87 @@
+{
+  "id": "chaotic-double-pendulum-simulation",
+  "name": "Chaos Theory: Double Pendulum",
+  "difficulty": "Hard",
+  "description": "The double pendulum is a classic example of a complex dynamical system that exhibits **deterministic chaos**. While its behavior is governed by a set of coupled ordinary differential equations, it is highly sensitive to initial conditions ($the$ 'Butterfly Effect').\n\n### The Physics of Chaos\nThe motion is derived using the Lagrangian mechanics formulation. The state of the system is defined by two angles, $\\theta_1$ and $\\theta_2$. The Lagrangian $L = T - V$ leads to the following angular accelerations:\n\n$$\\alpha_1 = \\frac{-g(2m_1+m_2)\\sin\\theta_1 - m_2g\\sin(\\theta_1-2\\theta_2) - 2\\sin(\\theta_1-\\theta_2)m_2(\\dot{\\theta}_2^2L_2 + \\dot{\\theta}_1^2L_1\\cos(\\theta_1-\\theta_2))}{L_1(2m_1+m_2-m_2\\cos(2\\theta_1-2\\theta_2))}$$\n\n$$\\alpha_2 = \\frac{2\\sin(\\theta_1-\\theta_2)(\\dot{\\theta}_1^2L_1(m_1+m_2) + g(m_1+m_2)\\cos\\theta_1 + \\dot{\\theta}_2^2L_2m_2\\cos(\\theta_1-\\theta_2))}{L_2(2m_1+m_2-m_2\\cos(2\\theta_1-2\\theta_2))}$$\n\nEven with identical starting parameters, a difference of $0.0001$ degrees in the initial angle would lead to a completely different trajectory within seconds. This simulation allows you to explore these parameters and visualize the beautiful, unpredictable path (phase trace) of the lower mass.",
+  "tags": [
+    "physics",
+    "chaos",
+    "mechanics",
+    "mathematics"
+  ],
+  "inputs": [
+    {
+      "id": "mass1",
+      "label": "Mass 1 (kg)",
+      "type": "range",
+      "min": 5,
+      "max": 50,
+      "step": 1,
+      "value": 20
+    },
+    {
+      "id": "mass2",
+      "label": "Mass 2 (kg)",
+      "type": "range",
+      "min": 5,
+      "max": 50,
+      "step": 1,
+      "value": 20
+    },
+    {
+      "id": "length1",
+      "label": "Arm 1 Length",
+      "type": "range",
+      "min": 50,
+      "max": 150,
+      "step": 1,
+      "value": 120
+    },
+    {
+      "id": "length2",
+      "label": "Arm 2 Length",
+      "type": "range",
+      "min": 50,
+      "max": 150,
+      "step": 1,
+      "value": 120
+    },
+    {
+      "id": "angle1",
+      "label": "Start Angle 1 (deg)",
+      "type": "range",
+      "min": 0,
+      "max": 360,
+      "step": 1,
+      "value": 90
+    },
+    {
+      "id": "angle2",
+      "label": "Start Angle 2 (deg)",
+      "type": "range",
+      "min": 0,
+      "max": 360,
+      "step": 1,
+      "value": 90
+    },
+    {
+      "id": "gravity",
+      "label": "Gravity",
+      "type": "range",
+      "min": 0,
+      "max": 2,
+      "step": 0.1,
+      "value": 0.8
+    },
+    {
+      "id": "damping",
+      "label": "Damping",
+      "type": "range",
+      "min": 0,
+      "max": 0.01,
+      "step": 0.001,
+      "value": 0.001
+    }
+  ],
+  "renderingCode": "class ScienceSimulation {\n    constructor(container, initialInputs) {\n        this.container = container;\n        this.canvas = document.createElement('canvas');\n        this.ctx = this.canvas.getContext('2d');\n        this.container.appendChild(this.canvas);\n        this.history = [];\n        this.state = {\n            th1: (initialInputs.angle1 * Math.PI) / 180,\n            th2: (initialInputs.angle2 * Math.PI) / 180,\n            v1: 0,\n            v2: 0\n        };\n        this.lastAngles = JSON.stringify({ a1: initialInputs.angle1, a2: initialInputs.angle2 });\n        this.resize();\n        window.addEventListener('resize', () => this.resize());\n    }\n\n    resize() {\n        this.canvas.width = this.container.clientWidth;\n        this.canvas.height = this.container.clientHeight;\n    }\n\n    update(inputs) {\n        const currentAngles = JSON.stringify({ a1: inputs.angle1, a2: inputs.angle2 });\n        if (this.lastAngles !== currentAngles) {\n            this.state.th1 = (inputs.angle1 * Math.PI) / 180;\n            this.state.th2 = (inputs.angle2 * Math.PI) / 180;\n            this.state.v1 = 0;\n            this.state.v2 = 0;\n            this.history = [];\n            this.lastAngles = currentAngles;\n        }\n\n        const m1 = inputs.mass1;\n        const m2 = inputs.mass2;\n        const l1 = inputs.length1;\n        const l2 = inputs.length2;\n        const g = inputs.gravity;\n        const damp = 1 - inputs.damping;\n\n        let { th1, th2, v1, v2 } = this.state;\n\n        for (let i = 0; i < 2; i++) {\n            let num1 = -g * (2 * m1 + m2) * Math.sin(th1);\n            let num2 = -m2 * g * Math.sin(th1 - 2 * th2);\n            let num3 = -2 * Math.sin(th1 - th2) * m2;\n            let num4 = v2 * v2 * l2 + v1 * v1 * l1 * Math.cos(th1 - th2);\n            let den = l1 * (2 * m1 + m2 - m2 * Math.cos(2 * th1 - 2 * th2));\n            let a1_a = (num1 + num2 + num3 * num4) / den;\n\n            num1 = 2 * Math.sin(th1 - th2);\n            num2 = (v1 * v1 * l1 * (m1 + m2));\n            num3 = g * (m1 + m2) * Math.cos(th1);\n            num4 = v2 * v2 * l2 * m2 * Math.cos(th1 - th2);\n            den = l2 * (2 * m1 + m2 - m2 * Math.cos(2 * th1 - 2 * th2));\n            let a2_a = (num1 * (num2 + num3 + num4)) / den;\n\n            v1 += a1_a;\n            v2 += a2_a;\n            v1 *= damp;\n            v2 *= damp;\n            th1 += v1;\n            th2 += v2;\n        }\n\n        this.state = { th1, th2, v1, v2 };\n\n        const ctx = this.ctx;\n        ctx.fillStyle = '#0f172a';\n        ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);\n\n        const cx = this.canvas.width / 2;\n        const cy = this.canvas.height / 2.5;\n\n        const x1 = l1 * Math.sin(th1);\n        const y1 = l1 * Math.cos(th1);\n        const x2 = x1 + l2 * Math.sin(th2);\n        const y2 = y1 + l2 * Math.cos(th2);\n\n        this.history.push({ x: x2 + cx, y: y2 + cy });\n        if (this.history.length > 500) this.history.shift();\n\n        if (this.history.length > 1) {\n            ctx.lineWidth = 1.5;\n            for (let i = 1; i < this.history.length; i++) {\n                const ratio = i / this.history.length;\n                ctx.strokeStyle = `rgba(59, 130, 246, ${ratio * 0.8})`;\n                ctx.beginPath();\n                ctx.moveTo(this.history[i - 1].x, this.history[i - 1].y);\n                ctx.lineTo(this.history[i].x, this.history[i].y);\n                ctx.stroke();\n            }\n        }\n\n        ctx.strokeStyle = '#94a3b8';\n        ctx.lineWidth = 4;\n        ctx.lineCap = 'round';\n        ctx.beginPath();\n        ctx.moveTo(cx, cy);\n        ctx.lineTo(x1 + cx, y1 + cy);\n        ctx.lineTo(x2 + cx, y2 + cy);\n        ctx.stroke();\n\n        ctx.fillStyle = '#3b82f6';\n        ctx.beginPath();\n        ctx.arc(x1 + cx, y1 + cy, 8, 0, Math.PI * 2);\n        ctx.fill();\n        ctx.shadowBlur = 15;\n        ctx.shadowColor = '#3b82f6';\n        ctx.fillStyle = '#60a5fa';\n        ctx.beginPath();\n        ctx.arc(x2 + cx, y2 + cy, 10, 0, Math.PI * 2);\n        ctx.fill();\n        ctx.shadowBlur = 0;\n\n        ctx.fillStyle = '#f8fafc';\n        ctx.font = '14px Inter, system-ui';\n        ctx.textAlign = 'center';\n        ctx.fillText(`Angular Vel 1: ${v1.toFixed(3)} rad/s`, cx, this.canvas.height - 40);\n        ctx.fillText(`Angular Vel 2: ${v2.toFixed(3)} rad/s`, cx, this.canvas.height - 20);\n    }\n}"
+}

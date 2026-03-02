@@ -1,0 +1,13 @@
+{
+  "id": "devops-lifecycle-standard",
+  "name": "The Modern DevOps Life Cycle",
+  "difficulty": "Beginner",
+  "description": "<p>The DevOps life cycle represents the continuous movement of software from planning to monitoring. It emphasizes the collaboration between Development and Operations teams through <b>Continuous Integration (CI)</b> and <b>Continuous Deployment (CD)</b>. By automating the build, test, and release phases, organizations can shorten the systems development life cycle and provide continuous delivery with high software quality.</p><ul><li><b>CI:</b> Automating the integration of code changes into a shared repository.</li><li><b>CD:</b> Automating the delivery of applications to selected infrastructure environments.</li><li><b>Feedback Loop:</b> Monitoring data informs the next planning phase, closing the loop.</li></ul>",
+  "tags": [
+    "DevOps",
+    "CI/CD",
+    "Workflow",
+    "SDLC"
+  ],
+  "code": "graph LR\n  subgraph SG_DEV [Planning & Coding]\n    PLAN[Planning] --> CODE[Coding]\n  end\n\n  subgraph SG_CI [Continuous Integration]\n    CODE --> BUILD[Build]\n    BUILD --> TEST[Automated Testing]\n  end\n\n  subgraph SG_CD [Continuous Delivery]\n    TEST --> RELEASE[Release Packaging]\n    RELEASE --> DEPLOY[Deployment]\n  end\n\n  subgraph SG_OPS [Operations & Feedback]\n    DEPLOY --> OPERATE[Operations]\n    OPERATE --> MONITOR[Monitoring]\n    MONITOR -.-> PLAN\n  end\n\n  style SG_DEV fill:none,stroke:#64748b,stroke-width:2px,stroke-dasharray: 5 5\n  style SG_CI fill:none,stroke:#64748b,stroke-width:2px,stroke-dasharray: 5 5\n  style SG_CD fill:none,stroke:#64748b,stroke-width:2px,stroke-dasharray: 5 5\n  style SG_OPS fill:none,stroke:#64748b,stroke-width:2px,stroke-dasharray: 5 5\n\n  classDef stage fill:#ffffff,stroke:#334155,stroke-width:2px,color:#0f172a,font-weight:bold\n  class PLAN,CODE,BUILD,TEST,RELEASE,DEPLOY,OPERATE,MONITOR stage"
+}
