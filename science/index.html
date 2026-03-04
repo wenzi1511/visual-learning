@@ -735,11 +735,19 @@
                     modelSelect.disabled = false;
                 });
 
-            // Restore key if switching platforms
-            if (platform === 'gemini') {
-                document.getElementById('ai-api-key').value = localStorage.getItem('gemini_api_key') || '';
+            // Save API key
+            if (apiKey) {
+                if (platform === 'gemini') {
+                    localStorage.setItem('gemini_api_key', apiKey);
+                } else {
+                    localStorage.setItem('groq_api_key', apiKey);
+                }
             } else {
-                document.getElementById('ai-api-key').value = localStorage.getItem('groq_api_key') || '';
+                if (platform === 'gemini') {
+                    document.getElementById('ai-api-key').value = localStorage.getItem('gemini_api_key') || '';
+                } else {
+                    document.getElementById('ai-api-key').value = localStorage.getItem('groq_api_key') || '';
+                }
             }
         }
 

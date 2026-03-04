@@ -3736,6 +3736,11 @@ async function fetchModels() {
     const modelSelect = document.getElementById('ai-model');
     const statusEl = document.getElementById('ai-status');
 
+    if (apiKey) {
+        if (platform === 'groq') localStorage.setItem('groqApiKey', apiKey);
+        else localStorage.setItem('geminiApiKey', apiKey);
+    }
+
     if (!apiKey) {
         modelSelect.innerHTML = '<option value="">Enter API Key to load models...</option>';
         return;

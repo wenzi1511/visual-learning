@@ -1,0 +1,39 @@
+{
+  "id": "knn-visualizer-001",
+  "name": "K-Nearest Neighbors Classification Demo",
+  "difficulty": "Medium",
+  "description": "A step‑by‑step visual demonstration of the **k‑Nearest Neighbors (k‑NN)** algorithm in 2‑D. A random dataset of two classes (blue and red) is generated inside a unit square. A query point (yellow) is placed by the user. The simulation shows (1) the generated points, (2) distances from the query point and highlights the *k* nearest neighbors, and (3) the resulting classification based on majority vote. Use the sliders to change *k*, the query point coordinates, and the dataset size. The math is displayed with KaTeX in the step descriptions, e.g., $d = \\sqrt{(x_i-x_q)^2+(y_i-y_q)^2}$.",
+  "tags": [
+    "machine‑learning",
+    "classification",
+    "knn",
+    "statistics"
+  ],
+  "inputs": [
+    {
+      "id": "k",
+      "label": "Number of Neighbors k",
+      "type": "number",
+      "value": 3
+    },
+    {
+      "id": "pointX",
+      "label": "Query X (0‑1)",
+      "type": "number",
+      "value": 0.5
+    },
+    {
+      "id": "pointY",
+      "label": "Query Y (0‑1)",
+      "type": "number",
+      "value": 0.5
+    },
+    {
+      "id": "datasetSize",
+      "label": "Dataset Size",
+      "type": "number",
+      "value": 30
+    }
+  ],
+  "renderingCode": "class ScienceSimulation {\\n    constructor(container, initialInputs) {\\n        this.container = container;\\n        this.canvas = document.createElement('canvas');\\n        this.ctx = this.canvas.getContext('2d');\\n        this.container.appendChild(this.canvas);\\n        this.resize();\\n        window.addEventListener('resize', () => this.resize());\\n    }\\n    resize() {\\n        this.canvas.width = this.container.clientWidth;\\n        this.canvas.height = this.container.clientHeight;\\n    }\\n    getSteps(inputs) {\\n        const steps = [];\\n        steps.push({\\n            title: 'Step 1: Dataset',\\n            description: `A random dataset of ${inputs.datasetSize} points is generated in the unit square. The query point is (${inputs.pointX.toFixed(2)}, ${inputs.pointY.toFixed(2)}).`\\n        });\\n        steps.push({\\n            title: 'Step 2: Distances',\\n            description: `Distances from the query point to each dataset point are computed. The ${inputs.k} nearest neighbors are highlighted.`\\n        });\\n        steps.push({\\n            title: 'Step 3: Classification',\\n            description: `The majority class among the ${inputs.k} nearest neighbors determines the class of the query point.`\\n        });\\n        return steps;\\n    }\\n    render(inputs, stepIndex) {\\n        const ctx = this.ctx;\\n        const w = this.canvas.width;\\n        const h = this.canvas.height;\\n        ctx.clearRect(0, 0, w, h);\\n        // ---- generate random dataset ----\\n        const points = [];\\n        for (let i = 0; i < inputs.datasetSize; i++) {\\n            const x = Math.random();\\n            const y = Math.random();\\n            const cls = Math.random() < 0.5 ? 'A' : 'B';\\n            points.push({ x, y, cls });\\n        }\\n        // ---- draw dataset points ----\\n        points.forEach(p => {\\n            ctx.fillStyle = p.cls === 'A' ? '#3b82f6' : '#ef4444'; // blue for A, red for B\\n            ctx.beginPath();\\n            ctx.arc(p.x * w, p.y * h, 5, 0, 2 * Math.PI);\\n            ctx.fill();\\n        });\\n        // ---- draw query point ----\\n        const qx = inputs.pointX;\\n        const qy = inputs.pointY;\\n        ctx.fillStyle = '#fbbf24'; // amber\\n        ctx.beginPath();\\n        ctx.arc(qx * w, qy * h, 7, 0, 2 * Math.PI);\\n        ctx.fill();\\n        if (stepIndex >= 1) {\\n            // compute distances and find nearest neighbors\\n            const dists = points.map(p => ({ p, d: Math.hypot(p.x - qx, p.y - qy) }));\\n            dists.sort((a, b) => a.d - b.d);\\n            const nearest = dists.slice(0, inputs.k);\\n            // draw lines to nearest neighbors\\n            ctx.strokeStyle = '#10b981'; // emerald\\n            ctx.lineWidth = 2;\\n            nearest.forEach(n => {\\n                ctx.beginPath();\\n                ctx.moveTo(qx * w, qy * h);\\n                ctx.lineTo(n.p.x * w, n.p.y * h);\\n                ctx.stroke();\\n            });\\n            // highlight nearest points\\n            nearest.forEach(n => {\\n                ctx.fillStyle = '#10b981';\\n                ctx.beginPath();\\n                ctx.arc(n.p.x * w, n.p.y * h, 8, 0, 2 * Math.PI);\\n                ctx.fill();\\n            });\\n        }\\n        if (stepIndex >= 2) {\\n            // classification result\\n            const dists = points.map(p => ({ p, d: Math.hypot(p.x - qx, p.y - qy) }));\\n            dists.sort((a, b) => a.d - b.d);\\n            const nearest = dists.slice(0, inputs.k);\\n            const countA = nearest.filter(n => n.p.cls === 'A').length;\\n            const countB = nearest.filter(n => n.p.cls === 'B').length;\\n            const cls = countA > countB ? 'A' : 'B';\\n            ctx.fillStyle = 'white';\\n            ctx.font = '20px sans-serif';\\n            ctx.fillText(`Classified as ${cls}`, 10, h - 20);\\n        }\\n    }\\n}"
+}

@@ -1,0 +1,48 @@
+{
+  "id": "transformer-llm-architecture",
+  "name": "How ChatGPT Works: Transformer Visualizer",
+  "difficulty": "Hard",
+  "description": "Large Language Models (LLMs) like ChatGPT are built on the **Transformer** architecture. This simulation visualizes the flow of data from raw text to the final probability distribution of the next word.\n\n### Key Concepts:\n1. **Tokenization**: Text is split into tokens (words or sub-words).\n2. **Embeddings**: Each token is converted into a high-dimensional vector $E \\in \\mathbb{R}^{d_{model}}$.\n3. **Self-Attention**: Tokens 'communicate' with each other to determine context. The relevance of token $j$ to token $i$ is calculated using the formula:\n   $$\\text{Attention}(Q, K, V) = \\text{softmax}\\left(\\frac{QK^T}{\\sqrt{d_k}}\\right)V$$\n4. **Temperature**: This parameter $T$ controls the randomness of the output. Higher $T$ results in more creative/random text by flattening the probability distribution:\n   $$P_i = \\frac{e^{z_i/T}}{\\sum_j e^{z_j/T}}$$",
+  "tags": [
+    "AI",
+    "Computer Science",
+    "Machine Learning",
+    "NLP"
+  ],
+  "inputs": [
+    {
+      "id": "numTokens",
+      "label": "Number of Tokens",
+      "type": "range",
+      "min": 3,
+      "max": 8,
+      "step": 1,
+      "value": 5
+    },
+    {
+      "id": "embDim",
+      "label": "Embedding Dimensions (Visual)",
+      "type": "number",
+      "value": 10
+    },
+    {
+      "id": "numHeads",
+      "label": "Attention Heads",
+      "type": "range",
+      "min": 1,
+      "max": 8,
+      "step": 1,
+      "value": 4
+    },
+    {
+      "id": "temperature",
+      "label": "Temperature (Softmax)",
+      "type": "range",
+      "min": 0.1,
+      "max": 2,
+      "step": 0.1,
+      "value": 0.7
+    }
+  ],
+  "renderingCode": "class ScienceSimulation {\n    constructor(container, initialInputs) {\n        this.container = container;\n        this.canvas = document.createElement('canvas');\n        this.ctx = this.canvas.getContext('2d');\n        this.container.appendChild(this.canvas);\n        this.tokens = [\"The\", \"quick\", \"brown\", \"fox\", \"jumps\", \"over\", \"the\", \"lazy\"];\n        this.resize();\n        window.addEventListener('resize', () => this.resize());\n    }\n\n    resize() {\n        this.canvas.width = this.container.clientWidth;\n        this.canvas.height = Math.max(500, this.container.clientHeight);\n    }\n\n    getSteps(inputs) {\n        const vocabSize = 50257;\n        return [\n            {\n                title: \"Step 1: Tokenization\",\n                description: `Raw text is mapped to unique integers. For ${inputs.numTokens} tokens, the model looks up indices in a vocabulary of ${vocabSize.toLocaleString()} entries.`\n            },\n            {\n                title: \"Step 2: Vector Embedding\",\n                description: `Integers are converted into continuous vectors of size $d_{model}$. We add Positional Encodings so the model knows 'The' is at index 0 and 'quick' is at index 1.`\n            },\n            {\n                title: \"Step 3: Multi-Head Self-Attention\",\n                description: `Each token calculates how much 'attention' to pay to others. With **${inputs.numHeads} heads**, the model can track ${inputs.numHeads} different types of relationships simultaneously (e.g., grammar, subject-verb, semantics).`\n            },\n            {\n                title: \"Step 4: Feed Forward & Layer Norm\",\n                description: `The attention output is refined through a Multi-Layer Perceptron (MLP). This projects the contextual data into a higher abstract space to extract complex logic.`\n            },\n            {\n                title: \"Step 5: Output Logits & Softmax\",\n                description: `The final vector is projected back to the vocabulary size. At Temperature **${inputs.temperature}**, the probabilities are calculated. Lower temperature makes the model more confident/repetitive; higher makes it more diverse.`\n            }\n        ];\n    }\n\n    drawToken(x, y, text, isActive) {\n        const ctx = this.ctx;\n        ctx.fillStyle = isActive ? '#3b82f6' : '#1e293b';\n        ctx.strokeStyle = '#64748b';\n        ctx.lineWidth = 2;\n        ctx.beginPath();\n        ctx.roundRect(x - 40, y - 20, 80, 40, 8);\n        ctx.fill();\n        ctx.stroke();\n        ctx.fillStyle = '#f8fafc';\n        ctx.font = 'bold 14px Inter, system-ui';\n        ctx.textAlign = 'center';\n        ctx.fillText(text, x, y + 5);\n    }\n\n    drawVector(x, y, size, values) {\n        const ctx = this.ctx;\n        const cellH = 12;\n        const cellW = 20;\n        values.forEach((v, i) => {\n            ctx.fillStyle = `rgba(59, 130, 246, ${0.2 + v * 0.8})`;\n            ctx.fillRect(x - cellW / 2, y + i * cellH, cellW, cellH);\n            ctx.strokeStyle = 'rgba(255,255,255,0.1)';\n            ctx.strokeRect(x - cellW / 2, y + i * cellH, cellW, cellH);\n        });\n    }\n\n    render(inputs, stepIndex) {\n        const ctx = this.ctx;\n        const w = this.canvas.width;\n        const h = this.canvas.height;\n        const { numTokens, embDim, temperature, numHeads } = inputs;\n\n        ctx.clearRect(0, 0, w, h);\n        ctx.fillStyle = '#0f172a';\n        ctx.fillRect(0, 0, w, h);\n\n        const centerX = w / 2;\n        const spacing = Math.min(w / (numTokens + 1), 100);\n        const startX = centerX - (spacing * (numTokens - 1)) / 2;\n\n        // Step 1: Tokenization\n        if (stepIndex >= 0) {\n            for (let i = 0; i < numTokens; i++) {\n                this.drawToken(startX + i * spacing, 80, this.tokens[i % this.tokens.length], stepIndex === 0);\n            }\n        }\n\n        // Step 2: Embeddings\n        if (stepIndex >= 1) {\n            for (let i = 0; i < numTokens; i++) {\n                const vals = Array.from({ length: Math.min(embDim, 8) }, (_, k) => Math.abs(Math.sin(i * k + 1)));\n                this.drawVector(startX + i * spacing, 120, embDim, vals);\n                if (stepIndex === 1) {\n                    ctx.strokeStyle = '#3b82f6';\n                    ctx.beginPath();\n                    ctx.moveTo(startX + i * spacing, 100);\n                    ctx.lineTo(startX + i * spacing, 120);\n                    ctx.stroke();\n                }\n            }\n        }\n\n        // Step 3: Attention\n        if (stepIndex >= 2) {\n            ctx.save();\n            ctx.globalAlpha = stepIndex === 2 ? 1 : 0.3;\n            for (let i = 0; i < numTokens; i++) {\n                for (let j = 0; j < numTokens; j++) {\n                    if (i === j) continue;\n                    const strength = Math.abs(Math.cos(i * j * 0.5)) * 0.5;\n                    ctx.beginPath();\n                    ctx.strokeStyle = `rgba(147, 197, 253, ${strength})`;\n                    ctx.lineWidth = strength * 5;\n                    const cpX = (startX + i * spacing + startX + j * spacing) / 2;\n                    const cpY = 280 + Math.abs(i - j) * 20;\n                    ctx.moveTo(startX + i * spacing, 220);\n                    ctx.quadraticCurveTo(cpX, cpY, startX + j * spacing, 220);\n                    ctx.stroke();\n                }\n            }\n            ctx.restore();\n        }\n\n        // Step 4: MLP / Transformer Block\n        if (stepIndex >= 3) {\n            const rectY = 320;\n            ctx.fillStyle = stepIndex === 3 ? '#1e3a8a' : '#1e293b';\n            ctx.strokeStyle = '#3b82f6';\n            ctx.beginPath();\n            ctx.roundRect(startX - 50, rectY, (numTokens - 1) * spacing + 100, 60, 10);\n            ctx.fill();\n            ctx.stroke();\n            ctx.fillStyle = '#f8fafc';\n            ctx.font = '12px monospace';\n            ctx.textAlign = 'center';\n            ctx.fillText('TRANSFORMER BLOCK (FFN + LAYER NORM)', centerX, rectY + 35);\n        }\n\n        // Step 5: Softmax\n        if (stepIndex >= 4) {\n            const barY = 420;\n            const nextWords = ['dog', 'mat', 'car', 'tree', 'box'];\n            const rawLogits = [10, 8, 3, 2, 1];\n            \n            // Temperature Scaling\n            const scaledLogits = rawLogits.map(l => Math.exp(l / temperature));\n            const sum = scaledLogits.reduce((a, b) => a + b, 0);\n            const probs = scaledLogits.map(s => s / sum);\n\n            probs.forEach((p, i) => {\n                const barW = 60;\n                const barH = p * 80;\n                const bx = centerX - (barW * 2.5) + i * (barW + 10);\n                \n                ctx.fillStyle = i === 0 ? '#10b981' : '#3b82f6';\n                ctx.fillRect(bx, barY - barH, barW, barH);\n                \n                ctx.fillStyle = '#f8fafc';\n                ctx.font = '10px Inter';\n                ctx.fillText(nextWords[i], bx + barW / 2, barY + 15);\n                ctx.fillText((p * 100).toFixed(1) + '%', bx + barW / 2, barY - barH - 5);\n            });\n\n            ctx.fillStyle = '#f8fafc';\n            ctx.textAlign = 'left';\n            ctx.font = '12px Inter';\n            ctx.fillText('Next Token Probabilities:', centerX - 180, barY - 100);\n        }\n    }\n}"
+}
