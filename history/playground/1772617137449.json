@@ -1,0 +1,36 @@
+{
+  "id": "minimum-integer-k-swaps",
+  "name": "Minimum Integer After K Swaps",
+  "difficulty": "Hard",
+  "description": "Given a string <code>num</code> representing a non-negative integer and an integer <code>k</code>, return the minimum possible integer you can obtain after at most <code>k</code> adjacent swaps of digits.<p>The strategy is <b>Greedy</b>: for each position in the number, we look ahead up to <code>k</code> positions to find the smallest possible digit. If we find a smaller digit, we bubble it up to the current position using adjacent swaps, reducing <code>k</code> by the number of swaps performed.</p>",
+  "tags": [
+    "Greedy",
+    "String",
+    "Array"
+  ],
+  "slots": [
+    {
+      "id": "digits",
+      "type": "array",
+      "label": "Current Number"
+    },
+    {
+      "id": "vars",
+      "type": "hashmap",
+      "label": "Variables"
+    }
+  ],
+  "inputs": [
+    {
+      "label": "Number (String)",
+      "default": "4321",
+      "placeholder": "Enter digits..."
+    },
+    {
+      "label": "K (Swaps)",
+      "default": "4",
+      "placeholder": "Max swaps"
+    }
+  ],
+  "code": "class Playground {\n    async run(inputs) {\n        const numStr = inputs[0];\n        let k = parseInt(inputs[1]);\n        \n        // Convert string to array of numbers for visualization\n        let nums = numStr.split('').map(Number);\n        const n = nums.length;\n\n        // 1. Initialization\n        this.digits.init(nums);\n        this.vars.init([\n            [\"k\", k],\n            [\"current_idx\", 0],\n            [\"search_limit\", 0]\n        ]);\n        this.log(\"Starting Greedy approach: try to place the smallest reachable digit at each index.\");\n        await this.await();\n\n        for (let i = 0; i < n && k > 0; i++) {\n            this.vars.put(\"current_idx\", i);\n            const searchLimit = Math.min(i + k, n - 1);\n            this.vars.put(\"search_limit\", searchLimit);\n            \n            // Highlight target position\n            this.digits.highlight(i, \"#00e0ff\");\n            this.log(`Looking for the smallest digit in range [${i}, ${searchLimit}]`);\n            await this.await();\n\n            let minDigit = nums[i];\n            let minIdx = i;\n\n            // 2. Scan for the minimum digit within K range\n            for (let j = i + 1; j <= searchLimit; j++) {\n                this.digits.highlight(j, \"#ffb703\"); // Scanning color\n                \n                if (nums[j] < minDigit) {\n                    minDigit = nums[j];\n                    minIdx = j;\n                }\n                // Small optimization: if we find a '0', it's the absolute minimum\n                if (minDigit === 0 && minIdx === j) {\n                    // Keep scanning to show the process, or break if needed\n                }\n            }\n            \n            if (minIdx !== i) {\n                const cost = minIdx - i;\n                this.log(`Found digit ${minDigit} at index ${minIdx}. Moving it to index ${i} (Cost: ${cost} swaps).`);\n                this.digits.highlight(minIdx, \"#00f5a0\"); // Found best color\n                await this.await();\n\n                // 3. Bubble up the digit using adjacent swaps\n                for (let j = minIdx; j > i; j--) {\n                    // Sync visual state\n                    this.digits.swap(j, j - 1);\n                    \n                    // Sync local state\n                    const temp = nums[j];\n                    nums[j] = nums[j-1];\n                    nums[j-1] = temp;\n                    \n                    this.log(`Swapping digit ${minDigit} left...`);\n                    await this.await();\n                }\n\n                k -= cost;\n                this.vars.put(\"k\", k);\n            } else {\n                this.log(`Digit ${nums[i]} is already the smallest reachable within k range.`);\n            }\n\n            // Cleanup highlights for next round\n            for (let h = 0; h < n; h++) {\n                this.digits.highlight(h, null);\n            }\n        }\n\n        const result = nums.join('');\n        this.log(`Finished! Minimum integer possible: ${result}`);\n        return result;\n    }\n}"
+}

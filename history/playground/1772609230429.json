@@ -1,0 +1,39 @@
+{
+  "id": "trapping-rain-water",
+  "name": "Trapping Rain Water",
+  "difficulty": "Hard",
+  "description": "<p>Given <code>n</code> non-negative integers representing an elevation map where the width of each bar is 1, compute how much water it can trap after raining.</p><ul><li>The elevation map is represented by an array of heights.</li><li>Water is trapped between bars of higher elevation.</li><li>We use a <strong>Two-Pointer</strong> approach to solve this in O(n) time and O(1) space.</li></ul>",
+  "tags": [
+    "Array",
+    "Two Pointers",
+    "Dynamic Programming",
+    "Stack"
+  ],
+  "slots": [
+    {
+      "id": "heights",
+      "type": "array",
+      "label": "Elevation Map",
+      "display": "bar"
+    },
+    {
+      "id": "water",
+      "type": "array",
+      "label": "Trapped Water",
+      "display": "bar"
+    },
+    {
+      "id": "vars",
+      "type": "hashmap",
+      "label": "Variables"
+    }
+  ],
+  "inputs": [
+    {
+      "label": "Heights (comma-separated)",
+      "default": "0,1,0,2,1,0,1,3,2,1,2,1",
+      "placeholder": "e.g. 4,2,0,3,2,5"
+    }
+  ],
+  "code": "class Playground {\n    async run(inputs) {\n        const inputStr = inputs[0] || \"0,1,0,2,1,0,1,3,2,1,2,1\";\n        const h = inputStr.split(',').map(Number);\n        const n = h.length;\n\n        // 1. Initialize data structures\n        await this.heights.init(h);\n        await this.water.init(new Array(n).fill(0));\n        await this.vars.init([\n            [\"Left\", 0],\n            [\"Right\", n - 1],\n            [\"LeftMax\", 0],\n            [\"RightMax\", 0],\n            [\"TotalWater\", 0]\n        ]);\n\n        let left = 0;\n        let right = n - 1;\n        let leftMax = 0;\n        let rightMax = 0;\n        let totalWater = 0;\n\n        this.log(\"Starting Two-Pointer approach from both ends.\");\n        await this.await();\n\n        while (left <= right) {\n            // Highlight current pointers\n            this.heights.highlight(left, \"#00e0ff\"); // Cyan for left\n            this.heights.highlight(right, \"#ffb703\"); // Amber for right\n            \n            this.vars.put(\"Left\", left);\n            this.vars.put(\"Right\", right);\n\n            if (h[left] < h[right]) {\n                this.log(`Height[Left] (${h[left]}) < Height[Right] (${h[right]}). Processing Left.`);\n                \n                if (h[left] >= leftMax) {\n                    leftMax = h[left];\n                    this.vars.put(\"LeftMax\", leftMax);\n                    this.log(`Updated LeftMax to ${leftMax}`);\n                } else {\n                    const trapped = leftMax - h[left];\n                    totalWater += trapped;\n                    await this.water.set(left, trapped);\n                    this.vars.put(\"TotalWater\", totalWater);\n                    this.log(`Trapped ${trapped} units at index ${left} (LeftMax ${leftMax} - Height ${h[left]})`);\n                }\n                \n                await this.await();\n                // Remove highlight before moving\n                this.heights.highlight(left, null);\n                left++;\n            } else {\n                this.log(`Height[Left] (${h[left]}) >= Height[Right] (${h[right]}). Processing Right.`);\n                \n                if (h[right] >= rightMax) {\n                    rightMax = h[right];\n                    this.vars.put(\"RightMax\", rightMax);\n                    this.log(`Updated RightMax to ${rightMax}`);\n                } else {\n                    const trapped = rightMax - h[right];\n                    totalWater += trapped;\n                    await this.water.set(right, trapped);\n                    this.vars.put(\"TotalWater\", totalWater);\n                    this.log(`Trapped ${trapped} units at index ${right} (RightMax ${rightMax} - Height ${h[right]})`);\n                }\n\n                await this.await();\n                // Remove highlight before moving\n                this.heights.highlight(right, null);\n                right--;\n            }\n        }\n\n        this.log(`Calculation complete. Total trapped water: ${totalWater}`);\n        return totalWater;\n    }\n}"
+}

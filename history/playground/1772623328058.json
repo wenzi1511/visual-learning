@@ -1,0 +1,31 @@
+{
+  "id": "maximum-sum-hourglass",
+  "name": "Maximum Sum of an Hourglass",
+  "difficulty": "Medium",
+  "description": "<p>You are given an <code>m x n</code> integer matrix <code>grid</code>.</p><p>An <b>hourglass</b> is a subset of values with indices matching the following form in the matrix:</p><pre>A B C\n  D\nE F G</pre><p>Return the <b>maximum sum</b> of the elements of an hourglass.</p><ul><li><code>m == grid.length</code></li><li><code>n == grid[i].length</code></li><li><code>3 <= m, n <= 150</code></li></ul>",
+  "tags": [
+    "Array",
+    "Matrix",
+    "Sliding Window"
+  ],
+  "slots": [
+    {
+      "id": "grid",
+      "type": "grid",
+      "label": "Input Matrix"
+    },
+    {
+      "id": "vars",
+      "type": "hashmap",
+      "label": "Variables"
+    }
+  ],
+  "inputs": [
+    {
+      "label": "Grid (JSON)",
+      "default": "[[6,2,1,3],[4,2,1,5],[9,2,8,7],[4,1,2,9]]",
+      "placeholder": "[[6,2,1,3],...]"
+    }
+  ],
+  "code": "class Playground {\n    async run(inputs) {\n        let gridData;\n        try {\n            gridData = JSON.parse(inputs[0]);\n        } catch (e) {\n            this.log(\"Invalid input format. Please provide a valid 2D array.\");\n            return null;\n        }\n\n        const rows = gridData.length;\n        const cols = gridData[0].length;\n\n        // 1. Initialize Visualizer Slots\n        this.grid.init(gridData);\n        this.vars.init([[\"maxSum\", -Infinity], [\"currentRow\", 0], [\"currentCol\", 0]]);\n        await this.await();\n\n        let maxSum = -Infinity;\n\n        // 2. Iterate through all possible top-left corners of an hourglass\n        for (let r = 0; r <= rows - 3; r++) {\n            for (let c = 0; c <= cols - 3; c++) {\n                this.vars.put(\"currentRow\", r);\n                this.vars.put(\"currentCol\", c);\n                this.log(`Checking hourglass starting at (${r}, ${c})`);\n\n                // Highlight hourglass shape\n                const hourglassCoords = [\n                    [r, c], [r, c + 1], [r, c + 2],  // Top row\n                    [r + 1, c + 1],                 // Middle\n                    [r + 2, c], [r + 2, c + 1], [r + 2, c + 2] // Bottom row\n                ];\n\n                let currentSum = 0;\n                for (const [hr, hc] of hourglassCoords) {\n                    this.grid.highlight(hr, hc, \"#00e0ff\");\n                    currentSum += gridData[hr][hc];\n                }\n\n                this.vars.put(\"currentSum\", currentSum);\n                this.log(`Calculated sum: ${currentSum}`);\n                await this.await();\n\n                // Check for new Max\n                if (currentSum > maxSum) {\n                    maxSum = currentSum;\n                    this.vars.put(\"maxSum\", maxSum);\n                    this.log(`New maximum sum found: ${maxSum}`);\n                    \n                    // Keep the best one highlighted in a different color briefly\n                    for (const [hr, hc] of hourglassCoords) {\n                        this.grid.highlight(hr, hc, \"#00f5a0\");\n                    }\n                    await this.await();\n                }\n\n                // Clear highlights for next iteration\n                for (const [hr, hc] of hourglassCoords) {\n                    this.grid.highlight(hr, hc, null);\n                }\n            }\n        }\n\n        this.log(`Final maximum sum: ${maxSum}`);\n        return maxSum;\n    }\n}"
+}

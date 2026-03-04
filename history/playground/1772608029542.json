@@ -1,0 +1,31 @@
+{
+  "id": "container-with-most-water",
+  "name": "Container With Most Water",
+  "difficulty": "Medium",
+  "description": "<p>Given an array <code>height</code> of length <code>n</code>. There are <code>n</code> vertical lines drawn such that the two endpoints of the <code>i</code>-th line are <code>(i, 0)</code> and <code>(i, height[i])</code>.</p><p>Find two lines that together with the x-axis form a container, such that the container contains the most water.</p><p>Return the maximum amount of water a container can store.</p>",
+  "tags": [
+    "Array",
+    "Two Pointers",
+    "Greedy"
+  ],
+  "slots": [
+    {
+      "id": "arr",
+      "type": "array",
+      "label": "Heights"
+    },
+    {
+      "id": "vars",
+      "type": "hashmap",
+      "label": "Variables"
+    }
+  ],
+  "inputs": [
+    {
+      "label": "Heights (comma-separated)",
+      "default": "1,8,6,2,5,4,8,3,7",
+      "placeholder": "1,8,6,2,5,4,8,3,7"
+    }
+  ],
+  "code": "class Playground {\n    async run(inputs) {\n        const heights = inputs[0].split(',').map(Number);\n        const n = heights.length;\n        \n        this.arr.init(heights);\n        this.vars.init([['left', 0], ['right', n - 1], ['maxArea', 0]]);\n        \n        let left = 0;\n        let right = n - 1;\n        let maxArea = 0;\n        \n        while (left < right) {\n            this.arr.highlight(left, '#00e0ff');\n            this.arr.highlight(right, '#00e0ff');\n            \n            const h = Math.min(heights[left], heights[right]);\n            const w = right - left;\n            const area = h * w;\n            \n            this.log(`Calculating area between index ${left} and ${right}: min(h) * width = ${h} * ${w} = ${area}`);\n            \n            if (area > maxArea) {\n                maxArea = area;\n                this.vars.put('maxArea', maxArea);\n            }\n            \n            this.vars.put('left', left);\n            this.vars.put('right', right);\n            \n            await this.await();\n            \n            if (heights[left] < heights[right]) {\n                this.arr.highlight(left, 'transparent');\n                left++;\n            } else {\n                this.arr.highlight(right, 'transparent');\n                right--;\n            }\n        }\n        \n        this.log(`Final Max Area: ${maxArea}`);\n        return maxArea;\n    }\n}"
+}
