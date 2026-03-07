@@ -322,8 +322,8 @@ app.post('/api/render', (req, res) => {
     let isTikz = texCode.includes('circuitikz') || texCode.includes('tikzpicture');
     let isChem = texCode.includes('chemfig');
 
-    // Use TikZ standalone class for flawless bounding box tracing on PGF paths
-    let docClass = isTikz ? '\\documentclass[tikz,border=2mm]{standalone}' : '\\documentclass[preview,border=2mm]{standalone}';
+    // Use TikZ standalone class for flawless bounding box tracing on PGF paths for both Chemistry & EEE
+    let docClass = '\\documentclass[tikz,border=5mm]{standalone}';
 
     if (!texCode.includes('\\documentclass')) {
         let wrappedCode = `${docClass}\n`;
@@ -337,6 +337,8 @@ app.post('/api/render', (req, res) => {
         // Force standalone document class with tight borders, respecting tikz necessity
         texCode = texCode.replace(/\\documentclass(\s*\[.*?\]\s*)?\{.*?\}/, docClass);
     }
+
+
 
     const tempDir = path.join(__dirname, 'temp');
     if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir);

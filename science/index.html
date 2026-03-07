@@ -310,8 +310,10 @@
             border-radius: 12px;
             background: rgba(15, 23, 42, 0.6);
             border: 1px solid var(--border);
+            position: sticky;
+            top: 20px;
+            height: calc(100vh - 40px);
             overflow: visible;
-            position: relative;
         }
 
         /* Step Navigation Buttons */
@@ -372,7 +374,7 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            z-index: 50;
+            z-index: 100;
             color: var(--text-sub);
             transition: all 0.2s ease;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);

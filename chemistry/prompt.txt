@@ -16,18 +16,19 @@ CRITICAL: The renderCode MUST be a complete, compilable LaTeX document using the
 
 Requirements for renderCode:
 1. Provide a full document structure. You MUST include \documentclass, \usepackage, \begin{document}, and \end{document}.
-2. Use the `standalone` document class with a small border so the SVG crops nicely: \documentclass[preview, border=2mm]{standalone}
+2. Use the `standalone` document class with the tikz library and a spacious border: \documentclass[tikz, border=5mm]{standalone}
 3. Include the package: \usepackage{chemfig}
 4. Write valid chemfig syntax inside the document body (e.g. \chemfig{H-O-H}).
 
 Important ChemFig Syntax:
 1. Bonds: Single (-), Double (=), Triple (~), Wedge (>), Dash (<)
-2. Branches: Use parentheses — e.g., \chemfig{C(=O)(-OH)-CH_3}
+2. Branches & Angles: Use parentheses for branches and ALWAYS specify bond angles in brackets to prevent overlapping text! e.g., \chemfig{C(=[1]O)(-[7]OH)-CH_3}. The angle is an integer from 0 to 7 (0=right, 1=top-right, 2=top, etc). 
+3. Spacing: To prevent dense clusters and text overlaps, you MUST include \setchemfig{atom sep=2.5em, bond offset=1pt} immediately after \begin{document}.
 3. Rings: Use * followed by bond count, e.g., Benzene: \chemfig{**6(------)}
 4. Escaping: the JSON payload MUST be correctly escaped for backslashes, e.g., \\documentclass, \\chemfig.
 
 Example valid renderCode (as it appears in JSON, with escaped backslashes):
-"\\documentclass[preview, border=2mm]{standalone}\n\\usepackage{chemfig}\n\\begin{document}\n\\chemfig{**6(---(-OH)---)}\n\\end{document}"
+"\\documentclass[tikz, border=5mm]{standalone}\n\\usepackage{chemfig}\n\\begin{document}\n\\chemfig{**6(---(-[1]OH)---)}\n\\end{document}"
 
 Notes:
 1. Make explanations educational and thorough — include molecular formula, properties, and applications.

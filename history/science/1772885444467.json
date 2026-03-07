@@ -1,0 +1,45 @@
+{
+  "id": "quantum-double-slit-experiment",
+  "name": "Quantum Mechanics: Double Slit Experiment",
+  "difficulty": "Hard",
+  "description": "Explore the fundamental mystery of quantum mechanics: **Wave-Particle Duality**. This simulation demonstrates how particles like electrons or photons behave as waves when not observed, creating an interference pattern. \n\n### Key Concepts\n- **Superposition**: The particle exists in a state of 'both' paths simultaneously.\n- **Interference**: The wave functions from each slit overlap. Constructive interference ($d \\sin \\theta = m\\lambda$) creates bright fringes, while destructive interference creates dark ones.\n- **Probability Density**: In quantum mechanics, the intensity of the wave pattern $|ψ|^2$ represents the probability of finding a particle at a specific location.\n- **Wave-Particle Duality**: Even when particles are sent one-by-one, they eventually form a wave-like interference pattern, proving they travel as waves but land as particles.",
+  "tags": [
+    "quantum physics",
+    "waves",
+    "interference",
+    "probability"
+  ],
+  "inputs": [
+    {
+      "id": "wavelength",
+      "label": "Wavelength (λ) [nm]",
+      "type": "range",
+      "min": 400,
+      "max": 750,
+      "step": 10,
+      "value": 550
+    },
+    {
+      "id": "slitSeparation",
+      "label": "Slit Separation (d) [μm]",
+      "type": "number",
+      "value": 2.5
+    },
+    {
+      "id": "slitWidth",
+      "label": "Slit Width (a) [μm]",
+      "type": "number",
+      "value": 0.5
+    },
+    {
+      "id": "particleCount",
+      "label": "Particle Count",
+      "type": "range",
+      "min": 100,
+      "max": 5000,
+      "step": 100,
+      "value": 1000
+    }
+  ],
+  "renderingCode": "class ScienceSimulation {\n    constructor(container, initialInputs) {\n        this.container = container;\n        this.canvas = document.createElement('canvas');\n        this.ctx = this.canvas.getContext('2d');\n        this.container.appendChild(this.canvas);\n        this.resize();\n        window.addEventListener('resize', () => this.resize());\n    }\n\n    resize() {\n        this.canvas.width = this.container.clientWidth;\n        this.canvas.height = this.container.clientHeight;\n    }\n\n    getSteps(inputs) {\n        return [\n            {\n                title: \"The Quantum Source\",\n                description: \"A coherent source emits particles (like photons or electrons) with a wavelength of **\" + inputs.wavelength + \" nm**. In quantum mechanics, these particles are described by a wave function $\\\\Psi$.\"\n            },\n            {\n                title: \"The Double Slit Barrier\",\n                description: \"The wave function encounters a barrier with two slits separated by **\" + inputs.slitSeparation + \" μm**. According to Huygens' Principle, each slit acts as a new source of spherical waves.\"\n            },\n            {\n                title: \"Wave Superposition\",\n                description: \"The waves from both slits overlap. The total wave function is the sum: $\\\\Psi_{total} = \\\\psi_1 + \\\\psi_2$. This leads to regions of constructive and destructive interference.\"\n            },\n            {\n                title: \"Probability Distribution\",\n                description: \"The intensity of the pattern on the screen is proportional to the square of the amplitude: $I \\\\propto |\\\\Psi|^2$. This curve represents the probability of a particle landing at a specific point.\"\n            },\n            {\n                title: \"Quantum Collapse\",\n                description: \"When we detect **\" + inputs.particleCount + \"** particles, they appear as individual dots. Over time, the stochastic 'hits' reconstruct the interference pattern predicted by wave theory.\"\n            }\n        ];\n    }\n\n    calculateIntensity(y, inputs, height) {\n        const L = 1000; // Distance to screen (arbitrary units)\n        const d = inputs.slitSeparation * 100;\n        const a = inputs.slitWidth * 100;\n        const lambda = inputs.wavelength / 5;\n        \n        const theta = Math.atan((y - height / 2) / L);\n        const sinTheta = Math.sin(theta);\n        \n        const beta = (Math.PI * d * sinTheta) / lambda;\n        const alpha = (Math.PI * a * sinTheta) / lambda;\n        \n        const interference = Math.pow(Math.cos(beta), 2);\n        const diffraction = alpha === 0 ? 1 : Math.pow(Math.sin(alpha) / alpha, 2);\n        \n        return interference * diffraction;\n    }\n\n    render(inputs, stepIndex) {\n        const { ctx, canvas } = this;\n        const { width, height } = canvas;\n        ctx.clearRect(0, 0, width, height);\n        \n        const margin = 50;\n        const sourceX = 50;\n        const barrierX = width * 0.3;\n        const screenX = width * 0.85;\n        const centerY = height / 2;\n\n        // Background\n        ctx.fillStyle = '#0f172a';\n        ctx.fillRect(0, 0, width, height);\n\n        // 1. Draw Source (Step 0+)\n        ctx.beginPath();\n        ctx.arc(sourceX, centerY, 10, 0, Math.PI * 2);\n        ctx.fillStyle = '#3b82f6';\n        ctx.fill();\n        ctx.shadowBlur = 15;\n        ctx.shadowColor = '#3b82f6';\n        \n        // 2. Draw Barrier (Step 1+)\n        if (stepIndex >= 1) {\n            ctx.shadowBlur = 0;\n            ctx.strokeStyle = '#94a3b8';\n            ctx.lineWidth = 4;\n            const gap = inputs.slitSeparation * 10;\n            ctx.beginPath();\n            ctx.moveTo(barrierX, 0);\n            ctx.lineTo(barrierX, centerY - gap/2 - 10);\n            ctx.moveTo(barrierX, centerY - gap/2 + 10);\n            ctx.lineTo(barrierX, centerY + gap/2 - 10);\n            ctx.moveTo(barrierX, centerY + gap/2 + 10);\n            ctx.lineTo(barrierX, height);\n            ctx.stroke();\n        }\n\n        // 3. Draw Waves (Step 0, 2, 3)\n        if (stepIndex === 0 || stepIndex === 2 || stepIndex === 3) {\n            ctx.lineWidth = 1;\n            const waveColor = `hsla(${inputs.wavelength - 300}, 100%, 50%, 0.3)`;\n            ctx.strokeStyle = waveColor;\n            \n            if (stepIndex === 0) {\n                for (let r = 20; r < barrierX - sourceX; r += 20) {\n                    ctx.beginPath();\n                    ctx.arc(sourceX, centerY, r, -Math.PI/3, Math.PI/3);\n                    ctx.stroke();\n                }\n            } else {\n                const gap = inputs.slitSeparation * 10;\n                const slits = [centerY - gap/2, centerY + gap/2];\n                slits.forEach(sy => {\n                    for (let r = 10; r < screenX - barrierX; r += 15) {\n                        ctx.beginPath();\n                        ctx.arc(barrierX, sy, r, -Math.PI/2, Math.PI/2);\n                        ctx.stroke();\n                    }\n                });\n            }\n        }\n\n        // 4. Draw Intensity Graph (Step 3, 4)\n        if (stepIndex >= 3) {\n            ctx.beginPath();\n            ctx.strokeStyle = '#4ade80';\n            ctx.lineWidth = 2;\n            for (let y = 0; y < height; y++) {\n                const intensity = this.calculateIntensity(y, inputs, height);\n                const xPos = screenX + (intensity * 80);\n                if (y === 0) ctx.moveTo(xPos, y);\n                else ctx.lineTo(xPos, y);\n            }\n            ctx.stroke();\n            \n            // Screen line\n            ctx.strokeStyle = '#ffffff';\n            ctx.beginPath();\n            ctx.moveTo(screenX, 0);\n            ctx.lineTo(screenX, height);\n            ctx.stroke();\n        }\n\n        // 5. Draw Particles (Step 4)\n        if (stepIndex === 4) {\n            const count = inputs.particleCount;\n            ctx.fillStyle = '#fbbf24';\n            // Use a fixed seed for deterministic randomness during re-renders\n            let seed = 123;\n            const pseudoRandom = () => {\n                seed = (seed * 9301 + 49297) % 233280;\n                return seed / 233280;\n            };\n\n            for (let i = 0; i < count; i++) {\n                const y = pseudoRandom() * height;\n                const prob = this.calculateIntensity(y, inputs, height);\n                if (pseudoRandom() < prob) {\n                    ctx.beginPath();\n                    ctx.arc(screenX - 2 - pseudoRandom() * 5, y, 1.5, 0, Math.PI * 2);\n                    ctx.fill();\n                }\n            }\n        }\n    }\n}"
+}

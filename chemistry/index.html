@@ -214,13 +214,15 @@
             border-color: #c4b5fd;
         }
 
-        /* Right Column Output */
         .right-content {
             display: flex;
             flex-direction: column;
             gap: 16px;
             flex: 1;
-            position: relative;
+            position: sticky;
+            top: 20px;
+            height: calc(100vh - 40px);
+            overflow: visible;
         }
 
         .panel-header-controls {
@@ -298,7 +300,7 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            z-index: 10;
+            z-index: 100;
             color: var(--text-sub);
             transition: all 0.2s ease;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
@@ -1046,16 +1048,18 @@
                 }
 
                 const clone = svgNode.cloneNode(true);
+                const scale = 3; // High-res scale multiplier
 
                 // SVGs loaded into an <image> tag have no DOM parent.
                 // Relative percentages (like width="100%") resolve to 0px and break the canvas rendering.
                 // We must permanently burn the intrinsic exact pixel boundaries into the exported Blob!
-                clone.style.width = intrinsicWidth + 'px';
-                clone.style.height = intrinsicHeight + 'px';
+                // We multiply the dimensions so the browser natively rasterizes the vectors crisp and sharp!
+                clone.style.width = (intrinsicWidth * scale) + 'px';
+                clone.style.height = (intrinsicHeight * scale) + 'px';
                 clone.style.maxWidth = 'none';
                 clone.style.maxHeight = 'none';
-                clone.setAttribute('width', intrinsicWidth);
-                clone.setAttribute('height', intrinsicHeight);
+                clone.setAttribute('width', intrinsicWidth * scale);
+                clone.setAttribute('height', intrinsicHeight * scale);
                 clone.style.backgroundColor = '#f7f7f7'; // Prevent transparent black-on-black in darkmode viewers
 
                 // Serialize explicitly scoped SVG to raw XML
@@ -1076,16 +1080,16 @@
                     const canvas = document.createElement("canvas");
 
                     // Add padding to the final canvas so the bounds aren't strictly hugging the lines
-                    const padding = 40;
-                    canvas.width = (intrinsicWidth * 2) + (padding * 2);
-                    canvas.height = (intrinsicHeight * 2) + (padding * 2);
+                    const padding = 60; // Extra padding for high-res
+                    canvas.width = (intrinsicWidth * scale) + (padding * 2);
+                    canvas.height = (intrinsicHeight * scale) + (padding * 2);
 
                     const ctx = canvas.getContext("2d");
                     ctx.fillStyle = "#f7f7f7";
                     ctx.fillRect(0, 0, canvas.width, canvas.height); // Flood fill white bg
 
                     // Draw image centered with padding
-                    ctx.drawImage(img, padding, padding, intrinsicWidth * 2, intrinsicHeight * 2);
+                    ctx.drawImage(img, padding, padding, intrinsicWidth * scale, intrinsicHeight * scale);
 
                     // Download PNG
                     const imgURI = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");

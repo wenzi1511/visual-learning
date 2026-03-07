@@ -1,0 +1,51 @@
+{
+  "id": "nephron-filtration-dynamics",
+  "name": "Nephrology: Glomerular Filtration & Nephron Function",
+  "difficulty": "Hard",
+  "description": "Explore the physiology of the human kidney's functional unit: the **Nephron**. This simulation visualizes the **Starling Forces** governing Glomerular Filtration Rate (GFR) and the subsequent processing of filtrate through the tubular system.\n\n### Key Concepts\n- **Glomerular Filtration**: The process by which the kidneys filter blood, removing excess wastes and fluids. The Net Filtration Pressure ($NFP$) is calculated as:\n  $$NFP = P_{GC} - P_{BS} - \\pi_{GC}$$\n  where $P_{GC}$ is glomerular capillary hydrostatic pressure, $P_{BS}$ is Bowman's space hydrostatic pressure, and $\\pi_{GC}$ is glomerular capillary oncotic pressure.\n- **Renal Threshold**: The plasma concentration at which a substance (like glucose) begins to appear in the urine because the transporters in the Proximal Convoluted Tubule (PCT) are saturated.\n- **Countercurrent Multiplier**: The mechanism in the Loop of Henle that creates an osmotic gradient in the renal medulla.",
+  "tags": [
+    "nephrology",
+    "biology",
+    "physiology",
+    "fluid-dynamics"
+  ],
+  "inputs": [
+    {
+      "id": "bp",
+      "label": "Mean Arterial Pressure (mmHg)",
+      "type": "range",
+      "min": 60,
+      "max": 180,
+      "step": 1,
+      "value": 100
+    },
+    {
+      "id": "colloid",
+      "label": "Plasma Oncotic Pressure (mmHg)",
+      "type": "number",
+      "value": 25
+    },
+    {
+      "id": "kf",
+      "label": "Filtration Coefficient (Kf)",
+      "type": "number",
+      "value": 12.5
+    },
+    {
+      "id": "glucose",
+      "label": "Plasma Glucose (mg/dL)",
+      "type": "number",
+      "value": 100
+    },
+    {
+      "id": "adh",
+      "label": "ADH Levels (Vasopressin)",
+      "type": "range",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "value": 50
+    }
+  ],
+  "renderingCode": "class ScienceSimulation {\n  constructor(container, initialInputs) {\n    this.container = container;\n    this.canvas = document.createElement('canvas');\n    this.ctx = this.canvas.getContext('2d');\n    this.container.appendChild(this.canvas);\n    this.resize();\n    window.addEventListener('resize', () => this.resize());\n  }\n\n  resize() {\n    this.canvas.width = this.container.clientWidth;\n    this.canvas.height = this.container.clientHeight;\n  }\n\n  getSteps(inputs) {\n    const pgc = inputs.bp * 0.6;\n    const pbs = 15;\n    const nfp = pgc - pbs - inputs.colloid;\n    const gfr = Math.max(0, inputs.kf * nfp);\n    const glucoseFiltered = (gfr * inputs.glucose) / 100;\n    const glucoseReabsorbed = Math.min(glucoseFiltered, 375); // Transport maximum TmG approx 375mg/min\n    const glycosuria = glucoseFiltered > 375;\n\n    return [\n      {\n        title: \"The Glomerulus: Filtration\",\n        description: `Blood enters the glomerulus. With a MAP of **${inputs.bp} mmHg**, the capillary pressure ($P_{GC}$) is approx **${pgc.toFixed(1)} mmHg**. \\n\\nNet Filtration Pressure: $${pgc.toFixed(1)} - ${pbs} - ${inputs.colloid} = ${nfp.toFixed(1)}$ mmHg. \\n\\nCalculated GFR: **${gfr.toFixed(1)} mL/min**.`\n      },\n      {\n        title: \"Proximal Convoluted Tubule (PCT)\",\n        description: `The PCT reabsorbs ~65% of water and 100% of glucose (up to the renal threshold). \\n\\nGlucose filtered: **${glucoseFiltered.toFixed(1)} mg/min**. \\n\\n${glycosuria ? \"**Warning:** Glucose exceeds transport maximum ($T_m$). Glucose will appear in urine (Glycosuria).\" : \"All glucose is successfully reabsorbed.\"}`\n      },\n      {\n        title: \"Loop of Henle\",\n        description: \"The descending limb reabsorbs water, while the thick ascending limb actively pumps out salts ($Na^+/K^+/2Cl^-$), creating the medullary osmotic gradient.\"\n      },\n      {\n        title: \"Distal Tubule & Collecting Duct\",\n        description: `Final water reabsorption is regulated by ADH (Vasopressin). At **${inputs.adh}%** ADH levels, the urine will be ${inputs.adh > 70 ? \"highly concentrated\" : inputs.adh < 30 ? \"very dilute\" : \"moderately concentrated\"}.`\n      }\n    ];\n  }\n\n  drawNephronPath(ctx, scale) {\n    ctx.beginPath();\n    ctx.strokeStyle = '#f59e0b';\n    ctx.lineWidth = 12 * scale;\n    ctx.lineJoin = 'round';\n    ctx.lineCap = 'round';\n    \n    // Bowman's Capsule\n    ctx.arc(150 * scale, 150 * scale, 40 * scale, 0.2 * Math.PI, 1.8 * Math.PI, true);\n    \n    // PCT\n    ctx.bezierCurveTo(200 * scale, 100 * scale, 250 * scale, 200 * scale, 300 * scale, 150 * scale);\n    \n    // Loop of Henle\n    ctx.lineTo(300 * scale, 450 * scale);\n    ctx.arc(325 * scale, 450 * scale, 25 * scale, Math.PI, 0, true);\n    ctx.lineTo(350 * scale, 150 * scale);\n    \n    // DCT\n    ctx.bezierCurveTo(400 * scale, 100 * scale, 450 * scale, 200 * scale, 500 * scale, 150 * scale);\n    \n    // Collecting Duct\n    ctx.lineTo(500 * scale, 550 * scale);\n    ctx.stroke();\n  }\n\n  render(inputs, stepIndex) {\n    const { ctx, canvas } = this;\n    const w = canvas.width;\n    const h = canvas.height;\n    const scale = Math.min(w / 600, h / 600);\n    \n    ctx.clearRect(0, 0, w, h);\n    ctx.fillStyle = '#0f172a';\n    ctx.fillRect(0, 0, w, h);\n\n    // Draw Nephron Structure\n    this.drawNephronPath(ctx, scale);\n\n    // Glomerulus (Capillary Tuft)\n    ctx.beginPath();\n    ctx.strokeStyle = '#ef4444';\n    ctx.lineWidth = 4 * scale;\n    for(let i=0; i<5; i++) {\n        ctx.arc(140 * scale + (i*4), 150 * scale, 20 * scale, 0, Math.PI * 2);\n    }\n    ctx.stroke();\n\n    // Afferent/Efferent Arterioles\n    ctx.beginPath();\n    ctx.moveTo(50 * scale, 130 * scale);\n    ctx.lineTo(120 * scale, 140 * scale);\n    ctx.moveTo(120 * scale, 160 * scale);\n    ctx.lineTo(50 * scale, 170 * scale);\n    ctx.stroke();\n\n    // Step-specific highlights\n    if (stepIndex === 0) {\n        // Filtration arrows\n        ctx.fillStyle = '#3b82f6';\n        for(let i=0; i<3; i++) {\n            this.drawArrow(ctx, 150*scale, 150*scale, 190*scale, 150*scale + (i-1)*20*scale);\n        }\n        ctx.fillStyle = '#f8fafc';\n        ctx.font = `${14 * scale}px sans-serif`;\n        ctx.fillText(\"Filtration (GFR)\", 160*scale, 110*scale);\n    }\n\n    if (stepIndex === 1) {\n        // PCT Reabsorption\n        ctx.fillStyle = '#10b981';\n        this.drawArrow(ctx, 250*scale, 150*scale, 250*scale, 80*scale);\n        ctx.fillText(\"Reabsorption\", 220*scale, 70*scale);\n        if (inputs.glucose > 180) {\n            ctx.fillStyle = '#f43f5e';\n            ctx.fillText(\"Glucose Loss!\", 280*scale, 180*scale);\n        }\n    }\n\n    if (stepIndex === 2) {\n        // Loop of Henle\n        ctx.fillStyle = '#3b82f6';\n        this.drawArrow(ctx, 290*scale, 300*scale, 240*scale, 300*scale); // Water out\n        ctx.fillStyle = '#f59e0b';\n        this.drawArrow(ctx, 360*scale, 300*scale, 410*scale, 300*scale); // Salt out\n        ctx.fillStyle = '#f8fafc';\n        ctx.fillText(\"H2O\", 220*scale, 305*scale);\n        ctx.fillText(\"NaCl\", 420*scale, 305*scale);\n    }\n\n    if (stepIndex === 3) {\n        // Collecting Duct\n        const urineColor = inputs.adh > 70 ? '#f59e0b' : '#fef08a';\n        ctx.fillStyle = urineColor;\n        ctx.beginPath();\n        ctx.arc(500*scale, 530*scale, 10*scale, 0, Math.PI*2);\n        ctx.fill();\n        ctx.fillStyle = '#f8fafc';\n        ctx.fillText(inputs.adh > 70 ? \"Concentrated Urine\" : \"Dilute Urine\", 450*scale, 570*scale);\n    }\n  }\n\n  drawArrow(ctx, fromx, fromy, tox, toy) {\n    const headlen = 10;\n    const dx = tox - fromx;\n    const dy = toy - fromy;\n    const angle = Math.atan2(dy, dx);\n    ctx.beginPath();\n    ctx.moveTo(fromx, fromy);\n    ctx.lineTo(tox, toy);\n    ctx.lineTo(tox - headlen * Math.cos(angle - Math.PI / 6), toy - headlen * Math.sin(angle - Math.PI / 6));\n    ctx.moveTo(tox, toy);\n    ctx.lineTo(tox - headlen * Math.cos(angle + Math.PI / 6), toy - headlen * Math.sin(angle + Math.PI / 6));\n    ctx.stroke();\n  }\n}"
+}

@@ -1,9 +1,9 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=latex 2026.3.5)  7 MAR 2026 18:12
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=latex 2026.3.5)  6 MAR 2026 20:15
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
-**./circuit.tex
-(circuit.tex
+**./test_margin.tex
+(test_margin.tex
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2024-01-04>
 
@@ -401,14 +401,10 @@ File: tikzlibrarytopaths.code.tex 2023-01-15 v3.1.10 (3.1.10)
 \sa@box=\box62
 \sa@yoffset=\skip50
 )
-(C:\Users\Admin\AppData\Local\Programs\MiKTeX\tex/latex/circuitikz\circuitikz.s
-ty
-Package: circuitikz 2026/02/04{} The CircuiTikz circuit drawing package version
- 1.8.5
-
-(C:\Users\Admin\AppData\Local\Programs\MiKTeX\tex/generic/pgf/frontendlayer/tik
-z/libraries\tikzlibrarycalc.code.tex
-File: tikzlibrarycalc.code.tex 2023-01-15 v3.1.10 (3.1.10)
+(C:\Users\Admin\AppData\Local\Programs\MiKTeX\tex/latex/chemfig\chemfig.sty
+(C:\Users\Admin\AppData\Local\Programs\MiKTeX\tex/generic/chemfig\chemfig.tex
+(C:\Users\Admin\AppData\Local\Programs\MiKTeX\tex/generic/simplekv\simplekv.tex
+Package: simplekv 2025/06/15 v0.32 Simple keyval package (CT)
 )
 (C:\Users\Admin\AppData\Local\Programs\MiKTeX\tex/generic/pgf/libraries\pgflibr
 aryarrows.meta.code.tex
@@ -418,95 +414,39 @@ File: pgflibraryarrows.meta.code.tex 2023-01-15 v3.1.10 (3.1.10)
 \pgfarrowwidth=\dimen195
 \pgfarrowlinewidth=\dimen196
 )
-(C:\Users\Admin\AppData\Local\Programs\MiKTeX\tex/generic/pgf/frontendlayer/tik
-z/libraries\tikzlibrarybending.code.tex
-File: tikzlibrarybending.code.tex 2023-01-15 v3.1.10 (3.1.10)
-
-(C:\Users\Admin\AppData\Local\Programs\MiKTeX\tex/generic/pgf/modules\pgfmodule
-bending.code.tex
-File: pgfmodulebending.code.tex 2023-01-15 v3.1.10 (3.1.10)
-
-(C:\Users\Admin\AppData\Local\Programs\MiKTeX\tex/generic/pgf/modules\pgfmodule
-nonlineartransformations.code.tex
-File: pgfmodulenonlineartransformations.code.tex 2023-01-15 v3.1.10 (3.1.10)
-\pgftransformnonlinearflatness=\dimen197
+\CF_cnt_atomgroup=\count286
+\CF_cnt_group=\count287
+\CF_cnt_atom=\count288
+\CF_cnt_cycle=\count289
+\CF_cnt_cyclebonds=\count290
+\CF_cnt_compound=\count291
+\CF_dim=\dimen197
+\CF_turnangle=\dimen198
+\CF_arrowsize=\dimen199
+\CF_zero=\dimen256
+\CF_box=\box63
+\CF_boxstuff=\box64
+\CF_testbox=\box65
+\CF_chargebox=\box66
+\CF_substtoks=\toks31
+\CF_harrow_boxup=\box67
+\CF_harrow_boxdown=\box68
+\CF_hreact_cnt=\count292
 )
-(C:\Users\Admin\AppData\Local\Programs\MiKTeX\tex/generic/pgf/libraries\pgflibr
-arycurvilinear.code.tex
-File: pgflibrarycurvilinear.code.tex 2023-01-15 v3.1.10 (3.1.10)
-\pgf@curvilinear@time@a=\dimen198
-\pgf@curvilinear@length@a=\dimen199
-\pgf@curvilinear@length@b=\dimen256
-\pgf@curvilinear@length@c=\dimen257
-\pgf@curvilinear@length@d=\dimen258
+Package: chemfig 2025/10/30 v1.71 Draw molecule with an easy syntax (CT)
 )
-\pgf@arrows@the@rigidity=\dimen259
-))
-(C:\Users\Admin\AppData\Local\Programs\MiKTeX\tex/generic/pgf/frontendlayer/tik
-z/libraries\tikzlibraryfpu.code.tex
-(C:\Users\Admin\AppData\Local\Programs\MiKTeX\tex/generic/pgf/libraries\pgflibr
-aryfpu.code.tex))
-(C:\Users\Admin\AppData\Local\Programs\MiKTeX\tex/generic/circuitikz\pgfcirc.de
-fines.tex
-\pgf@circ@count@a=\count286
-\pgf@circ@count@b=\count287
-\pgf@circ@count@c=\count288
-\pgf@circ@res@up=\dimen260
-\pgf@circ@res@down=\dimen261
-\pgf@circ@res@zero=\dimen262
-\pgf@circ@res@left=\dimen263
-\pgf@circ@res@right=\dimen264
-\pgf@circ@res@other=\dimen265
-\pgf@circ@res@step=\dimen266
-\pgf@circ@res@temp=\dimen267
-\pgf@circ@Rlen=\dimen268
-\pgf@circ@scaled@Rlen=\dimen269
-\pgfstartlinewidth=\dimen270
-)
-(C:\Users\Admin\AppData\Local\Programs\MiKTeX\tex/generic/circuitikz\pgfcircuti
-ls.tex
-\ctikz@scratchbox=\box63
-)
-(C:\Users\Admin\AppData\Local\Programs\MiKTeX\tex/generic/circuitikz\pgfcircpat
-h.tex
-\ctikz@vif@count=\count289
-)
-(C:\Users\Admin\AppData\Local\Programs\MiKTeX\tex/generic/circuitikz\pgfcircsha
-pes.tex)
-(C:\Users\Admin\AppData\Local\Programs\MiKTeX\tex/generic/circuitikz\pgfcircmon
-opoles.tex)
-(C:\Users\Admin\AppData\Local\Programs\MiKTeX\tex/generic/circuitikz\pgfcircbip
-oles.tex)
-(C:\Users\Admin\AppData\Local\Programs\MiKTeX\tex/generic/circuitikz\pgfcirctri
-poles.tex
-\pgf@circ@res@count=\count290
-)
-(C:\Users\Admin\AppData\Local\Programs\MiKTeX\tex/generic/circuitikz\pgfcircqua
-dpoles.tex)
-(C:\Users\Admin\AppData\Local\Programs\MiKTeX\tex/generic/circuitikz\pgfcircmul
-tipoles.tex)
-(C:\Users\Admin\AppData\Local\Programs\MiKTeX\tex/generic/circuitikz\pgfcirclab
-el.tex)
-(C:\Users\Admin\AppData\Local\Programs\MiKTeX\tex/generic/circuitikz\pgfcircvol
-tage.tex
-\pgfcirc@labelshift=\dimen271
-)
-(C:\Users\Admin\AppData\Local\Programs\MiKTeX\tex/generic/circuitikz\pgfcirccur
-rent.tex)
-(C:\Users\Admin\AppData\Local\Programs\MiKTeX\tex/generic/circuitikz\pgfcircflo
-w.tex))
 (C:\Users\Admin\AppData\Local\Programs\MiKTeX\tex/latex/l3backend\l3backend-dvi
 ps.def
 File: l3backend-dvips.def 2024-01-04 L3 backend support: dvips
-\l__pdf_internal_box=\box64
-\g__pdf_backend_object_int=\count291
-\l__pdf_backend_content_box=\box65
-\l__pdf_backend_model_box=\box66
-\g__pdf_backend_annotation_int=\count292
-\g__pdf_backend_link_int=\count293
-\g__pdf_backend_link_sf_int=\count294
-) (circuit.aux)
-\openout1 = `circuit.aux'.
+\l__pdf_internal_box=\box69
+\g__pdf_backend_object_int=\count293
+\l__pdf_backend_content_box=\box70
+\l__pdf_backend_model_box=\box71
+\g__pdf_backend_annotation_int=\count294
+\g__pdf_backend_link_int=\count295
+\g__pdf_backend_link_sf_int=\count296
+) (test_margin.aux)
+\openout1 = `test_margin.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 3.
 LaTeX Font Info:    ... okay on input line 3.
@@ -523,24 +463,22 @@ LaTeX Font Info:    ... okay on input line 3.
 LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 3.
 LaTeX Font Info:    ... okay on input line 3.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <7> on input line 5.
+(Font)              <7> on input line 4.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <5> on input line 5.
- [1
+(Font)              <5> on input line 4.
 
-] (circuit.aux)
- ***********
-LaTeX2e <2023-11-01> patch level 1
-L3 programming layer <2024-01-04>
- ***********
- ) 
+! Improper \prevdepth.
+\newpage ...everypar {}\fi \par \ifdim \prevdepth 
+                                                  >\z@ \vskip -\ifdim \prevd...
+l.4 ...fboxrule}{0pt}\fbox{\chemfig{CH_3-CH_2-OH}}
+                                                   
 Here is how much of TeX's memory you used:
- 31159 strings out of 474487
- 832834 string characters out of 5743782
- 1933539 words of memory out of 5000000
- 53200 multiletter control sequences out of 15000+600000
+ 13207 strings out of 474487
+ 279448 string characters out of 5743782
+ 1927539 words of memory out of 5000000
+ 35305 multiletter control sequences out of 15000+600000
  558069 words of font info for 36 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 117i,9n,121p,417b,810s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 117i,7n,121p,418b,655s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
-Output written on circuit.dvi (1 page, 16440 bytes).
+No pages of output.
