@@ -1,0 +1,32 @@
+{
+  "id": "container-with-most-water",
+  "name": "Container with Most Water",
+  "difficulty": "Medium",
+  "description": "<p>Given <code>n</code> non-negative integers <code>a1, a2, ..., an</code>, where each represents a point at coordinate <code>(i, ai)</code>. <code>n</code> vertical lines are drawn such that the two endpoints of the line <code>i</code> is at <code>(i, ai)</code> and <code>(i, 0)</code>.</p><p>Find two lines, which, together with the x-axis forms a container, such that the container contains the most water.</p><ul><li>The goal is to maximize the area: <code>Area = min(height[i], height[j]) * (j - i)</code></li><li>You may not slant the container.</li></ul>",
+  "tags": [
+    "Array",
+    "Two Pointers",
+    "Greedy"
+  ],
+  "slots": [
+    {
+      "id": "heights",
+      "type": "array",
+      "label": "Heights",
+      "display": "bar"
+    },
+    {
+      "id": "vars",
+      "type": "hashmap",
+      "label": "Variables"
+    }
+  ],
+  "inputs": [
+    {
+      "label": "Heights Array",
+      "default": "[1,8,6,2,5,4,8,3,7]",
+      "placeholder": "e.g. [1,8,6,2,5,4,8,3,7]"
+    }
+  ],
+  "code": "class Playground {\n    async run(inputs) {\n        const hArr = JSON.parse(inputs[0]);\n        await this.heights.init(hArr);\n\n        let left = 0;\n        let right = hArr.length - 1;\n        let maxArea = 0;\n\n        await this.vars.init([\n            [\"left\", left],\n            [\"right\", right],\n            [\"maxArea\", maxArea],\n            [\"currentArea\", 0]\n        ]);\n\n        while (left < right) {\n            const hL = this.heights.get(left);\n            const hR = this.heights.get(right);\n            const width = right - left;\n            const currentHeight = Math.min(hL, hR);\n            const currentArea = width * currentHeight;\n\n            // Highlight the two pointers\n            this.heights.highlight(left, \"#00e0ff\");\n            this.heights.highlight(right, \"#00e0ff\");\n\n            if (currentArea > maxArea) {\n                maxArea = currentArea;\n            }\n\n            // Update state visualization\n            this.vars.put(\"left\", left);\n            this.vars.put(\"right\", right);\n            this.vars.put(\"currentArea\", currentArea);\n            this.vars.put(\"maxArea\", maxArea);\n\n            this.log(`Checking indices ${left} and ${right}. Width: ${width}, Min Height: ${currentHeight}, Area: ${currentArea}`);\n            await this.await();\n\n            // Clear highlights for next step\n            this.heights.highlight(left, null);\n            this.heights.highlight(right, null);\n\n            // Move the pointer pointing to the shorter line\n            if (hL < hR) {\n                this.log(`Height at left (${hL}) < height at right (${hR}). Moving left pointer inward.`);\n                left++;\n            } else {\n                this.log(`Height at right (${hR}) <= height at left (${hL}). Moving right pointer inward.`);\n                right--;\n            }\n            \n            this.vars.put(\"left\", left);\n            this.vars.put(\"right\", right);\n        }\n\n        this.log(`Algorithm finished. Maximum area found: ${maxArea}`);\n        return maxArea;\n    }\n}"
+}

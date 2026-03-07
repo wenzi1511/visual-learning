@@ -1,0 +1,41 @@
+{
+  "id": "stack-using-queues",
+  "name": "Implement Stack using Queues",
+  "difficulty": "Easy",
+  "description": "<p>Implement a last-in-first-out (LIFO) stack using only two queues. The implemented stack should support all the functions of a normal stack (<code>push</code>, <code>top</code>, <code>pop</code>, and <code>empty</code>).</p><ul><li><code>push(x)</code>: Pushes element x to the top of the stack.</li><li><code>pop()</code>: Removes the element on the top of the stack and returns it.</li><li><code>top()</code>: Returns the element on the top of the stack.</li><li><code>empty()</code>: Returns true if the stack is empty, false otherwise.</li></ul><p><b>Note:</b> You must use only standard operations of a queue, which means only <code>enqueue</code> to back, <code>dequeue</code> from front, <code>peek</code>, and <code>size</code> operations are valid.</p>",
+  "tags": [
+    "Stack",
+    "Queue",
+    "Design"
+  ],
+  "slots": [
+    {
+      "id": "q1",
+      "type": "queue",
+      "label": "Queue 1 (Main Storage)"
+    },
+    {
+      "id": "q2",
+      "type": "queue",
+      "label": "Queue 2 (Buffer)"
+    },
+    {
+      "id": "stack_view",
+      "type": "stack",
+      "label": "Logical Stack View"
+    }
+  ],
+  "inputs": [
+    {
+      "label": "Operations (comma separated)",
+      "default": "push,push,top,pop,empty",
+      "placeholder": "push,push,pop,top,empty"
+    },
+    {
+      "label": "Values (comma separated)",
+      "default": "1,2,null,null,null",
+      "placeholder": "1,2,null,null,null"
+    }
+  ],
+  "code": "class Playground {\n    async run(inputs) {\n        const ops = inputs[0].split(',');\n        const vals = inputs[1].split(',');\n        \n        await this.q1.init([]);\n        await this.q2.init([]);\n        await this.stack_view.init([]);\n\n        const results = [];\n\n        for (let i = 0; i < ops.length; i++) {\n            const op = ops[i].trim();\n            const val = vals[i] && vals[i].trim() !== 'null' ? vals[i].trim() : null;\n\n            if (op === 'push') {\n                this.log(`Pushing ${val} to stack. Step 1: Enqueue to Queue 2.`);\n                this.q2.enqueue(val);\n                await this.await();\n\n                this.log(`Step 2: Move all elements from Queue 1 to Queue 2 to maintain LIFO order.`);\n                while (!this.q1.isEmpty()) {\n                    const moved = this.q1.dequeue();\n                    this.q2.enqueue(moved);\n                    await this.await();\n                }\n\n                this.log(`Step 3: Move everything back to Queue 1 so it remains the primary storage.`);\n                while (!this.q2.isEmpty()) {\n                    const moved = this.q2.dequeue();\n                    this.q1.enqueue(moved);\n                    await this.await();\n                }\n\n                this.stack_view.push(val);\n                this.log(`Successfully pushed ${val}. Queue 1 front now represents the stack top.`);\n                await this.await();\n                results.push(null);\n            } \n            else if (op === 'pop') {\n                if (this.q1.isEmpty()) {\n                    this.log(\"Stack is empty, cannot pop.\");\n                    results.push(null);\n                } else {\n                    const popped = this.q1.dequeue();\n                    this.stack_view.pop();\n                    this.log(`Popped ${popped} from the front of Queue 1.`);\n                    await this.await();\n                    results.push(popped);\n                }\n            } \n            else if (op === 'top') {\n                if (this.q1.isEmpty()) {\n                    this.log(\"Stack is empty, no top element.\");\n                    results.push(null);\n                } else {\n                    const topVal = this.q1.peek();\n                    this.log(`Top element is ${topVal} (front of Queue 1).`);\n                    this.q1.highlight(0, \"#00e0ff\");\n                    await this.await();\n                    results.push(topVal);\n                }\n            } \n            else if (op === 'empty') {\n                const isEmpty = this.q1.isEmpty();\n                this.log(`Checking if Queue 1 is empty: ${isEmpty}`);\n                await this.await();\n                results.push(isEmpty);\n            }\n        }\n\n        return results;\n    }\n}"
+}
