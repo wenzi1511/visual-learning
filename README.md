@@ -95,7 +95,7 @@ npm install
 ```
 
 3. Configure your API Keys:
-While API keys can be inserted directly in the browser UI, you can also securely add them to a `.env` file in the root directory for local backend testing.
+While API keys can be inserted directly in the browser UI, you can also securely add them to a `.env` file in the root directory for local backend testing. If you configure them in the `.env` file, you can leave the API key input fields in the UI completely empty, and the application will automatically fall back to using your `.env` keys.
 ```env
 GEMINI_API_KEY=your_google_gemini_key_here
 GROQ_API_KEY=your_groq_llama3_key_here
