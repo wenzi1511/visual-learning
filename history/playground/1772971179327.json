@@ -1,0 +1,40 @@
+{
+  "id": "two-sum",
+  "name": "Two Sum",
+  "difficulty": "Easy",
+  "description": "<p>Given an array of integers <code>nums</code> and an integer <code>target</code>, return the indices of the two numbers such that they add up to <code>target</code>. You may assume that each input would have exactly one solution, and you may not use the same element twice.</p><ul><li>Use a <code>HashMap</code> to store each number and its index while iterating.</li><li>Highlight the current element in the array and the lookup in the map.</li><li>Log each step so the visualization can be followed.</li></ul>",
+  "tags": [
+    "Array",
+    "Hashmap"
+  ],
+  "slots": [
+    {
+      "id": "nums",
+      "type": "array",
+      "label": "Input Array"
+    },
+    {
+      "id": "map",
+      "type": "hashmap",
+      "label": "Value→Index Map"
+    },
+    {
+      "id": "vars",
+      "type": "hashmap",
+      "label": "Variables"
+    }
+  ],
+  "inputs": [
+    {
+      "label": "nums (JSON array)",
+      "default": "[2,7,11,15]",
+      "placeholder": "e.g., [2,7,11,15]"
+    },
+    {
+      "label": "target",
+      "default": "9",
+      "placeholder": "e.g., 9"
+    }
+  ],
+  "code": "class Playground {\n    async run(inputs) {\n        // Parse inputs\n        const nums = JSON.parse(inputs[0]);\n        const target = parseInt(inputs[1]);\n        // Initialize visual slots\n        this.nums.init(nums);\n        this.map.init([]);\n        this.vars.init([]);\n        // Store target in variables slot for display\n        this.vars.put('target', target);\n        this.log('Start scanning the array for a pair that sums to ' + target);\n        await this.await();\n        for (let i = 0; i < nums.length; i++) {\n            const val = this.nums.get(i);\n            // Highlight current index\n            this.nums.highlight(i, '#ffb703');\n            this.vars.put('i', i);\n            this.vars.put('val', val);\n            this.log(`Inspect index ${i}, value ${val}`);\n            await this.await();\n            const complement = target - val;\n            this.vars.put('complement', complement);\n            this.log(`Looking for complement ${complement} in map`);\n            await this.await();\n            if (this.map.has(complement)) {\n                const j = this.map.get(complement);\n                this.log(`Found! indices ${j} and ${i} sum to ${target}`);\n                // Highlight both indices\n                this.nums.highlight(j, '#00e0ff');\n                this.nums.highlight(i, '#00e0ff');\n                await this.await();\n                return [j, i];\n            }\n            // Not found, store current value\n            this.map.put(val, i);\n            this.log(`Store value ${val} with index ${i} in map`);\n            // Highlight map entry (using key color)\n            this.map.highlight(val, '#6c8cff');\n            await this.await();\n        }\n        this.log('No pair found (should not happen per problem constraints)');\n        await this.await();\n        return null;\n    }\n}"
+}

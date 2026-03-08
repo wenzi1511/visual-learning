@@ -1,0 +1,30 @@
+{
+  "id": "factorial-of-n",
+  "name": "Factorial of N",
+  "difficulty": "Easy",
+  "description": "<p>The factorial of a non-negative integer <code>n</code>, denoted by <code>n!</code>, is the product of all positive integers less than or equal to <code>n</code>.</p><p>The factorial of <code>0</code> is defined as <code>1</code>.</p><ul><li><code>n! = n * (n-1) * (n-2) * ... * 1</code></li><li><code>0! = 1</code></li></ul><p>For example:</p><ul><li><code>5! = 5 * 4 * 3 * 2 * 1 = 120</code></li><li><code>3! = 3 * 2 * 1 = 6</code></li></ul><p>Your task is to implement a function that calculates the factorial of a given integer <code>n</code>.</p>",
+  "tags": [
+    "Recursion",
+    "Math"
+  ],
+  "slots": [
+    {
+      "id": "callstack",
+      "type": "callstack",
+      "label": "Function Call Stack"
+    },
+    {
+      "id": "recursionTree",
+      "type": "recursion-tree",
+      "label": "Recursion Tree"
+    }
+  ],
+  "inputs": [
+    {
+      "label": "n",
+      "default": "5",
+      "placeholder": "Enter a non-negative integer"
+    }
+  ],
+  "code": "class Playground {\n\n    async run(inputs) {\n        const n = parseInt(inputs[0]);\n\n        if (isNaN(n) || n < 0) {\n            this.log(\"Input 'n' must be a non-negative integer.\");\n            return -1;\n        }\n\n        this.callstack.init();\n        this.recursionTree.init();\n\n        this.log(`Starting factorial calculation for n = ${n}`);\n        await this.await();\n\n        const result = await this.calculateFactorial(n);\n\n        this.log(`Final result: ${n}! = ${result}`);\n        return result;\n    }\n\n    async calculateFactorial(currentN) {\n        // Push a new frame onto the call stack for the current function call\n        this.callstack.pushFrame('factorial', { n: currentN });\n        // Enter a new node in the recursion tree\n        this.recursionTree.enterNode(currentN, `factorial(${currentN})`);\n        this.log(`Entering factorial(${currentN})`);\n        await this.await();\n\n        // Base Case: factorial of 0 or 1 is 1\n        if (currentN === 0 || currentN === 1) {\n            this.log(`Base case reached: factorial(${currentN}) is 1.`);\n            this.callstack.updateLocal('result', 1);\n            await this.await();\n            \n            // Pop the frame and exit the recursion tree node with the result\n            this.callstack.popFrame(1);\n            this.recursionTree.exitNode('green'); // Mark as successfully computed\n            return 1;\n        }\n\n        // Recursive Step: n * factorial(n-1)\n        this.log(`Calculating factorial(${currentN}) = ${currentN} * factorial(${currentN - 1})`);\n        this.callstack.updateLocal('n', currentN);\n        await this.await();\n\n        // Recursively call for n-1\n        const subProblemResult = await this.calculateFactorial(currentN - 1);\n\n        this.log(`Received result for factorial(${currentN - 1}): ${subProblemResult}`);\n        this.callstack.updateLocal('subProblemResult', subProblemResult);\n        await this.await();\n\n        const currentResult = currentN * subProblemResult;\n        this.log(`Current result for factorial(${currentN}): ${currentN} * ${subProblemResult} = ${currentResult}`);\n        this.callstack.updateLocal('result', currentResult);\n        await this.await();\n\n        // Pop the frame and exit the recursion tree node with the result\n        this.callstack.popFrame(currentResult);\n        this.recursionTree.exitNode('green'); // Mark as successfully computed\n        return currentResult;\n    }\n}"
+}

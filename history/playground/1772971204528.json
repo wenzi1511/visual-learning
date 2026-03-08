@@ -1,0 +1,51 @@
+{
+  "id": "n-queens",
+  "name": "N Queens",
+  "difficulty": "Medium",
+  "description": "<p>Place <code>N</code> queens on an <code>N×N</code> chessboard so that no two queens attack each other. A queen attacks horizontally, vertically, and diagonally.</p><p>Return one valid board configuration where <code>1</code> represents a queen and <code>0</code> an empty cell.</p>",
+  "tags": [
+    "Backtracking",
+    "Recursion",
+    "Grid"
+  ],
+  "slots": [
+    {
+      "id": "board",
+      "type": "grid",
+      "label": "Chessboard"
+    },
+    {
+      "id": "callstack",
+      "type": "callstack",
+      "label": "Call Stack"
+    },
+    {
+      "id": "recursionTree",
+      "type": "recursion-tree",
+      "label": "Recursion Tree"
+    },
+    {
+      "id": "cols",
+      "type": "hashset",
+      "label": "Columns"
+    },
+    {
+      "id": "diag1",
+      "type": "hashset",
+      "label": "Diag1 (row-col)"
+    },
+    {
+      "id": "diag2",
+      "type": "hashset",
+      "label": "Diag2 (row+col)"
+    }
+  ],
+  "inputs": [
+    {
+      "label": "Board Size (N)",
+      "default": "4",
+      "placeholder": "Enter N"
+    }
+  ],
+  "code": "class Playground {\n    async run(inputs) {\n        const N = parseInt(inputs[0]);\n        // initialise board with zeros\n        const empty = Array.from({ length: N }, () => Array(N).fill(0));\n        this.board.init(empty);\n        // initialise helper sets\n        this.cols.init([]);\n        this.diag1.init([]);\n        this.diag2.init([]);\n        // initialise visual helpers\n        this.callstack.init();\n        this.recursionTree.init();\n        const self = this;\n        async function backtrack(row) {\n            self.callstack.pushFrame('backtrack', { row });\n            self.recursionTree.enterNode(`r${row}`, `row=${row}`, '#00e0ff');\n            self.log(`Entering row ${row}`);\n            await self.await();\n            if (row === N) {\n                self.log('Solution found');\n                await self.await();\n                self.callstack.popFrame();\n                self.recursionTree.exitNode('#00f5a0');\n                return true;\n            }\n            for (let col = 0; col < N; col++) {\n                const d1 = row - col;\n                const d2 = row + col;\n                if (self.cols.has(col) || self.diag1.has(d1) || self.diag2.has(d2)) {\n                    self.log(`Cell (${row},${col}) is unsafe`);\n                    await self.await();\n                    continue;\n                }\n                // place queen\n                self.board.setCell(row, col, 1);\n                self.cols.add(col);\n                self.diag1.add(d1);\n                self.diag2.add(d2);\n                self.log(`Placed queen at (${row},${col})`);\n                await self.await();\n                // recurse\n                if (await backtrack(row + 1)) {\n                    self.callstack.popFrame();\n                    self.recursionTree.exitNode('#00f5a0');\n                    return true;\n                }\n                // backtrack removal\n                self.board.setCell(row, col, 0);\n                self.cols.remove(col);\n                self.diag1.remove(d1);\n                self.diag2.remove(d2);\n                self.log(`Removed queen from (${row},${col})`);\n                await self.await();\n            }\n            self.callstack.popFrame();\n            self.recursionTree.exitNode('#ffb703');\n            return false;\n        }\n        const found = await backtrack(0);\n        if (!found) {\n            this.log('No solution exists');\n            await this.await();\n        }\n        return this.board.getValues();\n    }\n}"
+}

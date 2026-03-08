@@ -33,14 +33,11 @@ app.post('/api/keys', (req, res) => {
         const newGemini = geminiApiKey || process.env.GEMINI_API_KEY || '';
         const newGroq = groqApiKey || process.env.GROQ_API_KEY || '';
 
-        if (newGemini) {
-            envContent += `GEMINI_API_KEY=${newGemini}\n`;
-            process.env.GEMINI_API_KEY = newGemini;
-        }
-        if (newGroq) {
-            envContent += `GROQ_API_KEY=${newGroq}\n`;
-            process.env.GROQ_API_KEY = newGroq;
-        }
+        envContent += `GEMINI_API_KEY=${newGemini}\n`;
+        process.env.GEMINI_API_KEY = newGemini;
+
+        envContent += `GROQ_API_KEY=${newGroq}\n`;
+        process.env.GROQ_API_KEY = newGroq;
 
         fs.writeFileSync(path.join(__dirname, '.env'), envContent);
         res.json({ success: true, message: 'Settings saved globally in .env' });
