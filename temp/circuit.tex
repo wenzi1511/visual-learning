@@ -1,8 +1,39 @@
 \documentclass[tikz,border=5mm]{standalone}
 \usepackage{circuitikz}
+
 \begin{document}
+
 \begin{circuitikz}[american]
-\draw (0,0) to[short] (2,0);
-\node at (1, 0.5) {Awaiting Generation...};
+
+% Ground references
+\draw (0,0) node[ground]{};
+\draw (3,0) node[ground]{};
+
+% Input voltage source V_in
+\draw (0,0) to[V,v=$V_{in}$] (0,3);
+
+% Input resistor R_in
+\draw (0,3) to[R,l=$R_{in}{=}10k\Omega$] (3,3);
+
+% Op-amp U1
+\node[op amp](U1) at (6,2){}; % Center op-amp at (6,2)
+
+% Connect R_in to inverting input
+\draw (3,3) -- (U1.in-);
+
+% Connect non-inverting input to ground
+\draw (U1.in+) -- (5,1) -- (3,1) -- (3,0);
+
+% Feedback resistor R_f
+\draw (U1.in-) to[R,l_=$R_f{=}100k\Omega$] (U1.out);
+
+% Output voltage V_out
+\draw (U1.out) -- (8,2) node[right]{$V_{out}$};
+
+% Power supply connections (labeled)
+\draw (U1.up) -- (6,4) node[above]{$+15V$};
+\draw (U1.down) -- (6,0) node[below]{$-15V$};
+
 \end{circuitikz}
+
 \end{document}
