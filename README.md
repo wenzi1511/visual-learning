@@ -68,28 +68,28 @@ The system operates on a specialized pipeline designed to maintain academic rigo
     <td>Visualize circuit diagrams</td>
     <td>Circuitikz (LaTeX)</td>
     <td>Backend LaTeX Pipeline</td>
-    <td>Step by step math explanations (MathJax)</td>
+    <td>None</td>
   </tr>
   <tr>
     <td>Chemistry</td>
     <td>Represent molecular bonds</td>
     <td>Chemfig (LaTeX)</td>
     <td>Backend LaTeX Pipeline</td>
-    <td>Prevents overlapping text or impossible bonds</td>
+    <td>None</td>
   </tr>
   <tr>
     <td>Data Structures</td>
     <td>Step by step execution</td>
     <td>Structured State JSON</td>
     <td>Custom HTML Canvas reader</td>
-    <td>Deep interactivity with forward backward stepping</td>
+    <td>Deep interactivity with forward backward stepping along with trying various inputs</td>
   </tr>
   <tr>
     <td>Science and Math</td>
     <td>Dynamic modeling of physics</td>
     <td>JavaScript Classes</td>
     <td>Browser JavaScript Engine</td>
-    <td>Sliders for interactive mass, angle, friction tweaks</td>
+    <td>Sliders for interactive variables tweaks</td>
   </tr>
   <tr>
     <td>Architecture Flow</td>
