@@ -23,12 +23,12 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 script {
-                    echo "Installing dependencies..."
+                    echo "Installing application dependencies..."
 
                     if (isUnix()) {
-                        sh 'npm ci'
+                        sh 'npm install'
                     } else {
-                        bat 'npm ci'
+                        bat 'npm install'
                     }
                 }
             }
@@ -37,13 +37,11 @@ pipeline {
         stage('Run Tests') {
             steps {
                 script {
-                    echo "Running Jest tests..."
+                    echo "Running Jest test suite..."
 
                     if (isUnix()) {
-                        sh 'npm install --save-dev jest supertest'
                         sh 'npx jest'
                     } else {
-                        bat 'npm install --save-dev jest supertest'
                         bat 'npx jest'
                     }
                 }
@@ -56,11 +54,15 @@ pipeline {
                     echo "Building production Docker image..."
 
                     if (isUnix()) {
+
                         sh "docker build -f Dockerfile.github -t ${IMAGE_NAME}:${env.BUILD_ID} ."
                         sh "docker tag ${IMAGE_NAME}:${env.BUILD_ID} ${IMAGE_NAME}:latest"
+
                     } else {
+
                         bat "docker build -f Dockerfile.github -t %IMAGE_NAME%:%BUILD_ID% ."
                         bat "docker tag %IMAGE_NAME%:%BUILD_ID% %IMAGE_NAME%:latest"
+
                     }
                 }
             }
@@ -83,6 +85,7 @@ pipeline {
                         bat "docker run -d --name visual-learning-prod -p 3000:3000 %IMAGE_NAME%:latest"
 
                     }
+
                 }
             }
         }
