@@ -302,6 +302,19 @@
     <div id="landing-view">
         <div class="landing-bg"></div>
         <div class="landing-content">
+            <button onclick="openSettingsModal()"
+                style="position: absolute; top: 20px; right: 40px; background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255, 255, 255, 0.1); color: #c4b5fd; padding: 10px 16px; border-radius: 8px; cursor: pointer; backdrop-filter: blur(8px); display: flex; align-items: center; gap: 8px; font-weight: 500; transition: all 0.2s; box-shadow: 0 4px 12px rgba(0,0,0,0.3); z-index: 100;"
+                onmouseover="this.style.background='rgba(30, 41, 59, 0.9)'; this.style.transform='scale(1.05)';"
+                onmouseout="this.style.background='rgba(15, 23, 42, 0.8)'; this.style.transform='scale(1)';">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path
+                        d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
+                    </path>
+                </svg>
+                API Settings
+            </button>
             <h1 class="landing-title">Visual Learning</h1>
             <p class="landing-subtitle">Select a module to explore interactively and effortlessly.</p>
 
@@ -1283,6 +1296,89 @@
             </div>
         </div>
     </div>
+    <!-- Global Settings Modal -->
+    <div id="settings-modal"
+        style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; z-index:9999; background:rgba(0,0,0,0.8); backdrop-filter:blur(4px); align-items:center; justify-content:center;">
+        <div
+            style="background:#1e293b; border:1px solid #334155; padding:30px; border-radius:12px; width:400px; box-shadow:0 10px 40px rgba(0,0,0,0.5);">
+            <h2 style="margin-top:0; color:#f8fafc; font-size:1.5rem; margin-bottom:20px;">API Settings</h2>
+            <div style="margin-bottom:15px;">
+                <label style="display:block; color:#94a3b8; font-size:0.9rem; margin-bottom:5px;">Gemini API
+                    Key</label>
+                <input type="password" id="global-gemini-key" placeholder="Enter Gemini Key (e.g. AIzaSy... No quotes)"
+                    style="width:100%; padding:10px; border-radius:6px; border:1px solid #475569; background:#0f172a; color:#f8fafc; outline:none; font-family:'Inter', sans-serif;">
+            </div>
+            <div style="margin-bottom:20px;">
+                <label style="display:block; color:#94a3b8; font-size:0.9rem; margin-bottom:5px;">Groq API
+                    Key</label>
+                <input type="password" id="global-groq-key" placeholder="Enter Groq Key (e.g. gsk_aBc12... No quotes)"
+                    style="width:100%; padding:10px; border-radius:6px; border:1px solid #475569; background:#0f172a; color:#f8fafc; outline:none; font-family:'Inter', sans-serif;">
+            </div>
+            <div id="settings-status" style="margin-bottom:15px; font-size:0.85rem; color:#10b981; display:none;">
+            </div>
+            <div style="display:flex; justify-content:flex-end; gap:10px;">
+                <button onclick="closeSettingsModal()"
+                    style="padding:10px 15px; border-radius:6px; border:1px solid #475569; background:transparent; color:#f8fafc; cursor:pointer; transition:background 0.2s;"
+                    onmouseover="this.style.background='rgba(255,255,255,0.05)'"
+                    onmouseout="this.style.background='transparent'">Cancel</button>
+                <button onclick="saveGlobalKeys()"
+                    style="padding:10px 15px; border-radius:6px; border:none; background:linear-gradient(135deg, #3b82f6, #2563eb); color:#ffffff; cursor:pointer; font-weight:600; box-shadow:0 4px 12px rgba(59,130,246,0.4); transition:opacity 0.2s;"
+                    onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">Save
+                    Globally</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openSettingsModal() {
+            document.getElementById('settings-modal').style.display = 'flex';
+            document.getElementById('settings-status').style.display = 'none';
+
+            // Fetch status to see what's set
+            fetch('/api/keys/status')
+                .then(r => r.json())
+                .then(data => {
+                    document.getElementById('global-gemini-key').placeholder = data.geminiConfigured ? "Saved in .env! Type to replace (e.g. AIzaSy... No quotes)" : "Enter Gemini Key (e.g. AIzaSy... No quotes)";
+                    document.getElementById('global-groq-key').placeholder = data.groqConfigured ? "Saved in .env! Type to replace (e.g. gsk_aBc12... No quotes)" : "Enter Groq Key (e.g. gsk_aBc12... No quotes)";
+                }).catch(err => console.error(err));
+        }
+
+        function closeSettingsModal() {
+            document.getElementById('settings-modal').style.display = 'none';
+        }
+
+        async function saveGlobalKeys() {
+            const geminiApiKey = document.getElementById('global-gemini-key').value.trim();
+            const groqApiKey = document.getElementById('global-groq-key').value.trim();
+            const statusEl = document.getElementById('settings-status');
+
+            statusEl.style.display = 'block';
+            statusEl.style.color = '#e2e8f0';
+            statusEl.textContent = 'Saving...';
+
+            try {
+                const res = await fetch('/api/keys', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ geminiApiKey, groqApiKey })
+                });
+
+                if (res.ok) {
+                    statusEl.style.color = '#10b981';
+                    statusEl.textContent = 'Settings saved globally! You can now generate without entering a key.';
+                    setTimeout(() => closeSettingsModal(), 2000);
+                    document.getElementById('global-gemini-key').value = '';
+                    document.getElementById('global-groq-key').value = '';
+                } else {
+                    statusEl.style.color = '#ef4444';
+                    statusEl.textContent = 'Failed to save.';
+                }
+            } catch (e) {
+                statusEl.style.color = '#ef4444';
+                statusEl.textContent = 'Error saving.';
+            }
+        }
+    </script>
 
     <script type="module" src="js/main.js"></script>
 </body>

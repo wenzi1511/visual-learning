@@ -1,0 +1,47 @@
+{
+  "id": "permutations",
+  "name": "Permutations",
+  "difficulty": "Medium",
+  "description": "<p>Given an array <code>nums</code> of distinct integers, return all the possible <b>permutations</b>. You can return the answer in any order.</p><ul><li>A permutation is a rearrangement of all the elements of an array.</li><li>The input array contains distinct integers.</li><li>The visualization shows the backtracking process using a recursion tree and a hashset to track used elements.</li></ul>",
+  "tags": [
+    "Backtracking",
+    "Recursion",
+    "Array",
+    "Hashset"
+  ],
+  "slots": [
+    {
+      "id": "nums",
+      "type": "array",
+      "label": "Input Array"
+    },
+    {
+      "id": "current",
+      "type": "array",
+      "label": "Current Permutation"
+    },
+    {
+      "id": "used",
+      "type": "hashset",
+      "label": "Used Elements"
+    },
+    {
+      "id": "recursionTree",
+      "type": "recursion-tree",
+      "label": "Backtracking Tree"
+    },
+    {
+      "id": "callstack",
+      "type": "callstack",
+      "label": "Call Stack"
+    }
+  ],
+  "inputs": [
+    {
+      "label": "Numbers",
+      "default": "[1, 2, 3]",
+      "placeholder": "e.g. [1, 2, 3]"
+    }
+  ],
+  "code": "class Playground {\n    async run(inputs) {\n        let numsArr;\n        try {\n            numsArr = JSON.parse(inputs[0]);\n            if (!Array.isArray(numsArr)) throw new Error();\n        } catch (e) {\n            this.log(\"Invalid input. Please provide a valid array like [1, 2, 3]\");\n            return [];\n        }\n\n        // Initialize slots\n        this.nums.init(numsArr);\n        this.current.init([]);\n        this.used.init([]);\n        this.recursionTree.init();\n        this.callstack.init();\n\n        const results = [];\n        this.nodeCounter = 0;\n        this.numsSize = numsArr.length;\n\n        await this.backtrack(results);\n\n        this.log(`Found ${results.length} total permutations.`);\n        return results;\n    }\n\n    async backtrack(results) {\n        const path = this.current.getValues();\n        const nodeId = \"node_\" + (this.nodeCounter++);\n        const label = path.length === 0 ? \"root\" : \"[\" + path.join(\",\") + \"]\";\n\n        // Recursion Visualization Start\n        this.callstack.pushFrame(\"backtrack\", { path: [...path] });\n        this.recursionTree.enterNode(nodeId, label);\n        this.log(`Exploring path: ${label}`);\n        await this.await();\n\n        // Base Case\n        if (path.length === this.numsSize) {\n            results.push([...path]);\n            this.log(`Found valid permutation: [${path.join(\",\")}]`);\n            await this.await();\n            \n            this.callstack.popFrame();\n            this.recursionTree.exitNode(\"#00f5a0\"); // Success color\n            return;\n        }\n\n        // Recursive Step\n        for (let i = 0; i < this.numsSize; i++) {\n            this.callstack.updateLocal(\"i\", i);\n            const val = this.nums.get(i);\n\n            if (this.used.has(val)) {\n                this.log(`Value ${val} is already used in current path. Skipping.`);\n                this.nums.highlight(i, \"#ff4d4f\");\n                await this.await();\n                this.nums.highlight(i, null);\n                continue;\n            }\n\n            // Choose\n            this.log(`Choosing ${val} at index ${i}`);\n            this.nums.highlight(i, \"#00e0ff\");\n            this.used.add(val);\n            this.current.push(val);\n            await this.await();\n\n            // Recurse\n            await this.backtrack(results);\n\n            // Un-choose (Backtrack)\n            this.log(`Backtracking: removing ${val} from path.`);\n            this.current.pop();\n            this.used.remove(val);\n            this.nums.highlight(i, null);\n            await this.await();\n        }\n\n        // Recursion Visualization End\n        this.callstack.popFrame();\n        this.recursionTree.exitNode();\n    }\n}"
+}

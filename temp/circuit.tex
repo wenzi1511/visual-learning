@@ -2,7 +2,7 @@
 \usepackage{circuitikz}
 \begin{document}
 \begin{circuitikz}[american]
-\draw (0,0) node[ground]{} to[V, v=$V_s{=}5V$] (0,3) node[left]{Start} to[R, l=$R{=}10k\Omega$] (3,3) to[C, l=$C{=}1\mu F$] (3,0) node[ground]{} to[short] (0,0);
-\node[right] at (0.5, 1.5) {Series RC Circuit};
+\draw (0,0) to[short] (2,0);
+\node at (1, 0.5) {Awaiting Generation...};
 \end{circuitikz}
 \end{document}

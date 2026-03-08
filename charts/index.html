@@ -760,11 +760,6 @@
                 else localStorage.setItem('geminiApiKey', apiKey);
             }
 
-            if (!apiKey) {
-                modelSelect.innerHTML = '<option value="">Enter API Key to load models...</option>';
-                return;
-            }
-
             modelSelect.innerHTML = '<option value="">Loading models...</option>';
             modelSelect.disabled = true;
 
@@ -819,8 +814,8 @@
                 }
             } catch (error) {
                 console.error(error);
-                modelSelect.innerHTML = '<option value="">Error loading models</option>';
-                alert("Model Fetch Error: " + error.message);
+                modelSelect.innerHTML = '<option value="">Enter API Key (or configure .env) to load models...</option>';
+                // Silently fail instead of alerting, allows user to just use .env
             }
         }
 
@@ -923,12 +918,8 @@
             const statusEl = document.getElementById('ai-status');
             const btn = document.getElementById('btn-generate');
 
-            if (!apiKey) {
-                alert('Please enter an API Key.');
-                return;
-            }
             if (!promptDesc) {
-                alert('Please describe data to chart.');
+                alert('Please describe data to generate a chart.');
                 return;
             }
 

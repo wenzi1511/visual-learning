@@ -1397,11 +1397,6 @@
             const platform = document.getElementById('tutor-provider').value;
             const modelSelect = document.getElementById('tutor-model');
 
-            if (!apiKey) {
-                modelSelect.innerHTML = '<option value="">Enter API Key first</option>';
-                return;
-            }
-
             modelSelect.innerHTML = '<option value="">Loading...</option>';
             modelSelect.disabled = true;
 
@@ -1487,14 +1482,6 @@
             const apiKey = document.getElementById('tutor-api-key').value.trim();
             const platform = document.getElementById('tutor-provider').value;
             const model = document.getElementById('tutor-model').value;
-
-            if (!apiKey) {
-                // Auto-open settings if no key
-                const panel = document.getElementById('settings-panel');
-                if (!panel.classList.contains('open')) toggleSettings();
-                document.getElementById('tutor-api-key').focus();
-                return;
-            }
 
             // Hide welcome
             const welcome = document.getElementById('chat-welcome');

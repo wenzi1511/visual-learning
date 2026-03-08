@@ -1,0 +1,36 @@
+{
+  "id": "n-queens-backtracking",
+  "name": "N-Queens Problem",
+  "difficulty": "Hard",
+  "description": "<p>The <b>N-Queens puzzle</b> is the problem of placing <code>n</code> queens on an <code>n x n</code> chessboard such that no two queens attack each other.</p><ul><li>A queen can attack any cell in the same row, column, or diagonal.</li><li>This visualization uses backtracking to explore valid configurations.</li></ul>",
+  "tags": [
+    "Backtracking",
+    "Recursion",
+    "Grid"
+  ],
+  "slots": [
+    {
+      "id": "board",
+      "type": "grid",
+      "label": "Chessboard"
+    },
+    {
+      "id": "callstack",
+      "type": "callstack",
+      "label": "Call Stack"
+    },
+    {
+      "id": "recursion-tree",
+      "type": "recursion-tree",
+      "label": "Decision Tree"
+    }
+  ],
+  "inputs": [
+    {
+      "label": "N",
+      "default": "4",
+      "placeholder": "Enter board size (e.g., 4)"
+    }
+  ],
+  "code": "class Playground {\n    async run(inputs) {\n        const n = parseInt(inputs[0]);\n        const board = Array.from({ length: n }, () => Array(n).fill(0));\n        this.board.init(board);\n        this.callstack.init();\n        this.recursionTree.init();\n\n        const solve = async (row, nodeId) => {\n            this.callstack.pushFrame('solve', { row });\n            this.recursionTree.enterNode(nodeId, `Row ${row}`);\n\n            if (row === n) {\n                this.log('Found a valid configuration!');\n                this.callstack.popFrame(true);\n                this.recursionTree.exitNode('#00f5a0');\n                return true;\n            }\n\n            for (let col = 0; col < n; col++) {\n                if (await this.isSafe(row, col, n)) {\n                    this.board.setCell(row, col, 1);\n                    this.board.highlight(row, col, '#00e0ff');\n                    await this.await();\n\n                    if (await solve(row + 1, `${nodeId}-${col}`)) {\n                        this.callstack.popFrame(true);\n                        this.recursionTree.exitNode('#00f5a0');\n                        return true;\n                    }\n\n                    this.board.setCell(row, col, 0);\n                    this.board.highlight(row, col, '#ffffff');\n                    await this.await();\n                }\n            }\n\n            this.callstack.popFrame(false);\n            this.recursionTree.exitNode('#ff0000');\n            return false;\n        };\n\n        return await solve(0, 'root');\n    }\n\n    async isSafe(row, col, n) {\n        const grid = this.board.getValues();\n        for (let i = 0; i < row; i++) {\n            for (let j = 0; j < n; j++) {\n                if (grid[i][j] === 1) {\n                    if (j === col || Math.abs(i - row) === Math.abs(j - col)) return false;\n                }\n            }\n        }\n        return true;\n    }\n}"
+}

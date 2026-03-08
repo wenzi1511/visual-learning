@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=latex 2026.3.5)  7 MAR 2026 18:20
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=latex 2026.3.5)  8 MAR 2026 13:32
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -522,10 +522,6 @@ LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 3.
 LaTeX Font Info:    ... okay on input line 3.
 LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 3.
 LaTeX Font Info:    ... okay on input line 3.
-LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <7> on input line 5.
-LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <5> on input line 5.
  [1
 
 ] (circuit.aux)
@@ -535,12 +531,12 @@ L3 programming layer <2024-01-04>
  ***********
  ) 
 Here is how much of TeX's memory you used:
- 31159 strings out of 474487
- 832834 string characters out of 5743782
- 1933539 words of memory out of 5000000
- 53200 multiletter control sequences out of 15000+600000
+ 30780 strings out of 474487
+ 822516 string characters out of 5743782
+ 1926539 words of memory out of 5000000
+ 52821 multiletter control sequences out of 15000+600000
  558069 words of font info for 36 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 117i,9n,121p,417b,810s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 117i,5n,121p,417b,699s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
-Output written on circuit.dvi (1 page, 16440 bytes).
+Output written on circuit.dvi (1 page, 11500 bytes).

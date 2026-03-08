@@ -15,11 +15,47 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname)));
 
 /* ============================================================
+   SETTINGS/KEYS ENDPOINTS
+============================================================ */
+app.get('/api/keys/status', (req, res) => {
+    res.json({
+        geminiConfigured: !!process.env.GEMINI_API_KEY,
+        groqConfigured: !!process.env.GROQ_API_KEY
+    });
+});
+
+app.post('/api/keys', (req, res) => {
+    try {
+        const { geminiApiKey, groqApiKey } = req.body;
+        let envContent = '';
+
+        // Retain existing key if the submitted one is empty
+        const newGemini = geminiApiKey || process.env.GEMINI_API_KEY || '';
+        const newGroq = groqApiKey || process.env.GROQ_API_KEY || '';
+
+        if (newGemini) {
+            envContent += `GEMINI_API_KEY=${newGemini}\n`;
+            process.env.GEMINI_API_KEY = newGemini;
+        }
+        if (newGroq) {
+            envContent += `GROQ_API_KEY=${newGroq}\n`;
+            process.env.GROQ_API_KEY = newGroq;
+        }
+
+        fs.writeFileSync(path.join(__dirname, '.env'), envContent);
+        res.json({ success: true, message: 'Settings saved globally in .env' });
+    } catch (e) {
+        console.error('Error saving keys:', e);
+        res.status(500).json({ error: 'Failed to write to .env file' });
+    }
+});
+
+/* ============================================================
    GENERATE ENDPOINT
 ============================================================ */
 app.post('/api/generate', async (req, res) => {
     try {
-        const {
+        let {
             apiKey,
             problemDescription,
             platform = 'gemini',
@@ -29,7 +65,9 @@ app.post('/api/generate', async (req, res) => {
             chatId
         } = req.body;
 
-        if (!apiKey) return res.status(400).json({ error: 'API key is required.' });
+        apiKey = apiKey || (platform === 'groq' ? process.env.GROQ_API_KEY : process.env.GEMINI_API_KEY);
+
+        if (!apiKey) return res.status(400).json({ error: 'API key is required. Please set it in local or Global Settings.' });
         if (!problemDescription) return res.status(400).json({ error: 'Problem description is required.' });
 
         const selectedModel = req.body.model || 'gemini-2.5-flash';
@@ -173,7 +211,9 @@ app.post('/api/generate', async (req, res) => {
 ============================================================ */
 app.post('/api/models', async (req, res) => {
     try {
-        const { apiKey, platform = 'gemini' } = req.body;
+        let { apiKey, platform = 'gemini' } = req.body;
+        apiKey = apiKey || (platform === 'groq' ? process.env.GROQ_API_KEY : process.env.GEMINI_API_KEY);
+
         if (!apiKey) return res.status(400).json({ error: 'API key is required.' });
 
         let availableModels = [];

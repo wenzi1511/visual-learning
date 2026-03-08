@@ -3741,11 +3741,6 @@ async function fetchModels() {
         else localStorage.setItem('geminiApiKey', apiKey);
     }
 
-    if (!apiKey) {
-        modelSelect.innerHTML = '<option value="">Enter API Key to load models...</option>';
-        return;
-    }
-
     modelSelect.innerHTML = '<option value="">Loading models...</option>';
     modelSelect.disabled = true;
 
@@ -3814,9 +3809,13 @@ async function fetchModels() {
         console.error(error);
         modelSelect.innerHTML = '<option value="">Error loading models</option>';
         if (error.message.includes('Failed to fetch')) {
-            alert('Error: Could not connect to the local server. Please ensure you have started it by running "node server.js" in your terminal, and access the playground via http://localhost:3000/playground/test.html');
+            modelSelect.innerHTML = '<option value="">Server offline. Start local server.</option>';
+            console.warn('Error: Could not connect to the local server.');
+        } else if (error.message.includes('API key not configured') || error.message.includes('Invalid API key')) {
+            modelSelect.innerHTML = `<option value="">Enter ${platform === 'groq' ? 'Groq' : 'Gemini'} API Key to load models...</option>`;
         } else {
-            alert("Model Unavailable : " + error.message);
+            modelSelect.innerHTML = '<option value="">Models unavailable</option>';
+            console.warn("Model Unavailable : " + error.message);
         }
     }
 }

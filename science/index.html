@@ -681,11 +681,6 @@
             const platform = document.getElementById('ai-platform').value;
             const modelSelect = document.getElementById('ai-model');
 
-            if (!apiKey) {
-                modelSelect.innerHTML = '<option value="">Enter API Key to load models...</option>';
-                return;
-            }
-
             modelSelect.innerHTML = '<option value="">Loading models...</option>';
             modelSelect.disabled = true;
 
@@ -733,7 +728,7 @@
                 })
                 .catch(err => {
                     console.error(err);
-                    modelSelect.innerHTML = '<option value="">Error loading models</option>';
+                    modelSelect.innerHTML = '<option value="">Enter API Key (or configure .env) to load models...</option>';
                     modelSelect.disabled = false;
                 });
 
@@ -1007,11 +1002,6 @@
             const statusEl = document.getElementById('ai-status');
             const btn = document.getElementById('btn-generate');
 
-            if (!apiKey) {
-                statusEl.textContent = 'Error: Please provide an API key.';
-                statusEl.style.color = '#ef4444';
-                return;
-            }
             if (!promptDesc) {
                 statusEl.textContent = 'Error: Please provide a description to simulate.';
                 statusEl.style.color = '#ef4444';
