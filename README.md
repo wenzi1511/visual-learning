@@ -68,14 +68,14 @@ The system operates on a specialized pipeline designed to maintain academic rigo
     <td>Visualize circuit diagrams</td>
     <td>Circuitikz (LaTeX)</td>
     <td>Backend LaTeX Pipeline</td>
-    <td>None</td>
+    <td>Deterministic circuit schematic rendering with correct electrical symbols and node topology</td>
   </tr>
   <tr>
     <td>Chemistry</td>
     <td>Represent molecular bonds</td>
     <td>Chemfig (LaTeX)</td>
     <td>Backend LaTeX Pipeline</td>
-    <td>None</td>
+    <td>Structurally accurate molecular diagrams generated from chemical notation</td>
   </tr>
   <tr>
     <td>Data Structures</td>
@@ -163,3 +163,43 @@ The overarching goal of Visual Learning is to combine these disparate rendering 
 5. The interface spawns a Science Simulation allowing the user to adjust the resistor value and observe the cutoff frequency shift in real time.
 
 By merging traditional text based learning with precise, academically rigorous, and highly interactive visual rendering across disciplines, this project creates an omni capable learning engine that scales infinitely beyond traditional textbooks.
+
+## 7.0 Architectural Extensibility
+
+The Visual Learning system is designed with a renderer-agnostic architecture. This means the platform is not inherently limited to the modules currently implemented (Electrical Engineering, Chemistry, Data Structures, Science Simulations, Architecture Diagrams, and Interactive Charts).
+
+Any discipline whose concepts can be expressed through structured code or formal visual descriptions can theoretically be integrated into the Visual Learning pipeline.
+
+Because the system relies on deterministic code generation rather than pixel-based image synthesis, integrating a new visualization domain requires defining only three components:
+
+A structured output format that the AI must generate.
+
+A rendering engine capable of interpreting that format.
+
+A module specific system prompt enforcing syntax and structural constraints.
+
+Once these elements are defined, the same processing workflow (prompt ingestion, structured JSON generation, code sanitization, and deterministic rendering) can be reused without changes to the core architecture.
+
+## 7.1 Examples of Potential Domain Extensions
+
+Although not currently implemented, the architecture can theoretically support many additional scientific domains whose knowledge is inherently visual.
+
+Domain	Possible Representation	Rendering Method
+Biology	Cellular structures, biological pathways, phylogenetic trees	SVG / Canvas / Cytoscape / WebGL
+Geology	Terrain models, tectonic plates, stratigraphic layers	Three.js / WebGL
+Astronomy	Orbital mechanics, planetary systems, star maps	WebGL / Three.js
+Geography	Spatial maps, topographical data, climate layers	GeoJSON / Map rendering engines
+
+These domains are suitable because their structures can be represented using programmatic descriptions rather than static raster images.
+
+## 7.2 Core Design Principle
+
+The central design principle of Visual Learning is that any concept that can be expressed as structured code can be deterministically rendered as a visual representation.
+
+Circuit diagrams are rendered from Circuitikz syntax.
+Chemical structures are rendered from Chemfig notation.
+Algorithms are visualized from structured state objects.
+System architectures are rendered from Mermaid diagrams.
+Charts are produced from JSON configuration objects.
+
+By separating the AI generation layer from the renderer layer, the platform remains extensible and capable of supporting future scientific visualization domains without requiring changes to the underlying pipeline.
