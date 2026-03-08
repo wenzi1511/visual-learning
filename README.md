@@ -187,11 +187,12 @@ Once these elements are defined, the same processing workflow (prompt ingestion,
 
 Although not currently implemented, the architecture can theoretically support many additional scientific domains whose knowledge is inherently visual.
 
-Domain	Possible Representation	Rendering Method
-Biology	Cellular structures, biological pathways, phylogenetic trees	SVG / Canvas / Cytoscape / WebGL
-Geology	Terrain models, tectonic plates, stratigraphic layers	Three.js / WebGL
-Astronomy	Orbital mechanics, planetary systems, star maps	WebGL / Three.js
-Geography	Spatial maps, topographical data, climate layers	GeoJSON / Map rendering engines
+| Domain    | Possible Representation                                              | Rendering Method                          |
+|-----------|---------------------------------------------------------------------|-------------------------------------------|
+| Biology   | Cellular structures, biological pathways, phylogenetic trees       | SVG / Canvas / Cytoscape / WebGL          |
+| Geology   | Terrain models, tectonic plates, stratigraphic layers              | Three.js / WebGL                          |
+| Astronomy | Orbital mechanics, planetary systems, star maps                    | WebGL / Three.js                          |
+| Geography | Spatial maps, topographical data, climate layers                   | GeoJSON / Map rendering engines           |
 
 These domains are suitable because their structures can be represented using programmatic descriptions rather than static raster images.
 

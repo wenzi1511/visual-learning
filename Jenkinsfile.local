@@ -1,0 +1,90 @@
+pipeline {
+    agent any
+
+    environment {
+        // Use a static port for local testing, or dynamically allocate one
+        NODE_ENV = 'development'
+        PORT = 4000
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                // If this Jenkins instance has access to the local path, we can checkout from it.
+                // Or Jenkins uses the SCM attached to the pipeline.
+                checkout scm
+                echo "Checked out local repository successfully."
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                script {
+                    echo "Installing Node.js dependencies..."
+                    // In a windows local environment we'll use bat, on linux we use sh
+                    if (isUnix()) {
+                        sh 'npm install'
+                    } else {
+                        bat 'npm install'
+                    }
+                }
+            }
+        }
+
+        stage('Run Tests') {
+            steps {
+                script {
+                    echo "Running automated tests..."
+                    if (isUnix()) {
+                        sh 'npm install --save-dev jest supertest' // Make sure they exist in the pipeline
+                        sh 'npx jest'
+                    } else {
+                        bat 'npm install --save-dev jest supertest'
+                        bat 'npx jest'
+                    }
+                }
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    echo "Building Docker image for local validation..."
+                    if (isUnix()) {
+                        sh 'docker build -f Dockerfile.local -t visual-learning-local:latest .'
+                    } else {
+                        bat 'docker build -f Dockerfile.local -t visual-learning-local:latest .'
+                    }
+                }
+            }
+        }
+        
+        // Optional: Deploy locally
+        stage('Deploy Local Container') {
+            steps {
+                script {
+                    echo "Deploying local container on port 4000..."
+                    if (isUnix()) {
+                        sh 'docker rm -f visual-learning-local-container || true'
+                        sh 'docker run -d --name visual-learning-local-container -p 4000:3000 visual-learning-local:latest'
+                    } else {
+                        bat 'docker rm -f visual-learning-local-container || exit 0'
+                        bat 'docker run -d --name visual-learning-local-container -p 4000:3000 visual-learning-local:latest'
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            echo 'Local Pipeline Evaluation Complete.'
+        }
+        success {
+            echo 'Local Pipeline Succeeded!'
+        }
+        failure {
+            echo 'Local Pipeline Failed.'
+        }
+    }
+}

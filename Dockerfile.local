@@ -1,0 +1,32 @@
+# Dockerfile.local
+# This Dockerfile is intended for testing the local CI pipeline for the visual-learning application
+
+# Use Node.js 20 on an Alpine base for a lightweight image, but we need TeX packages for rendering
+FROM node:20-alpine
+
+# Install necessary dependencies for dvisvgm and latex compilation
+RUN apk update && apk add --no-cache \
+    texlive-core \
+    texlive-latex-extra \
+    dvisvgm \
+    python3 \
+    make \
+    g++
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Copy package.json and package-lock.json
+COPY package*.json ./
+
+# Install npm dependencies
+RUN npm install
+
+# Copy the rest of the application files
+COPY . .
+
+# Expose the application port
+EXPOSE 3000
+
+# Start the application
+CMD ["npm", "start"]

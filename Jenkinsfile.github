@@ -1,0 +1,95 @@
+pipeline {
+    agent {
+        // Run this pipeline in a Docker container or natively; for simplicity we use any
+        // which implies running on the host that installed Jenkins
+        label 'any'
+    }
+
+    environment {
+        NODE_ENV = 'production'
+    }
+
+    // Triggers when a webhook event is received from GitHub (push)
+    triggers {
+        githubPush()
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                script {
+                    echo "Checking out code from GitHub..."
+                    // Automatically checks out the commit that triggered the build
+                    checkout scm
+                }
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                script {
+                    echo "Installing dependencies..."
+                    if (isUnix()) {
+                        sh 'npm ci'
+                    } else {
+                        bat 'npm ci'
+                    }
+                }
+            }
+        }
+
+        stage('Run Tests') {
+            steps {
+                script {
+                    echo "Running Jest tests..."
+                    // In a real pipeline, the environment variables like GROQ_API_KEY/GEMINI_API_KEY
+                    // should be injected via Jenkins Credentials manager if tests rely on them
+                    if (isUnix()) {
+                        sh 'npm install --save-dev jest supertest'
+                        sh 'npx jest'
+                    } else {
+                        bat 'npm install --save-dev jest supertest'
+                        bat 'npx jest'
+                    }
+                }
+            }
+        }
+
+        stage('Build Production Docker Image') {
+            steps {
+                script {
+                    echo "Building Production Docker Image..."
+                    if (isUnix()) {
+                        sh "docker build -f Dockerfile.github -t visual-learning-github:\${env.BUILD_ID} ."
+                        sh "docker tag visual-learning-github:\${env.BUILD_ID} visual-learning-github:latest"
+                    } else {
+                        bat 'docker build -f Dockerfile.github -t visual-learning-github:%BUILD_ID% .'
+                        bat 'docker tag visual-learning-github:%BUILD_ID% visual-learning-github:latest'
+                    }
+                }
+            }
+        }
+
+        stage('Deploy (Mock)') {
+            steps {
+                script {
+                    echo "In a real scenario, this would push visual-learning-github:\${env.BUILD_ID} to ECR/DockerHub or trigger a Kubernetes rollout."
+                    echo "For this project, the pipeline assumes deployment is customized further downstream."
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            echo 'GitHub Pipeline Complete.'
+            // Usually we might send email notifications or Slack messages here
+        }
+        success {
+            echo 'GitHub Deployment Successful!'
+        }
+        failure {
+            echo 'GitHub Deployment Failed.'
+        }
+    }
+}
