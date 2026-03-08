@@ -23,12 +23,12 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 script {
-                    echo "Installing application dependencies..."
+                    echo "Installing dependencies (including devDependencies)..."
 
                     if (isUnix()) {
-                        sh 'npm install'
+                        sh 'npm install --include=dev'
                     } else {
-                        bat 'npm install'
+                        bat 'npm install --include=dev'
                     }
                 }
             }
